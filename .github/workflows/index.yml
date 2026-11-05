@@ -19,3 +19,13 @@ jobs:
         with:
           node-version: 24
       - run: node scripts/build-index.mjs --check
+
+  # The checks Claude's plugin directory runs on its manifests, skills and .mcp.json
+  validate-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npx --yes @anthropic-ai/claude-code@2.1.311 plugin validate --strict .

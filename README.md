@@ -6,16 +6,24 @@ Agent skills for [Rollstack](https://www.rollstack.com), the AI presentation pla
 | --- | --- |
 | [`rollstack-getting-started`](skills/rollstack-getting-started/SKILL.md) | Connect to Rollstack and find your way around a workspace |
 | [`rollstack-build-deck`](skills/rollstack-build-deck/SKILL.md) | Build or change a deck from a dashboard, spreadsheet or CSV with the slides agent |
-| [`rollstack-refresh-and-schedule`](skills/rollstack-refresh-and-schedule/SKILL.md) | Refresh a report, schedule its updates and email it |
-
+| [`rollstack-refresh-and-schedule`](skills/rollstack-refresh-and-schedule/SKILL.md) | Refresh a report and schedule its updates |
+| [`rollstack-send-report-email`](skills/rollstack-send-report-email/SKILL.md) | Set a report's recipients, send a test, then email it once the user confirms |
 ## Install
 
 **Claude Code plugin** (the MCP server and the skills together):
 
 ```
+/plugin install rollstack --marketplace Rollstack/skills
+```
+
+Or in two steps, on Claude Code before 2.1.275:
+
+```
 /plugin marketplace add Rollstack/skills
 /plugin install rollstack@rollstack
 ```
+
+The plugin adds one remote MCP server, `https://api.rollstack.com/public/v1/mcp`, which you sign in to with your Rollstack account. It runs nothing on your machine.
 
 **Skills only**, with the [skills CLI](https://skills.sh):
 

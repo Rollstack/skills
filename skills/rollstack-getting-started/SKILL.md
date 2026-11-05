@@ -27,6 +27,8 @@ Start with these calls:
 2. `listReports`: their reports, newest first. Filter with `name`, `folderId` or `type`, and page with `cursor`.
 3. `listConnections`: the BI tools and data sources the organization has connected, such as Tableau, Power BI or Looker.
 
+To show the user a deck, call `showReport` with its id: clients that can show it, such as Claude, open a viewer with every slide.
+
 ## Know the two kinds of report
 
 A report's `type` decides what you can do with it:
@@ -45,4 +47,5 @@ Check `type` before you call any other tool on a report.
 ## Next
 
 - To build or change a deck, use the `rollstack-build-deck` skill.
-- To refresh, schedule or email a report, use the `rollstack-refresh-and-schedule` skill.
+- To refresh or schedule a report, use the `rollstack-refresh-and-schedule` skill.
+- To email a report, use the `rollstack-send-report-email` skill.
