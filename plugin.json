@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "rollstack",
+  "version": "1.0.0",
+  "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "homepage": "https://www.rollstack.com",
+  "repository": "https://github.com/Rollstack/skills",
+  "license": "MIT"
+}

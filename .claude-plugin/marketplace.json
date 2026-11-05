@@ -1,0 +1,15 @@
+{
+  "name": "rollstack",
+  "description": "Rollstack's official plugin: its MCP server and agent skills for building and sending data-driven decks.",
+  "owner": {
+    "name": "Rollstack",
+    "url": "https://www.rollstack.com"
+  },
+  "plugins": [
+    {
+      "name": "rollstack",
+      "source": "./",
+      "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills."
+    }
+  ]
+}
