@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "rollstack-build-deck",
+      "type": "skill-md",
+      "description": "Build or change a slide deck in Rollstack from company data, such as a BI dashboard, a spreadsheet or a CSV, with Rollstack's slides agent, then review and export it. Use when the user asks for a deck, QBR, business review, board pack or slides from their data in Rollstack.",
+      "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-build-deck/SKILL.md",
+      "digest": "sha256:c5566201680e5a94e50afcbae3198669daac155e0db632331c4a97bd64de1813"
+    },
+    {
+      "name": "rollstack-getting-started",
+      "type": "skill-md",
+      "description": "Connect to Rollstack, the AI presentation platform for business reporting, and find your way around a user's workspace. Use when the user mentions Rollstack, or wants slides or reports built from their company's data and Rollstack isn't connected yet.",
+      "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-getting-started/SKILL.md",
+      "digest": "sha256:f371da44e5d3a6f283e62c618f859f122b57c5dfc1e76c82eba7f21207acf970"
+    },
+    {
+      "name": "rollstack-refresh-and-schedule",
+      "type": "skill-md",
+      "description": "Keep a Rollstack report up to date and delivered. Refresh its data from the sources now, set when it updates on its own, and email it to its recipients. Use when the user wants a recurring report, such as a weekly business review, monthly board pack or QBR, refreshed, scheduled or sent.",
+      "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-refresh-and-schedule/SKILL.md",
+      "digest": "sha256:8d6ac0ffd96788ef419dadaa8f450fcc62c3b3356fbc356565cee3f5b3146356"
+    }
+  ]
+}
