@@ -10,13 +10,22 @@ Agent skills for [Rollstack](https://www.rollstack.com), the AI presentation pla
 
 ## Install
 
-With the [skills CLI](https://skills.sh):
+**Claude Code plugin** (the MCP server and the skills together):
+
+```
+/plugin marketplace add Rollstack/skills
+/plugin install rollstack@rollstack
+```
+
+**Skills only**, with the [skills CLI](https://skills.sh):
 
 ```bash
 npx skills add Rollstack/skills
 ```
 
 Or copy a skill's folder into your agent's skills directory, such as `~/.claude/skills/` for Claude Code.
+
+The repo is also an [Agent Plugin](https://agent-plugins.org): `plugin.json` and `mcp.json` at the root describe the same plugin for other clients.
 
 ## Connect Rollstack
 

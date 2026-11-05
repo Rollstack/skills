@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rollstack": {
+      "type": "http",
+      "url": "https://api.rollstack.com/public/v1/mcp"
+    }
+  }
+}
