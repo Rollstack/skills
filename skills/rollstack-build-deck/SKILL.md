@@ -42,6 +42,7 @@ Call `getReportMessage` with the `messageId`. It waits up to 30 seconds (`waitSe
 
 ## 5. Check the slides
 
+- `showReport` with the reply's `changedSlideIds` shows the user the deck in a viewer, opened on the first changed slide, with every changed slide marked. Clients that can't show the viewer, such as most coding agents, only get the slides' ids and titles back: use `getReportSlideImages` there.
 - `getReportSlideImages` with the reply's `changedSlideIds` renders them as images, at most 10 per call. Look for text that overflows, overlapping shapes and charts too small to read.
 - `getReportContent` with the same ids returns the titles, text and every chart's and table's values. Use it to check the numbers.
 

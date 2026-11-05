@@ -1,10 +1,10 @@
 ---
 name: rollstack-refresh-and-schedule
-description: Keep a Rollstack report up to date and delivered. Refresh its data from the sources now, set when it updates on its own, and email it to its recipients. Use when the user wants a recurring report, such as a weekly business review, monthly board pack or QBR, refreshed, scheduled or sent.
+description: Keep a Rollstack report up to date. Refresh its data from the sources now, and set when it updates, and so is emailed, on its own. Use when the user wants a recurring report, such as a weekly business review, monthly board pack or QBR, refreshed or scheduled.
 license: MIT
 ---
 
-# Refresh, schedule and send a Rollstack report
+# Refresh and schedule a Rollstack report
 
 Set up the connection first with the `rollstack-getting-started` skill. Start by reading the report with `getReport`. Its answer includes the report's `type`, its current `schedules`, `lastRunStatus`, and `running` (whether a run is going on now).
 
@@ -34,15 +34,8 @@ Rollstack checks schedules every 15 minutes, so every time must fall on `:00`, `
 
 ## Email it
 
-Only `SlideDeck` reports have email settings here.
-
-1. Call `getReportEmailConfig` to see who gets the email. A 404 means the email isn't set up yet: set the recipients with `updateReportEmailConfig` (`to`, and optionally `cc`, `bcc` and `replyTo`; at most 100 addresses).
-2. Call `sendReportTestEmail` to send it to the user only. Ask them to check it.
-3. Confirm the recipients with the user, then call `sendReportEmail`. It sends the report as it is now to everyone on the list, so refresh the report first if the user wants fresh numbers.
-
-You can also ask the slides agent to change the email or send it. It answers with an `email_send_proposal` or a `settings_proposal`: show the user what it would do, and approve it only if they say so.
+A scheduled run emails the report to its recipients when its email is set up, unless the email's `trigger` is `none`. A run started with `startReportRun` never does. To set the recipients, test the email or send it now, use the `rollstack-send-report-email` skill.
 
 ## Limits
 
-- 5 email sends a minute per user, test emails included.
-- Only the report's editors can change its schedules or send its email. A 403 means the user needs edit access, or the token lacks a scope (`slide_decks:write` for schedules, `slide_decks:email` for email).
+- Only the report's editors can change its schedules. A 403 means the user needs edit access, or the token lacks the `slide_decks:write` scope.
