@@ -8,6 +8,13 @@ Agent skills for [Rollstack](https://www.rollstack.com), the AI presentation pla
 | [`rollstack-build-deck`](skills/rollstack-build-deck/SKILL.md) | Build or change a deck from a dashboard, spreadsheet or CSV with the slides agent |
 | [`rollstack-refresh-and-schedule`](skills/rollstack-refresh-and-schedule/SKILL.md) | Refresh a report and schedule its updates |
 | [`rollstack-send-report-email`](skills/rollstack-send-report-email/SKILL.md) | Set a report's recipients, send a test, then email it once the user confirms |
+| [`rollstack-slides`](skills/rollstack-slides/SKILL.md) | Write a deck's slides yourself as HTML, check them and save them |
+| [`rollstack-data`](skills/rollstack-data/SKILL.md) | Bring a CSV or Excel file into a report and shape its data for charts |
+| [`rollstack-update-deck`](skills/rollstack-update-deck/SKILL.md) | Refresh a deck with new data and fix the slides it made wrong |
+| [`rollstack-edit-deck`](skills/rollstack-edit-deck/SKILL.md) | Change, add, move, remove, hide or show slides, keeping edits made in Rollstack |
+| [`rollstack-brand-deck`](skills/rollstack-brand-deck/SKILL.md) | Give a deck a brand's colours and fonts |
+| [`rollstack-check-figures`](skills/rollstack-check-figures/SKILL.md) | Check a deck's numbers against its data before it goes out |
+
 ## Install
 
 **Claude Code plugin** (the MCP server and the skills together):
