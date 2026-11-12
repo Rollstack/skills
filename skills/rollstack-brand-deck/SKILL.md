@@ -15,5 +15,3 @@ license: MIT
 7. The theme holds colours and fonts only. For a presentation's layouts and logo, tell the user to import it as a template in Rollstack, then switch the deck to it with `applyReportTemplate`.
 
 The change answers a `versionBeforeId`: restore it with `restoreReportVersion` when the user wants the old look back.
-
-When `updateReportTheme` is not among Rollstack's tools, it is not on for the user yet: ask Rollstack's slides agent with `sendReportMessage`.

@@ -11,6 +11,4 @@ Rollstack's MCP server hands out the guide to getting data in and shaping it, so
 1. Call `getReportDataGuide` once, before anything else. Read it and follow it.
 2. In short: send the file with `createDatasetUpload` when you have a shell, read a workbook's sheets with `getDataset` and add the range that starts at its header row, then add the file to the report with `addReportDatasheets` and use the datasheet ids it answers.
 3. Check every figure you will claim with `queryReportData`, and shape data a chart needs with `previewReportDatasheetChanges` until it answers `valid: true`. Save it with `saveReportDatasheetChanges` before you save the slides that show it.
-4. To write the slides themselves, follow the `rollstack-slides` skill.
-
-When `getReportDataGuide` is not among Rollstack's tools, they are not on for the user yet: upload a CSV with `createDataset`, add it with `addReportDatasheets` and pass the datasheet ids to the slides agent with `sendReportMessage`.
+4. To write the slides themselves, follow the `rollstack-slides` skill. To have Rollstack's slides agent build them, pass the datasheet ids to `sendReportMessage` as the `rollstack-build-deck` skill says.

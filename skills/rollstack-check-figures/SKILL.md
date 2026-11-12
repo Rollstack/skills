@@ -16,5 +16,3 @@ This is a read: change nothing unless the user asks you to fix what you find.
 6. Report each slide that is wrong: what it says, what the data says, and the query you checked it with. Say too which figures were typed in rather than tied to a datasheet, since those do not update when the data does: in a slide's draft from `getReportSlideHtml`, a tied one sits in an element with a `data-datasheet-id`.
 
 To fix what you found, follow the `rollstack-edit-deck` skill.
-
-When `queryReportData` is not among Rollstack's tools, it is not on for the user yet: read each datasheet's rows with `getReportDatasheetData` and say that totals over many rows could not be checked.

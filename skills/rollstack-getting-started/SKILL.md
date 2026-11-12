@@ -46,6 +46,6 @@ Check `type` before you call any other tool on a report.
 
 ## Next
 
-- To build or change a deck, use the `rollstack-build-deck` skill.
+- To build or change a deck, use the `rollstack-build-deck` skill to have Rollstack's slides agent do it, or the `rollstack-slides` and `rollstack-edit-deck` skills to write the slides yourself.
 - To refresh or schedule a report, use the `rollstack-refresh-and-schedule` skill.
 - To email a report, use the `rollstack-send-report-email` skill.

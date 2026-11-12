@@ -1,6 +1,6 @@
 ---
 name: rollstack-slides
-description: Design slides for a Rollstack slide deck yourself, as HTML, check each one with the Rollstack MCP tool renderReportSlides and save them with saveReportSlides. Use when the user asks you to build or redesign slides in Rollstack and wants you to write them, instead of asking Rollstack's own slides agent.
+description: Write the slides of a Rollstack slide deck yourself, as HTML, check each one with the Rollstack MCP tool renderReportSlides and save them with saveReportSlides. Use when the user wants to shape the slides with you, or gives you material Rollstack can't read, such as files or notes in this chat. To have Rollstack's slides agent build a whole deck in one call on the company template, use rollstack-build-deck instead.
 license: MIT
 ---
 
