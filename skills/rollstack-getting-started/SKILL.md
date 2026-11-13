@@ -12,8 +12,8 @@ Rollstack builds slide decks from a company's data, such as warehouses, BI dashb
 
 Rollstack's MCP server is `https://api.rollstack.com/public/v1/mcp` (Streamable HTTP).
 
-- **From an MCP client**, such as Claude or Cursor: add the URL as a remote MCP server. The client opens Rollstack's sign-in, the user approves the scopes, and the client gets a token. Nothing else to set up.
-- **From a script**: the user creates an API key in Rollstack under Settings → Connected apps and gives it to you. Send it as `Authorization: Bearer rsk_…`.
+- **From an MCP client**: add the URL as a remote MCP server. The client opens Rollstack's sign-in, the user approves the scopes, and the client gets a token. Nothing else to set up.
+- **From a script**: the script sends an API key the user created in Rollstack under Settings → Connected apps, from its environment, as `Authorization: Bearer rsk_…`. Never ask the user to paste a key into the chat.
 
 How to get credentials in detail, including scopes and errors: https://rollstack.com/auth.md
 
@@ -27,7 +27,7 @@ Start with these calls:
 2. `listReports`: their reports, newest first. Filter with `name`, `folderId` or `type`, and page with `cursor`.
 3. `listConnections`: the BI tools and data sources the organization has connected, such as Tableau, Power BI or Looker.
 
-To show the user a deck, call `showReport` with its id: clients that can show it, such as Claude, open a viewer with every slide.
+To show the user a deck, call `showReport` with its id: clients that can show it open a viewer with every slide.
 
 ## Know the two kinds of report
 

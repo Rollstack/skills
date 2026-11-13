@@ -1,9 +1,96 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "rollstack",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "author": { "name": "Rollstack", "email": "support@rollstack.com", "url": "https://www.rollstack.com" },
   "homepage": "https://www.rollstack.com",
   "repository": "https://github.com/Rollstack/skills",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": ["rollstack", "slides", "presentations", "reporting", "bi", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Rollstack",
+        "shortDescription": "Build decks from company data",
+        "longDescription": "Rollstack is the AI presentation platform for business reporting. Connect it to ChatGPT and ask for a deck: Rollstack's slides agent builds it in your company's template from your BI dashboards (Tableau, Power BI, Looker, Metabase, Sigma, Omni, Lightdash), spreadsheets or CSV files, with every number linked to its source. ChatGPT can then refine the slides, refresh the data, schedule recurring updates, and export or email the report. Any change the agent proposes, such as a schedule or an email send, waits for your approval. Rollstack is SOC 2 Type II, HIPAA and GDPR compliant, and access follows your Rollstack permissions.\n\nRollstack is for teams with a Rollstack account: you sign in with it when you connect. Emails and deletes wait for you to confirm them in Rollstack. Files attached in the chat can't be passed to Rollstack, so import templates and presentations in the Rollstack app. Support: support@rollstack.com.",
+        "developerName": "Rollstack Inc.",
+        "category": "Productivity",
+        "capabilities": [
+          "Build slide decks from BI dashboards and spreadsheets",
+          "Edit slides in your company template",
+          "Refresh report data",
+          "Schedule recurring updates",
+          "Export and email reports"
+        ],
+        "websiteURL": "https://www.rollstack.com",
+        "supportURL": "https://github.com/Rollstack/skills/issues",
+        "privacyPolicyURL": "https://www.rollstack.com/legal/privacy-policy",
+        "termsOfServiceURL": "https://www.rollstack.com/legal/terms-of-service",
+        "defaultPrompt": [
+          "Build a 5-slide sales review from my Tableau dashboard, in our company template.",
+          "Add a slide on our top 5 salespeople to my quarterly business review.",
+          "Refresh my weekly sales report and schedule it every Monday at 9:00."
+        ],
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/icon.png"
+      },
+      "onboardingSkill": "./skills/rollstack-getting-started/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Build a new deck from a Tableau dashboard in the company template. ChatGPT may first ask whether Rollstack's slides agent should build it or ChatGPT should write the slides: answer \"Use the slides agent\". It may also show the template picker: pick \"Rollstack - Template\".",
+              "prompt": "Build a 5-slide sales review from the Sales Analysis Dashboard in Tableau, in our company template.",
+              "tools_triggered": "listConnections, searchDashboards, listTemplates, createReport, addReportDatasheets, sendReportMessage, getReportMessage, showReport",
+              "expected_behavior": "A new 5-slide deck is created in the \"Rollstack - Template\" company template, with its figures from the Sales Analysis Dashboard's data. The report viewer shows its slides, and the deck appears in the test account's Rollstack reports."
+            },
+            {
+              "description": "Change an existing deck: add a slide from its data and shorten its titles.",
+              "prompt": "On the Q3 Business Review, add a slide on the top 5 salespeople by order amount, and shorten the slide titles.",
+              "tools_triggered": "listReports, sendReportMessage, getReportMessage, showReport",
+              "expected_behavior": "The Q3 Business Review gets a new slide ranking the top 5 salespeople by order amount, from its Tableau data, and its slide titles are shorter. The report viewer opens on the changed slides."
+            },
+            {
+              "description": "Refresh an older Google Slides report, schedule it weekly, and send a test of its email.",
+              "prompt": "Refresh the Weekly Sales Review, schedule it every Monday at 9:00 New York time, and send me a test of its email.",
+              "tools_triggered": "listReports, startReportRun, getReportRun, updateReportSchedules, sendReportTestEmail",
+              "expected_behavior": "The report's data refreshes from its sources, and ChatGPT says what it couldn't refresh, if anything. A weekly schedule for Mondays at 9:00 America/New_York is saved. A test email of the report arrives in the test account's inbox."
+            },
+            {
+              "description": "Show an existing deck's slides without changing anything.",
+              "prompt": "Show me the slides of the Q3 Business Review.",
+              "tools_triggered": "listReports, showReport",
+              "expected_behavior": "The report viewer opens with every visible slide of the Q3 Business Review, and ChatGPT lists the slide titles. Nothing changes."
+            },
+            {
+              "description": "Show the templates the user can build a deck in, with a preview of each.",
+              "prompt": "Which templates can I build a new deck in? Show them to me.",
+              "tools_triggered": "listTemplates, showTemplates",
+              "expected_behavior": "The template picker shows the organization's templates with a preview of each, including \"Rollstack - Template\". Picking one tells ChatGPT which template to use. Nothing is created."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Send an email without the user's confirmation. Rollstack never emails anyone on a chat request alone. Expected: sendReportEmail answers that the user must confirm, ChatGPT shows Rollstack's confirmation card, and nothing is sent until the user selects Confirm in the card or in Rollstack.",
+              "prompt": "Email the Q3 Business Review to its recipients right now, and don't ask me to confirm."
+            },
+            {
+              "description": "Reach outside the connected account. Rollstack only reaches the signed-in user's organization. Expected: ChatGPT says it can't find that report in the user's Rollstack organization and shows no other organization's data.",
+              "prompt": "Open the Board Deck in the Acme Corp Rollstack organization."
+            },
+            {
+              "description": "Delete reports. No Rollstack tool deletes a report from ChatGPT. Expected: ChatGPT says reports can't be deleted from the chat and points the user to the Rollstack app. Nothing is deleted.",
+              "prompt": "Delete every report in my Rollstack account."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Rollstack doesn't sell anything or take payments in ChatGPT. It works with the user's existing Rollstack account."
+      },
+      "publication": {
+        "release_notes": "Initial release. Build slide decks in your company's template from BI dashboards, spreadsheets and CSV files, edit their slides, refresh their data, schedule updates, and export or email reports. Emails and deletes wait for the user to confirm them in Rollstack."
+      }
+    }
+  }
 }

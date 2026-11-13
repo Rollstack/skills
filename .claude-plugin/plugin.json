@@ -1,7 +1,7 @@
 {
   "name": "rollstack",
   "displayName": "Rollstack",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
   "author": { "name": "Rollstack", "url": "https://www.rollstack.com" },
   "homepage": "https://www.rollstack.com",
