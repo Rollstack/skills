@@ -34,7 +34,7 @@ To show the user a deck, call `showReport` with its id: clients that can show it
 A report's `type` decides what you can do with it:
 
 - **`SlideDeck`**: a deck built in Rollstack. Every tool works on it, including the slides agent, exports and email.
-- **Any other type**: an older report that updates a Google Slides, Google Docs, PowerPoint or Word file, or sends an email. Only `getReport`, `updateReport`, sharing, schedules and runs work on it.
+- **Any other type**: an older report that updates a Google Slides, Google Docs, PowerPoint or Word file, or sends an email. Only `getReport`, `updateReport`, sharing, schedules, runs, email, sent emails, `listReportSyncs` and bursts work on it.
 
 Check `type` before you call any other tool on a report.
 
@@ -49,3 +49,4 @@ Check `type` before you call any other tool on a report.
 - To build or change a deck, use the `rollstack-build-deck` skill to have Rollstack's slides agent do it, or the `rollstack-slides` and `rollstack-edit-deck` skills to write the slides yourself.
 - To refresh or schedule a report, use the `rollstack-refresh-and-schedule` skill.
 - To email a report, use the `rollstack-send-report-email` skill.
+- To make one version of a report per client, region or team, use the `rollstack-burst-reports` skill.
