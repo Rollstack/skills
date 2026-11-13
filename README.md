@@ -14,6 +14,7 @@ Agent skills for [Rollstack](https://www.rollstack.com), the AI presentation pla
 | [`rollstack-edit-deck`](skills/rollstack-edit-deck/SKILL.md) | Change, add, move, remove, hide or show slides, keeping edits made in Rollstack |
 | [`rollstack-brand-deck`](skills/rollstack-brand-deck/SKILL.md) | Give a deck a brand's colours and fonts |
 | [`rollstack-check-figures`](skills/rollstack-check-figures/SKILL.md) | Check a deck's numbers against its data before it goes out |
+| [`rollstack-burst-reports`](skills/rollstack-burst-reports/SKILL.md) | Make one version of a report per client, region or team, set each one's recipients, and run or send them |
 
 ## Install
 

@@ -10,14 +10,15 @@ Rollstack's slides agent builds and edits decks the way its chat does in the app
 
 ## 1. Pick or create the report
 
-- **An existing deck**: find it with `listReports` (filter by `name`). Its `type` must be `SlideDeck`.
-- **A new deck**: call `createReport` with a `name`, and a `folderId` from `listFolders` if the user wants it in a folder. To start from the company's design, pass `templateDeckId`, the id of a deck that has it. The new report gets that deck's theme and layouts, but none of its slides.
+- **An existing deck**: find it with `listReports` (filter by `name`). Its `type` must be `SlideDeck`. To move it to another template, use `applyReportTemplate`.
+- **A new deck**: call `createReport` with a `name`, and a `folderId` from `listFolders` if the user wants it in a folder. To build it in the company's design, find the templates with `listTemplates`, or let the user pick one by its look with `showTemplates`, ask the user which one when the company has its own, and pass it as `templateId`. `templateDeckId` instead takes the design of another deck. Either way the new report gets the theme and layouts, but none of the slides.
 
 ## 2. Add the data
 
 The agent builds slides from datasheets on the report. Add the sources it needs:
 
 - **A BI dashboard** (Tableau, Power BI, Looker, Metabase, Sigma, Omni, Lightdash): search with `searchDashboards` using the name the user gives, confirm the right one with the user, optionally check its tabs with `getDashboard`, then add it with `addReportDatasheets`.
+- **A Snowflake or Databricks table**: search with `searchTables` using the name the user gives, confirm the right one with the user, then add it with `addReportDatasheets`. The slides agent queries it in the warehouse.
 - **A Google Sheets or Excel file** the user has added in Rollstack: find it with `searchSpreadsheets`, then add a range with `addReportDatasheets`.
 - **A CSV**: upload it with `createDataset` (a header row, at most 10 MB), then add it with `addReportDatasheets`. For a large file, the REST endpoint is better than writing the CSV into a tool call.
 

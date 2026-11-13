@@ -13,7 +13,14 @@
       "type": "skill-md",
       "description": "Build or change a whole slide deck in Rollstack from company data, such as a BI dashboard, a spreadsheet or a CSV, with Rollstack's slides agent, which does it in one call on the company template, then review and export it. Use when the user asks Rollstack for a deck, QBR, business review, board pack or slides from their data. To write or shape the slides yourself with the user, use rollstack-slides instead.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-build-deck/SKILL.md",
-      "digest": "sha256:cd68de9cedfb1d2809a4285a6fd512149d10fb82f2159df4298503872f17f419"
+      "digest": "sha256:0fc15aea577a497ec98e1bb27f97ce39d41ae1398e533e312a6cfedfca3464f1"
+    },
+    {
+      "name": "rollstack-burst-reports",
+      "type": "skill-md",
+      "description": "Make one version of a Rollstack report per client, region, team or other value with a burst, set who each version is emailed to, then run or send them all, with the Rollstack MCP tools getReportParameters, createBurst, addBurstVariants, updateBurstVariantRecipients, startBurstRun and sendBurstVariantEmails. Use when the user wants the same report for every customer, region or team, or asks about a burst. For a single report, use rollstack-refresh-and-schedule or rollstack-send-report-email instead.",
+      "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-burst-reports/SKILL.md",
+      "digest": "sha256:2d275c542466db7a5b5894315fdb00ede20b85d2e17ea233ee52a9f7a59f4315"
     },
     {
       "name": "rollstack-check-figures",
@@ -41,21 +48,21 @@
       "type": "skill-md",
       "description": "Connect to Rollstack, the AI presentation platform for business reporting, and find your way around a user's workspace. Use when the user mentions Rollstack, or wants slides or reports built from their company's data and Rollstack isn't connected yet.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-getting-started/SKILL.md",
-      "digest": "sha256:4feddc0e13a66f9bd18cdef930bd98afa7eb1ef2de8b3b1a40bfb9e18e24bc2e"
+      "digest": "sha256:e665d9f3e695f9c362f956b634afb1cf7a0d290738410ef60b1e47c9d04b5771"
     },
     {
       "name": "rollstack-refresh-and-schedule",
       "type": "skill-md",
       "description": "Keep a Rollstack report up to date. Refresh its data from the sources now, and set when it updates, and so is emailed, on its own. Use when the user wants a recurring report, such as a weekly business review, monthly board pack or QBR, refreshed or scheduled.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-refresh-and-schedule/SKILL.md",
-      "digest": "sha256:bf969a69de2b1e94d8bcd71a4cfc235e22227169b777391092e39a369039a55e"
+      "digest": "sha256:918c44c9c432e5e807afd3c6fa458c064bff02604dc431c26a7c4e00ac8e4d86"
     },
     {
       "name": "rollstack-send-report-email",
       "type": "skill-md",
       "description": "Set who a Rollstack report is emailed to, check the email with a test send, and send it to its recipients only after the user confirms them. Use when the user wants to email a deck or report from Rollstack, change its recipients, sender or attachment, or have its scheduled updates email it.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-send-report-email/SKILL.md",
-      "digest": "sha256:38510ebb7d04bbcb080c45ffb7d2830f686999f1ba4595f009e918c98dc3b7cb"
+      "digest": "sha256:5991aaa6fc6649f9731920f7bddd233d423ea05b18a5bdd1f6e72150bc8804bd"
     },
     {
       "name": "rollstack-slides",

@@ -8,7 +8,7 @@ license: MIT
 
 An email goes to real people and can't be unsent. Show the user who gets it before anything is sent, and send a test first. Set up the connection with the `rollstack-getting-started` skill.
 
-Only `SlideDeck` reports have email settings here. Check the report's `type` with `getReport` first.
+Reports of any type have email settings here. Check the report's `type` with `getReport` first: on an older report that sends to several recipient groups, `updateReportEmailConfig` answers 400, and the user changes them in the app.
 
 ## 1. Read the current setup
 
@@ -53,7 +53,7 @@ It answers 400 when the report has no recipients. The send runs in the backgroun
 - `all` (the default) or `scheduled`: each run started by one of the report's schedules sends it, once every datasheet updated. Set the schedules with the `rollstack-refresh-and-schedule` skill.
 - `none`: only `sendReportEmail` or the app sends it.
 
-Runs started with `startReportRun` or from the app never send it. A scheduled run in which a datasheet failed sends nothing, unless the failure is listed in `ignoredFailureStatusMessages`.
+On a `SlideDeck` report, runs started with `startReportRun` or from the app never send it. On an older report, `all` also sends it after a run of the whole report started with `startReportRun` or from the app. A scheduled run in which a datasheet failed sends nothing, unless the failure is listed in `ignoredFailureStatusMessages`.
 
 ## When the slides agent proposes it
 
@@ -64,6 +64,10 @@ The user can ask the slides agent to change the email or send it. Its reply is a
 3. After approving a send, follow it with `getReportMessage` until its status is `sent`, `partially_sent`, `failed` or `unconfirmed`.
 
 Approving a send answers 409 while the report is still updating, such as after a filter change in the same message. Wait for the update, then approve again.
+
+## Did it go out
+
+`listReportEmails` lists the emails a report sent, newest first: when, to whom, and whether each was delivered, failed or opened. To check many reports at once, or a burst's emails, use `listEmails`.
 
 ## Limits
 

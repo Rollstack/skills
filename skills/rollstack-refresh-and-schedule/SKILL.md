@@ -18,7 +18,7 @@ Set up the connection first with the `rollstack-getting-started` skill. Start by
 
 `updateReportSchedules` **replaces** all of a report's schedules, at most 10. So:
 
-1. Read the current schedules from `getReport`.
+1. Read the current schedules with `getReportSchedules`.
 2. Show the user the full list you're about to set, the existing ones they want to keep included, and get their go.
 3. Send the whole list.
 
@@ -34,7 +34,11 @@ Rollstack checks schedules every 15 minutes, so every time must fall on `:00`, `
 
 ## Email it
 
-A scheduled run emails the report to its recipients when its email is set up, unless the email's `trigger` is `none`. A run started with `startReportRun` never does. To set the recipients, test the email or send it now, use the `rollstack-send-report-email` skill.
+A scheduled run emails the report to its recipients when its email is set up, unless the email's `trigger` is `none`. On a `SlideDeck` report, a run started with `startReportRun` never does. On an older report, a run of the whole report started with `startReportRun` emails it too when its `trigger` is `all`: tell the user who would get it before you start the run, and Rollstack asks them to confirm it. To set the recipients, test the email or send it now, use the `rollstack-send-report-email` skill.
+
+## Why an update failed
+
+`listReportRuns` lists the runs that ended, newest first, with what started each and why it failed. On an older report, `listReportSyncs` shows how each sync did and why it failed: pass the failed ones as `syncIds` to `startReportRun` to update only those.
 
 ## Limits
 
