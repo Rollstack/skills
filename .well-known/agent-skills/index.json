@@ -20,7 +20,7 @@
       "type": "skill-md",
       "description": "Check that the numbers and claims on a Rollstack slide deck match its data, with the Rollstack MCP tools getReportContent, listReportDatasheets and queryReportData, and report what is wrong. Use when the user asks you to check, verify, audit or proofread the numbers of a deck before it goes out.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-check-figures/SKILL.md",
-      "digest": "sha256:e9feb032f2c62cdfda8a1afa694209b7de662974c429e4c7bda9327a0f7d17b3"
+      "digest": "sha256:336cd65ec86221ed6763234f6bebd84dbccd32d4bc1dd0f09d292f5439a92ea9"
     },
     {
       "name": "rollstack-data",
