@@ -3,7 +3,12 @@
   "mcpServers": {
     "rollstack": {
       "type": "streamable-http",
-      "url": "https://api.rollstack.com/public/v1/mcp"
+      "url": "https://api.rollstack.com/public/v1/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": { "type": "oauth", "client": { "mode": "dcr" } }
+        }
+      }
     }
   }
 }

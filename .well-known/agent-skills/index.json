@@ -48,7 +48,7 @@
       "type": "skill-md",
       "description": "Connect to Rollstack, the AI presentation platform for business reporting, and find your way around a user's workspace. Use when the user mentions Rollstack, or wants slides or reports built from their company's data and Rollstack isn't connected yet.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-getting-started/SKILL.md",
-      "digest": "sha256:e665d9f3e695f9c362f956b634afb1cf7a0d290738410ef60b1e47c9d04b5771"
+      "digest": "sha256:a4ffb223ff6f386a6da39a14ab7b0bf1a2349307f5555680e590ee485c1e8852"
     },
     {
       "name": "rollstack-refresh-and-schedule",
