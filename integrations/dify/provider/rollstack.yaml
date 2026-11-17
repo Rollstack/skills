@@ -1,0 +1,38 @@
+identity:
+  author: rollstack
+  name: rollstack
+  label:
+    en_US: Rollstack
+  description:
+    en_US: Rollstack is the AI presentation platform for business reporting. Build slide decks from your company's data, in your own template, and keep them up to date.
+  icon: icon.png
+  tags:
+    - productivity
+    - business
+credentials_for_provider:
+  rollstack_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Rollstack API key
+    placeholder:
+      en_US: Starts with rsk_
+    help:
+      en_US: Create an API key in Rollstack, under Settings > Connected apps
+    url: https://app.rollstack.com/settings/connected-apps
+tools:
+  - tools/list_reports.yaml
+  - tools/get_report.yaml
+  - tools/list_templates.yaml
+  - tools/create_report.yaml
+  - tools/send_report_message.yaml
+  - tools/get_report_message.yaml
+  - tools/get_report_content.yaml
+  - tools/start_report_run.yaml
+  - tools/get_report_run.yaml
+  - tools/get_report_schedules.yaml
+  - tools/update_report_schedules.yaml
+  - tools/export_report.yaml
+extra:
+  python:
+    source: provider/rollstack.py

@@ -1,0 +1,62 @@
+identity:
+  name: getReportRun
+  author: rollstack
+  label:
+    en_US: "Get report run"
+description:
+  human:
+    en_US: "A run's status and the datasheets, or visualizations on a report of another type than SlideDeck, it could not refresh."
+  llm: "A run's status and the datasheets, or visualizations on a report of another type than SlideDeck, it could not refresh. Waits up to waitSeconds for the run to end and answers as soon as it does, so call it again while the status is running. A user's later run of the report reuses the id, so this describes the latest one."
+parameters:
+  - name: id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Report ID"
+    human_description:
+      en_US: "The report to act on, of any type, by its id from listReports or createReport."
+    llm_description: "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+  - name: runId
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Run ID"
+    human_description:
+      en_US: "The run, by the runId that startReportRun returned."
+    llm_description: "The run, by the `runId` that `startReportRun` returned. Runs of a report started by the same member share one id, so it always refers to that member's latest run of the report."
+  - name: waitSeconds
+    type: number
+    required: false
+    form: llm
+    label:
+      en_US: "Wait seconds"
+    human_description:
+      en_US: "How long this call waits for the work to finish, in seconds: the message to the slides agent on getReportMessage, the run on getReportRun, the batch of variants being added on getBurstVariantBatch, the runs of a burst's variants on getBurstRun."
+    llm_description: "How long this call waits for the work to finish, in seconds: the message to the slides agent on `getReportMessage`, the run on `getReportRun`, the batch of variants being added on `getBurstVariantBatch`, the runs of a burst's variants on `getBurstRun`. It returns as soon as the work is done, or as things stand once the time is up, so call it again while `status` is still `queued` or `running`. `0` returns at once. Defaults to `20`; at most `30`."
+    min: 0
+    max: 30
+output_schema:
+  type: object
+  properties:
+    runId:
+      type: string
+      description: "Identifies the run, as returned by `startReportRun`."
+    status:
+      type: string
+      description: "Where the run stands."
+    startedAt:
+      type: string
+      description: "When the run started."
+    finishedAt:
+      type: string
+      description: "When the run ended, whatever its outcome."
+    errors:
+      type: array
+      items:
+        type: object
+      description: "The datasheets, or visualizations on a report of another type than `SlideDeck`, the run could not refresh, each with the reason."
+extra:
+  python:
+    source: tools/get_report_run.py
