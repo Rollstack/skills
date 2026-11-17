@@ -1,0 +1,27 @@
+name: Publish to ClawHub
+
+# Publishes the plugin to ClawHub, OpenClaw's registry. It runs only when someone starts it from the Actions tab,
+# and it only previews unless "publish" is ticked. A real publish needs the CLAWHUB_TOKEN secret: a ClawHub API
+# token allowed to publish for the owner named in scripts/publish-clawhub.mjs
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish for real. Left unticked, the run only previews and uploads nothing
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  clawhub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: node scripts/publish-clawhub.mjs ${{ inputs.publish && '--publish' || '' }}
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
