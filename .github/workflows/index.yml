@@ -21,6 +21,8 @@ jobs:
       - run: node scripts/build-index.mjs --check
       # Each client reads its own manifest, so one left at an old version would keep that client's users on it
       - run: node scripts/check-versions.mjs
+      # Fails when mcp.json has a field Agent Plugins v1 doesn't allow, which makes strict clients skip the server
+      - run: node scripts/build-chatgpt-zip.mjs
 
   # The checks Claude's plugin directory runs on its manifests, skills and .mcp.json
   validate-plugin:

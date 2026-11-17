@@ -1,0 +1,7 @@
+{
+  "rollstack": {
+    "com.openai": {
+      "auth": { "type": "oauth", "client": { "mode": "dcr" } }
+    }
+  }
+}
