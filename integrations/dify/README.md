@@ -46,18 +46,22 @@ The slides agent, exports and slide content work on reports whose type is `Slide
 
 ### In an Agent app
 
-Add the tools, then ask in plain words. For example:
+Add the tools, then ask in plain words. These requests work in any Rollstack account, one after the other, because they start from a new deck:
 
-- "Find my Q3 business review and add a slide on the top 5 accounts by revenue."
-- "Refresh the weekly sales report and tell me what could not be refreshed."
-- "Update the board report every Monday at 9:00, Paris time."
-- "Export the Q3 business review as a PDF."
+- "Create a new deck called Alphabet 2025, and ask the slides agent for five slides on Alphabet's 2025 financial results."
+- "What do the slides say?"
+- "Ask the slides agent to shorten the slide titles."
+- "Export the deck as a PDF."
+- "Update the deck every Monday at 9:00, Paris time, then show me its schedules."
 
-A system prompt along these lines helps the agent use them well:
+The same requests work on the reports you already have: name the report instead of creating one.
+
+A system prompt along these lines helps the agent use the tools well:
 
 ```text
-You help the user with their Rollstack reports. Find a report with listReports before you act on it, and check its
-type. To build or change slides, send the request to the slides agent with sendReportMessage, then call
+You help the user with their Rollstack reports. For a new deck, create it with createReport, in a template from
+listTemplates when the user wants one. For an existing report, find it with listReports and check its type before you
+act on it. To build or change slides, send the request to the slides agent with sendReportMessage, then call
 getReportMessage until its status is completed or failed. If a reply asks questions, ask the user. If a reply
 proposes a change, tell the user to review it in Rollstack: nothing changes until they approve it there. Before you
 replace schedules, read the current ones and show the user the full list you are about to save.
@@ -74,7 +78,7 @@ Work that takes a while answers at once and is followed with a second tool:
 
 Lists of ids, such as `slideIds`, are text separated by commas. `schedules` and `answers` are JSON text: an array of objects, described in each parameter.
 
-For example, to export a deck once it has refreshed: `listReports` (name) → `startReportRun` (id) → `getReportRun` in a Loop (id, runId) → `exportReport` (id, format `pdf`), then use the `url` it returns within 15 minutes.
+For example, to build a deck and export it: `createReport` (name) → `sendReportMessage` (id, content) → `getReportMessage` in a Loop (id, messageId) → `exportReport` (id, format `pdf`), then use the `url` it returns within 15 minutes.
 
 ## What waits for you
 

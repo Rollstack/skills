@@ -35,7 +35,7 @@ ROLLSTACK_LIVE=1 .venv/bin/python -m pytest tests/test_live.py
 
 ## Try it in Dify
 
-Nothing replaces a run in a real workspace with a real key. Copy `.env.example` to `.env`, fill in the host and key your Dify workspace shows under Debugging, then run `.venv/bin/python -m main` from this folder. The plugin appears in the workspace while the process runs: authorize it with a Rollstack API key and call the tools from an agent or a workflow.
+Nothing replaces a run in a real workspace with a real key. Copy `.env.example` to `.env`, fill in the host and key your Dify workspace shows under Debugging, then run `.venv/bin/python -m main` from this folder. The plugin appears in the workspace while the process runs: authorize it with a Rollstack API key and call the tools from an agent or a workflow. The steps under "How to test" in [marketplace/pull-request.md](marketplace/pull-request.md) go through every tool and work in any Rollstack account.
 
 ## Package and validate
 

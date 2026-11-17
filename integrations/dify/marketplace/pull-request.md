@@ -4,7 +4,8 @@
 The body of the pull request to langgenius/dify-plugins that adds rollstack/rollstack/rollstack-0.0.1.difypkg.
 Title: add rollstack 0.0.1
 Before opening it:
-1. Run the plugin in a Dify workspace with a Rollstack API key (see "Try it in Dify" in DEVELOPMENT.md).
+1. Run the plugin in a Dify workspace with a Rollstack API key (see "Try it in Dify" in DEVELOPMENT.md), following the
+   "How to test" steps under "Reviewer notes", and correct any step that doesn't go as written.
 2. Tick the three boxes left open under "Required checks": the first two are your own statement, the third is that run.
 3. Replace the "Not yet run in a Dify workspace" paragraph under "Reviewer notes" with what you tested and on which Dify version.
 These comments are not shown on the pull request.
@@ -143,6 +144,17 @@ $ ROLLSTACK_LIVE=1 python -m pytest tests/test_live.py
 
 **Why the tools call Rollstack's MCP endpoint.** `POST /public/v1/mcp` is a documented, fixed HTTPS endpoint of Rollstack's API that takes one JSON-RPC `tools/call` per request. The plugin uses it rather than the REST routes because there Rollstack requires the user's confirmation for any call that emails people, whatever the kind of credential.
 
-**Reviewing with an account.** Rollstack is for teams that have an account: a company starts at https://www.rollstack.com/book-a-demo. Without a key, the key check and every tool return Rollstack's `api-key-invalid` error.
+**How to test.** Rollstack is for teams that have an account: a company starts at https://www.rollstack.com/book-a-demo. Without a key, the key check and every tool return Rollstack's `api-key-invalid` error. With a key that has the three scopes, these steps work in any Rollstack account: they start from a new deck and need no existing report, template or data source.
+
+1. `createReport` with a `name`, such as `Alphabet 2025`. It returns the new deck's `id`, used in every step below.
+2. `sendReportMessage` with `content` set to `Build five slides on Alphabet's 2025 financial results`. It returns a `messageId`.
+3. `getReportMessage` with that `messageId`, again while `status` is `queued` or `running`. The slides agent's reply is in `replies`. If it asks a question (a `clarification` reply), answer with another `sendReportMessage` that passes the same `chatId`.
+4. `getReportContent` returns the titles and text of the slides.
+5. `exportReport` with `format` set to `pdf` returns a `url` that downloads the deck, valid for 15 minutes.
+6. `updateReportSchedules` with `schedules` set to `[{"frequency": "weekly", "cronExpression": "0 9 * * 1", "startDate": "2026-01-05T09:00:00Z", "timezone": "Europe/Paris"}]`, then `getReportSchedules`, which lists it. `updateReportSchedules` with `[]` removes it.
+7. `startReportRun` returns a `runId`, and `getReportRun` follows the run until it ends.
+8. `listReports` with `name` set to the deck's name finds it, `getReport` reads it, and `listTemplates` lists the templates a deck can be created in.
+
+In an Agent app, the example requests in the README's Usage section do the same in plain words.
 
 <!-- Optional: say here how a reviewer can get a test key, if you want to offer one. -->
