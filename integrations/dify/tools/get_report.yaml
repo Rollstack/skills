@@ -1,0 +1,46 @@
+identity:
+  name: getReport
+  author: rollstack
+  label:
+    en_US: "Get report"
+description:
+  human:
+    en_US: "A report of any type with its schedules, who it is shared with and who is emailed when a run fails. lastRunStatus and running tell how its latest run went and whether one is going, and appUrl opens it in Rollstack. type tells which other endpoints work on it."
+  llm: "A report of any type with its schedules, who it is shared with and who is emailed when a run fails. lastRunStatus and running tell how its latest run went and whether one is going, and appUrl opens it in Rollstack. type tells which other endpoints work on it."
+parameters:
+  - name: id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Report ID"
+    human_description:
+      en_US: "The report to act on, of any type, by its id from listReports or createReport."
+    llm_description: "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: "Unique identifier for the report."
+    name:
+      type: string
+      description: "Name of the report, as members see it in Rollstack."
+    type:
+      type: string
+      description: "The kind of report, which decides the endpoints that work on it."
+    folderId:
+      type: string
+      description: "The folder the report is in, by its `id` in `listFolders`."
+    appUrl:
+      type: string
+      description: "Link that opens the report in Rollstack."
+    running:
+      type: boolean
+      description: "Whether a run of the report is in progress, whoever started it, such as you with `startReportRun`, a member in the app, or one of its schedules."
+    lastRunStatus:
+      type: string
+      description: "How the report's latest run ended."
+extra:
+  python:
+    source: tools/get_report.py

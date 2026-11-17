@@ -1,0 +1,39 @@
+identity:
+  name: getReportContent
+  author: rollstack
+  label:
+    en_US: "Get report content"
+description:
+  human:
+    en_US: "What a viewer sees on a report's visible slides: titles, text, and each chart's and table's values."
+  llm: "What a viewer sees on a report's visible slides: titles, text, and each chart's and table's values. On a long report, pass slideIds for only the slides you need, such as a reply's changedSlideIds."
+parameters:
+  - name: id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Report ID"
+    human_description:
+      en_US: "The report to act on, by its id from listReports or createReport."
+    llm_description: "The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report's link in Rollstack: it's the part right after `/slides/`."
+  - name: slideIds
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Slide IDs"
+    human_description:
+      en_US: "The slides to return, from a reply's changedSlideIds or an earlier getReportContent call."
+    llm_description: "The slides to return, from a reply's `changedSlideIds` or an earlier `getReportContent` call. If omitted, every visible slide is returned. Hidden slides and ids that are not slides of the report are ignored. Up to 20 ids: repeat the parameter for each one, as in `?slideIds=a&slideIds=b`. Pass the ids as text, separated by commas."
+output_schema:
+  type: object
+  properties:
+    slides:
+      type: array
+      items:
+        type: object
+      description: "The report's visible slides in report order, or only those in `slideIds`."
+extra:
+  python:
+    source: tools/get_report_content.py

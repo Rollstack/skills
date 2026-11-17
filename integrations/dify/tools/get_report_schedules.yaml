@@ -1,0 +1,30 @@
+identity:
+  name: getReportSchedules
+  author: rollstack
+  label:
+    en_US: "List schedules"
+description:
+  human:
+    en_US: "The schedules of a report of any type, with the syncs each updates and when each runs next, or null for one that never runs again."
+  llm: "The schedules of a report of any type, with the syncs each updates and when each runs next, or null for one that never runs again. Read them before `updateReportSchedules`, which replaces them all."
+parameters:
+  - name: id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Report ID"
+    human_description:
+      en_US: "The report to act on, of any type, by its id from listReports or createReport."
+    llm_description: "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+output_schema:
+  type: object
+  properties:
+    schedules:
+      type: array
+      items:
+        type: object
+      description: "The schedules of a report of any type, with the syncs each updates and when each runs next, or null for one that never runs again."
+extra:
+  python:
+    source: tools/get_report_schedules.py

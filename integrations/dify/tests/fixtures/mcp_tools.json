@@ -1,0 +1,828 @@
+{
+  "source": "https://api.rollstack.com/public/v1/mcp (tools/list)",
+  "tools": [
+    {
+      "name": "listReports",
+      "title": "List reports",
+      "description": "The reports the user can see, of every type, newest first. Each report's type tells which endpoints work on it: the slides agent, exports, content, datasheets, parameters, templates, duplicating and ownership transfer take SlideDeck reports only, and syncs take the other types only. You can filter by folderId, name and type; when several are set, all must match, and name matching ignores case. Answers up to limit reports, 50 by default and 200 at most, and a nextCursor: pass it as cursor for the next page, until it is null.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "description": "Options for the call, such as filters, paging or how long to wait",
+            "type": "object",
+            "properties": {
+              "folderId": {
+                "description": "Only return reports directly in this folder, by its `id` from `listFolders`. Reports in its subfolders aren't included.",
+                "examples": [
+                  "a3d5e7f9-1b2c-4d6e-8f0a-1b2c3d4e5f6a"
+                ],
+                "type": "string"
+              },
+              "name": {
+                "description": "Only return reports whose name contains this text, ignoring case: `review` matches `Q3 Business Review`.",
+                "examples": [
+                  "business review"
+                ],
+                "type": "string",
+                "minLength": 1
+              },
+              "type": {
+                "description": "Only return reports of this `type`, such as `SlideDeck` for the reports that the slides agent, exports and datasheets work on.",
+                "examples": [
+                  "SlideDeck"
+                ],
+                "type": "string",
+                "enum": [
+                  "GoogleDocs",
+                  "GoogleSlides",
+                  "MicrosoftPowerPoint",
+                  "MicrosoftWord",
+                  "Email",
+                  "UploadedPPTXFile",
+                  "SlideDeck"
+                ]
+              },
+              "limit": {
+                "default": 50,
+                "description": "Maximum number of reports to return on this page, from 1 to 200. Defaults to `50`.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              "cursor": {
+                "description": "Where to continue the list: pass the `nextCursor` returned with the previous page to get the next one. Omit it for the first page.",
+                "examples": [
+                  "6c1f9a2e-3b4d-4e8f-9a1b-2c3d4e5f6a7b"
+                ],
+                "type": "string"
+              }
+            }
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "List reports",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "getReport",
+      "title": "Get report",
+      "description": "A report of any type with its schedules, who it is shared with and who is emailed when a run fails. lastRunStatus and running tell how its latest run went and whether one is going, and appUrl opens it in Rollstack. type tells which other endpoints work on it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Get report",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "listTemplates",
+      "title": "List templates",
+      "description": "The templates the user can build a slide deck in: their company's, with who imported each and whether it is shared with the organization, then Rollstack's own. Pass a template's id as templateId to createReport or applyReportTemplate.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "List templates",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "createReport",
+      "title": "Create report",
+      "description": "Creates a report of type SlideDeck, in a folder the user can see when folderId is set. It starts empty, in the look of a saved template from listTemplates when templateId is set, or of another report when templateDeckId is set: its theme, masters and layouts, without its slides. Ask the user which template to use when the organization has company templates. With link, it imports an existing deck instead, with its slides: a PowerPoint file in OneDrive or SharePoint, or a Google Slides presentation, read with the user's own Microsoft or Google account. Rollstack can open only the Google Slides presentations the user picked in Rollstack before, so a link to one they never did answers 422. Over REST, it also imports a PowerPoint (.pptx) file sent as multipart/form-data in the file field, with name and folderId as fields beside it; a report imported from a file is named after it unless name is set. An import answers once the deck is in, which can take a minute for a large one: send an Idempotency-Key (MCP: idempotencyKey) so a retry doesn't import it twice. At most 10 imports a minute per user.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name for the report, as members will see it in Rollstack. Leading and trailing spaces are removed, and it can't be blank. If omitted, a report imported with `link` takes its file's name, and an empty report is named Untitled report until the slides agent names it as it builds the deck, as in the app.",
+                "examples": [
+                  "Q3 business review"
+                ],
+                "type": "string",
+                "minLength": 1
+              },
+              "folderId": {
+                "description": "The folder to create the report in, by its `id` from `listFolders`; it must be one you can see. Members with access to the folder can then open the report too, with the access the folder gives them. If omitted, the report is created at the top level, outside any folder.",
+                "examples": [
+                  "a3d5e7f9-1b2c-4d6e-8f0a-1b2c3d4e5f6a"
+                ],
+                "type": "string"
+              },
+              "templateDeckId": {
+                "description": "An existing report whose design the new report starts with, by its `id` from `listReports`: its theme, slide masters, layouts and slide size, but none of its slides or data. Its `type` must be `SlideDeck`, and you need at least view access to it. If neither this, `templateId` nor `link` is set, the report starts with no slides and Rollstack's default theme and layouts.",
+                "examples": [
+                  "6c1f9a2e-3b4d-4e8f-9a1b-2c3d4e5f6a7b"
+                ],
+                "type": "string"
+              },
+              "templateId": {
+                "description": "A saved template the new report starts with, by its `id` from `listTemplates`: a company template or Rollstack's own. The report gets its theme, slide masters, layouts and slide size, with no slides. Leave out `templateDeckId` when you set it.",
+                "examples": [
+                  "rollstack-signature"
+                ],
+                "type": "string",
+                "minLength": 1
+              },
+              "link": {
+                "description": "A link to an existing deck to import, as its Share or Copy link button gives it: a PowerPoint (.pptx) file in OneDrive or SharePoint, or a Google Slides presentation. The report starts with its slides and look: a PowerPoint file's charts come in as charts with their data, and a Google Slides presentation's as pictures. The file stays as it is. It is read with the user's own Microsoft or Google account, connected in the app, so they must be able to open it, and Rollstack can open only the Google Slides presentations the user picked in Rollstack before. The report keeps the deck's look, so leave out `templateId` and `templateDeckId`.",
+                "examples": [
+                  "https://contoso.sharepoint.com/:p:/s/Finance/EbXqT9kLmNpQrStUvWxYz",
+                  "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789/edit"
+                ],
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "description": "What the tool creates, changes or sends"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[\\x20-\\x7e]{1,255}$",
+            "description": "A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters."
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Create report",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "sendReportMessage",
+      "title": "Send message to slides agent",
+      "description": "Asks the slides agent to build or change a report, or to answer a question about it, as the app's chat does. Answers the message's id at once: follow it with getReportMessage. When the client can show one, a view shows the user the slides as the agent drafts them. Without chatId the message starts a new chat, which shows in the user's chat history in the app. With it, the message continues that chat and waits its turn while a reply is still generating. Several chats on a report can generate at once; an agent working on a part of the report another chat is editing works on something else or says so. For slides built from your own data, a connected dashboard, a warehouse table or a spreadsheet, upload the data with createDataset, find the dashboard or Salesforce report with searchDashboards, the Snowflake, Databricks or BigQuery table with searchTables or the spreadsheet with searchSpreadsheets, add any of them with addReportDatasheets and pass the datasheet ids as datasheetIds. For a brief, a report or notes to build from, upload it with createDocument and pass its id in documentIds. Only its editors may. At most 6 messages a minute per user. To write the slides yourself instead, start with getReportDesign.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report's link in Rollstack: it's the part right after `/slides/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "default": "",
+                "description": "Your message to the slides agent, as you would write it in the chat in the app: for example, slides to build or change, or a question about the report. On a report with no slides yet, the agent takes it as a request to build the report. A link to a picture in the message, such as a logo or a photo to place, is downloaded and given to the agent. Required unless you send `answers`; with them, it's sent after your answers as a note. At most 10,000 characters: send a longer text, such as a brief, as a document with `createDocument`.",
+                "examples": [
+                  "Add a slide comparing revenue by region"
+                ],
+                "type": "string",
+                "maxLength": 10000
+              },
+              "chatId": {
+                "description": "The chat to continue: the `chatId` returned for an earlier message. The agent reads the chat's earlier messages as context, and if it's still replying in that chat, your message waits its turn (`queued`). If omitted, the message starts a new chat, which shows in your chat history on the report in the app. Must be one of your own chats on this report.",
+                "examples": [
+                  "0e4c2b7a-9d1f-4a3b-8c5e-6f7a8b9c0d1e"
+                ],
+                "type": "string"
+              },
+              "slideIds": {
+                "description": "The slides your message is about, as when you select slides in the app before writing in the chat. The agent knows you selected them and uses the datasheets on them for your request. Slide ids come from `getReportContent`. 1 to 100 slides of this report.",
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "examples": [
+                    "f1e2d3c4-b5a6-4978-8a1b-2c3d4e5f6a7b"
+                  ]
+                }
+              },
+              "datasheetIds": {
+                "description": "Datasheets of this report for the agent to work from, on top of those on the slides in `slideIds`, as when you pick data in the chat in the app. To have the agent build slides from data you just added, pass the ids `addReportDatasheets` returned; for data already on the report, take them from `listReportDatasheets`. 1 to 100 datasheets of this report.",
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "examples": [
+                    "d7b9a1c3-e5f7-4a9b-8c1d-3e5f7a9b1c2d"
+                  ]
+                }
+              },
+              "documentIds": {
+                "description": "Documents for the agent to read, as when you attach documents in the chat in the app: the ids `createDocument` returned. The agent reads their text and looks at their pages, for example to build slides from a brief or to rebuild a report as slides. 1 to 5 documents your organization can read.",
+                "minItems": 1,
+                "maxItems": 5,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "answers": {
+                "description": "Your answers to the questions of a `clarification` reply, as when you pick options in the chat in the app: one entry per question you answer. Send them as the next message on the same chat, by passing its `chatId`. When a picked option offers a dashboard, table or spreadsheet, Rollstack adds it to the report as a datasheet before the agent goes on. To add a note, send it in `content` with the answers.",
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "string",
+                      "description": "The `header` of the question you're answering, copied unchanged from the `clarification` reply's `questions`.",
+                      "examples": [
+                        "Chart type"
+                      ]
+                    },
+                    "question": {
+                      "type": "string",
+                      "description": "The question you're answering, copied unchanged from the `clarification` reply's `questions`. With `header`, it tells Rollstack which question your picks are for.",
+                      "examples": [
+                        "Which chart should show revenue by region?"
+                      ]
+                    },
+                    "answers": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "examples": [
+                          "Bar chart"
+                        ]
+                      },
+                      "description": "The `label` of each option picked: one for a question whose `multiSelect` is `false`, one or more when it's `true`."
+                    }
+                  },
+                  "required": [
+                    "header",
+                    "question",
+                    "answers"
+                  ]
+                }
+              }
+            },
+            "additionalProperties": false,
+            "description": "What the tool creates, changes or sends"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[\\x20-\\x7e]{1,255}$",
+            "description": "A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters."
+          }
+        },
+        "required": [
+          "params",
+          "body"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Send message to slides agent",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "getReportMessage",
+      "title": "Get slides agent message",
+      "description": "A message to the slides agent and its replies. Waits up to waitSeconds for the message to finish and answers as soon as it does, so call it again while the status is queued or running. A clarification reply asks questions: ask the user, then send the options they pick as answers in a new message on the same chat. A proposal reply changes nothing until it is approved: show the user what its proposal changes, then approve or reject it as they decide. Only the user who sent the message may read it, while they can edit the report.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report's link in Rollstack: it's the part right after `/slides/`."
+              },
+              "messageId": {
+                "type": "string",
+                "description": "The message to the slides agent: the `messageId` that `sendReportMessage` returned. Only the user who sent the message can read, cancel or decide its proposals, and only while they can edit the report."
+              }
+            },
+            "required": [
+              "id",
+              "messageId"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "query": {
+            "description": "Options for the call, such as filters, paging or how long to wait",
+            "type": "object",
+            "properties": {
+              "waitSeconds": {
+                "default": 20,
+                "description": "How long this call waits for the work to finish, in seconds: the message to the slides agent on `getReportMessage`, the run on `getReportRun`, the batch of variants being added on `getBurstVariantBatch`, the runs of a burst's variants on `getBurstRun`. It returns as soon as the work is done, or as things stand once the time is up, so call it again while `status` is still `queued` or `running`. `0` returns at once. Defaults to `20`; at most `30`.",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 30
+              }
+            }
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Get slides agent message",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "getReportContent",
+      "title": "Get report content",
+      "description": "What a viewer sees on a report's visible slides: titles, text, and each chart's and table's values. On a long report, pass slideIds for only the slides you need, such as a reply's changedSlideIds.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report's link in Rollstack: it's the part right after `/slides/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "query": {
+            "description": "Options for the call, such as filters, paging or how long to wait",
+            "type": "object",
+            "properties": {
+              "slideIds": {
+                "description": "The slides to return, from a reply's `changedSlideIds` or an earlier `getReportContent` call. If omitted, every visible slide is returned. Hidden slides and ids that are not slides of the report are ignored. Up to 20 ids: repeat the parameter for each one, as in `?slideIds=a&slideIds=b`.",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ],
+                "examples": [
+                  "f1e2d3c4-b5a6-4978-8a1b-2c3d4e5f6a7b"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Get report content",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "startReportRun",
+      "title": "Start report run",
+      "description": "Refreshes a report's data, or only some of its datasheets, then repairs failed calculations and the slides with AI. On a report of another type than SlideDeck, such as a Google Slides presentation, refreshes every sync, or only the `syncIds` given, instead, as Update in the app does, updating its file when it has one (an Email report has none). A run of the whole report then emails it when its email trigger is `all`; a run of only some `syncIds` never does. Answers the run's id at once; while a run of the report is already going, from the API, the app or its schedule, it answers that run's id with started false and starts nothing. Pass repairSlides false to leave the slides as they are, when you wrote them yourself and will check and fix them. From an AI client, a run that emails the report only asks the user to confirm it in Rollstack: it answers `confirmation-required` and runs once they confirm.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "body": {
+            "description": "What the tool creates, changes or sends",
+            "default": {},
+            "type": "object",
+            "properties": {
+              "datasheetIds": {
+                "description": "The datasheets to update, from `listReportDatasheets`, instead of the whole report. Each must be a datasheet of this report. Unlike a run of the whole report, which reads every source again, a run of only some datasheets reuses the data last read from their sources: it reads a source again only if that data is missing or expired, or what the datasheet reads has changed, such as its source, its filters or the connection it reads with, as when you replace an uploaded file with `replaceDataset`. If omitted, the run updates the whole report. 1 to 500 ids. Only on reports whose `type` is `SlideDeck`: a report of another type has syncs instead, so passing it returns `400`.",
+                "minItems": 1,
+                "maxItems": 500,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "examples": [
+                    "d7b9a1c3-e5f7-4a9b-8c1d-3e5f7a9b1c2d"
+                  ]
+                }
+              },
+              "syncIds": {
+                "description": "The syncs to update, from `listReportSyncs`, instead of the whole report, such as the ones whose `status` is `failed`. Each must be a sync of this report. A `paused` sync is skipped, as in the app. A run of only some syncs never emails the report. If omitted, the run updates the whole report. 1 to 500 ids. Only on reports other than `SlideDeck`, which has datasheets instead, so passing it on a slide deck returns `400`.",
+                "minItems": 1,
+                "maxItems": 500,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                }
+              },
+              "repairSlides": {
+                "description": "Whether Rollstack repairs the slides with AI once the data is in: failed calculations, and text the new data made wrong. Pass `false` to read the data only, when you check and fix the slides yourself. If omitted, the slides are repaired. Only on reports whose `type` is `SlideDeck`.",
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[\\x20-\\x7e]{1,255}$",
+            "description": "A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters."
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Start report run",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "getReportRun",
+      "title": "Get report run",
+      "description": "A run's status and the datasheets, or visualizations on a report of another type than SlideDeck, it could not refresh. Waits up to waitSeconds for the run to end and answers as soon as it does, so call it again while the status is running. A user's later run of the report reuses the id, so this describes the latest one.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+              },
+              "runId": {
+                "type": "string",
+                "description": "The run, by the `runId` that `startReportRun` returned. Runs of a report started by the same member share one id, so it always refers to that member's latest run of the report."
+              }
+            },
+            "required": [
+              "id",
+              "runId"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "query": {
+            "description": "Options for the call, such as filters, paging or how long to wait",
+            "type": "object",
+            "properties": {
+              "waitSeconds": {
+                "default": 20,
+                "description": "How long this call waits for the work to finish, in seconds: the message to the slides agent on `getReportMessage`, the run on `getReportRun`, the batch of variants being added on `getBurstVariantBatch`, the runs of a burst's variants on `getBurstRun`. It returns as soon as the work is done, or as things stand once the time is up, so call it again while `status` is still `queued` or `running`. `0` returns at once. Defaults to `20`; at most `30`.",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 30
+              }
+            }
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Get report run",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "getReportSchedules",
+      "title": "List schedules",
+      "description": "The schedules of a report of any type, with the syncs each updates and when each runs next, or null for one that never runs again. Read them before `updateReportSchedules`, which replaces them all.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "List schedules",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "updateReportSchedules",
+      "title": "Replace report schedules",
+      "description": "Replaces the schedules of a report of any type, at most 10; an empty list removes them all. Only its editors may. A scheduled run updates the whole report: an AI update on a SlideDeck report, and a refresh of every sync on a report of another type, or only the `syncIds` a schedule names. Schedules are checked every 15 minutes, so a cron that fires more often still runs at most once per 15 minutes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report's link in Rollstack (`appUrl`): it's the part right after `/slides/` or `/destinations/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "schedules": {
+                "maxItems": 10,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "frequency": {
+                      "type": "string",
+                      "enum": [
+                        "hourly",
+                        "daily",
+                        "weekly",
+                        "monthly",
+                        "quarterly"
+                      ],
+                      "description": "How often the schedule runs. `hourly` runs every day at each time in `selectedTimes`, and takes no `cronExpression`. `daily`, `weekly`, `monthly` and `quarterly` run whenever `cronExpression` fires, and take no `selectedTimes`. For those, the frequency doesn't change when the report runs, but the app uses it to describe and edit the schedule, so pick the one that matches your cron expression."
+                    },
+                    "cronExpression": {
+                      "description": "When a `daily`, `weekly`, `monthly` or `quarterly` schedule runs: a five-field cron expression (minute, hour, day of month, month, day of week) in the schedule's `timezone`, such as `0 9 * * 1` for every Monday at 9:00, or `0 9 L * *` for 9:00 on the last day of each month. Required for those frequencies; omit it for `hourly`. Rollstack checks schedules every 15 minutes, so the minute field must include 0, 15, 30 or 45, and runs at other minutes are skipped. At most 100 characters.",
+                      "examples": [
+                        "0 9 * * 1"
+                      ],
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "selectedTimes": {
+                      "description": "The times of day an `hourly` schedule runs, every day, as 24-hour `HH:mm` in the schedule's `timezone`, such as `09:00` or `13:45`. Required for `hourly`; omit it for other frequencies. Each time must be on the quarter hour (`:00`, `:15`, `:30` or `:45`). From 1 to 96 times.",
+                      "minItems": 1,
+                      "maxItems": 96,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^([01]\\d|2[0-3]):(00|15|30|45)$",
+                        "examples": [
+                          "09:00"
+                        ]
+                      }
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                      "description": "When the schedule starts: it never runs the report before this date and time. This is a local date and time in the schedule's `timezone`, written as if it were UTC: `2026-11-02T09:00:00Z` means 9:00 on November 2, 2026 in that timezone, not 9:00 UTC. For frequencies other than `hourly`, set it to the date and time of the first run: the app shows its time as the schedule's time, and when someone changes the schedule's frequency or days there, it rebuilds `cronExpression` at that time.",
+                      "examples": [
+                        "2026-11-02T09:00:00Z"
+                      ]
+                    },
+                    "endDate": {
+                      "default": null,
+                      "description": "When the schedule ends: it never runs the report after this date and time. Omit it or pass `null` for a schedule that never ends. Like `startDate`, this is a local date and time in the schedule's `timezone`, written as if it were UTC. Must be later than `startDate`. Set it later than the last run you want: a run at exactly this time may be skipped.",
+                      "examples": [
+                        "2027-11-02T09:00:00Z"
+                      ],
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "timezone": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The timezone the schedule runs in. Its run times (`cronExpression` or `selectedTimes`), `startDate` and `endDate` are all local times in this timezone, so a schedule set for 9:00 keeps running at 9:00 local time when daylight saving time starts or ends. Given as an IANA timezone name, such as `America/New_York`. UTC offsets such as `+05:30` aren't accepted.",
+                      "examples": [
+                        "America/New_York"
+                      ]
+                    },
+                    "syncIds": {
+                      "default": null,
+                      "description": "The syncs, from `listReportSyncs`, that the schedule updates on a report other than a `SlideDeck`. `null` when it updates the whole report, which a slide deck always does. Omit it or pass `null` to update the whole report. Each id must be a sync of this report, so it only works on a report other than a `SlideDeck`. Keep the `syncIds` `getReportSchedules` returns for schedules you don't mean to change. A sync deleted later is skipped, so a schedule whose syncs are all gone updates nothing.",
+                      "anyOf": [
+                        {
+                          "minItems": 1,
+                          "maxItems": 500,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "frequency",
+                    "startDate",
+                    "timezone"
+                  ],
+                  "additionalProperties": false
+                },
+                "description": "The report's new schedules. They replace all of its current schedules, so read them with `getReportSchedules` first and include any you want to keep, with their `syncIds`; send an empty list to remove them all. When several schedules fall at the same time, the report runs once. Up to 10."
+              }
+            },
+            "required": [
+              "schedules"
+            ],
+            "additionalProperties": false,
+            "description": "What the tool creates, changes or sends"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[\\x20-\\x7e]{1,255}$",
+            "description": "A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters."
+          }
+        },
+        "required": [
+          "params",
+          "body"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Replace report schedules",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "exportReport",
+      "title": "Export report",
+      "description": "Exports a report as PDF or PowerPoint and answers a download link valid for 15 minutes. At most 10 exports a minute per user.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report's link in Rollstack: it's the part right after `/slides/`."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "The ids of what the tool acts on"
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": [
+                  "pdf",
+                  "pptx"
+                ],
+                "description": "The kind of file to create. `pdf` is a PDF of the report's visible slides; hidden slides are left out. `pptx` is a PowerPoint file in which hidden slides are included but stay hidden, speaker notes are kept, and charts are images rather than editable charts."
+              },
+              "slideIds": {
+                "description": "The slides to export, from `getReportContent` or a reply's `changedSlideIds`. The file keeps the report's slide order whatever order you list them in. Ids that are not slides of the report are ignored, and so are hidden slides in a PDF. If omitted, the whole report is exported.",
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "examples": [
+                    "f1e2d3c4-b5a6-4978-8a1b-2c3d4e5f6a7b"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "format"
+            ],
+            "additionalProperties": false,
+            "description": "What the tool creates, changes or sends"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "pattern": "^[\\x20-\\x7e]{1,255}$",
+            "description": "A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters."
+          }
+        },
+        "required": [
+          "params",
+          "body"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "annotations": {
+        "title": "Export report",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

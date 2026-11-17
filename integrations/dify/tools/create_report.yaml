@@ -1,0 +1,76 @@
+identity:
+  name: createReport
+  author: rollstack
+  label:
+    en_US: "Create report"
+description:
+  human:
+    en_US: "Creates a report of type SlideDeck, in a folder the user can see when folderId is set."
+  llm: "Creates a report of type SlideDeck, in a folder the user can see when folderId is set. It starts empty, in the look of a saved template from listTemplates when templateId is set, or of another report when templateDeckId is set: its theme, masters and layouts, without its slides. Ask the user which template to use when the organization has company templates. With link, it imports an existing deck instead, with its slides: a PowerPoint file in OneDrive or SharePoint, or a Google Slides presentation, read with the user's own Microsoft or Google account. Rollstack can open only the Google Slides presentations the user picked in Rollstack before, so a link to one they never did answers 422. At most 10 imports a minute per user."
+parameters:
+  - name: name
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Name"
+    human_description:
+      en_US: "Name for the report, as members will see it in Rollstack."
+    llm_description: "Name for the report, as members will see it in Rollstack. Leading and trailing spaces are removed, and it can't be blank. If omitted, a report imported with `link` takes its file's name, and an empty report is named Untitled report until the slides agent names it as it builds the deck, as in the app."
+  - name: templateId
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Template ID"
+    human_description:
+      en_US: "A saved template the new report starts with, by its id from listTemplates: a company template or Rollstack's own."
+    llm_description: "A saved template the new report starts with, by its `id` from `listTemplates`: a company template or Rollstack's own. The report gets its theme, slide masters, layouts and slide size, with no slides. Leave out `templateDeckId` when you set it."
+  - name: templateDeckId
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Template report ID"
+    human_description:
+      en_US: "An existing report whose design the new report starts with, by its id from listReports: its theme, slide masters, layouts and slide size, but none of its slides or data."
+    llm_description: "An existing report whose design the new report starts with, by its `id` from `listReports`: its theme, slide masters, layouts and slide size, but none of its slides or data. Its `type` must be `SlideDeck`, and you need at least view access to it. If neither this, `templateId` nor `link` is set, the report starts with no slides and Rollstack's default theme and layouts."
+  - name: folderId
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Folder ID"
+    human_description:
+      en_US: "The folder to create the report in, by its id from listFolders; it must be one you can see."
+    llm_description: "The folder to create the report in, by its `id` from `listFolders`; it must be one you can see. Members with access to the folder can then open the report too, with the access the folder gives them. If omitted, the report is created at the top level, outside any folder."
+  - name: link
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Link"
+    human_description:
+      en_US: "A link to an existing deck to import, as its Share or Copy link button gives it: a PowerPoint (.pptx) file in OneDrive or SharePoint, or a Google Slides presentation."
+    llm_description: "A link to an existing deck to import, as its Share or Copy link button gives it: a PowerPoint (.pptx) file in OneDrive or SharePoint, or a Google Slides presentation. The report starts with its slides and look: a PowerPoint file's charts come in as charts with their data, and a Google Slides presentation's as pictures. The file stays as it is. It is read with the user's own Microsoft or Google account, connected in the app, so they must be able to open it, and Rollstack can open only the Google Slides presentations the user picked in Rollstack before. The report keeps the deck's look, so leave out `templateId` and `templateDeckId`."
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: "Unique identifier for the report."
+    name:
+      type: string
+      description: "Name of the report, as members see it in Rollstack."
+    type:
+      type: string
+      description: "The kind of report, which decides the endpoints that work on it."
+    folderId:
+      type: string
+      description: "The folder the report is in, by its `id` in `listFolders`."
+    appUrl:
+      type: string
+      description: "Link that opens the report in Rollstack."
+extra:
+  python:
+    source: tools/create_report.py
