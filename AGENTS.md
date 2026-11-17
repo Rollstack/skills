@@ -15,3 +15,4 @@ Guidance for AI coding agents working in this repo, and for agents using Rollsta
 - The `description` says what the skill does and when to use it. Agents read only that to decide whether to load the skill.
 - Name only tools the Rollstack MCP server has, with their exact names and inputs. Check them in the MCP reference: https://docs.rollstack.com/api/mcp-server
 - After editing a skill, run `node scripts/build-index.mjs` and commit the updated `.well-known/agent-skills/index.json`. CI runs it with `--check`.
+- The plugin's version is in five manifests, one per client: `.claude-plugin/plugin.json`, `plugin.json`, `.cursor-plugin/plugin.json`, `.grok-plugin/plugin.json` and `package.json`. Change it in all of them together. CI runs `node scripts/check-versions.mjs`.

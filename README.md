@@ -33,6 +33,22 @@ Or in two steps, on Claude Code before 2.1.275:
 
 The plugin adds one remote MCP server, `https://api.rollstack.com/public/v1/mcp`, which you sign in to with your Rollstack account. It runs nothing on your machine.
 
+**Pi package** (the MCP server and the skills together):
+
+```bash
+pi install git:github.com/Rollstack/skills
+```
+
+Then sign in from a Pi session with `/mcp login rollstack`.
+
+**DeepSeek Harness bundle** (the MCP server and the skills together), added to the profile you run, such as `web`:
+
+```bash
+dsh plugin --profile web add github:Rollstack/skills
+```
+
+dsh can't sign in to an MCP server with OAuth yet, so it connects with an API key: create one in Rollstack under Settings → Connected apps, then start dsh with it in `ROLLSTACK_API_KEY`. Without the key, the skills still load and the MCP server stays off.
+
 **Skills only**, with the [skills CLI](https://skills.sh):
 
 ```bash
@@ -41,7 +57,7 @@ npx skills add Rollstack/skills
 
 Or copy a skill's folder into your agent's skills directory, such as `~/.claude/skills/` for Claude Code.
 
-The repo is also an [Agent Plugin](https://agent-plugins.org): `plugin.json` and `mcp.json` at the root describe the same plugin for other clients.
+The repo is also an [Agent Plugin](https://agent-plugins.org): `plugin.json` and `mcp.json` at the root describe the same plugin for other clients. `.cursor-plugin/plugin.json` and `.grok-plugin/plugin.json` describe it for Cursor and Grok Build.
 
 ## Connect Rollstack
 
