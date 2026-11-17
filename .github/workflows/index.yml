@@ -19,6 +19,8 @@ jobs:
         with:
           node-version: 24
       - run: node scripts/build-index.mjs --check
+      # Each client reads its own manifest, so one left at an old version would keep that client's users on it
+      - run: node scripts/check-versions.mjs
 
   # The checks Claude's plugin directory runs on its manifests, skills and .mcp.json
   validate-plugin:

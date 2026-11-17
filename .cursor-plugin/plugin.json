@@ -1,0 +1,16 @@
+{
+  "name": "rollstack",
+  "displayName": "Rollstack",
+  "version": "1.3.0",
+  "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "author": { "name": "Rollstack", "email": "support@rollstack.com" },
+  "homepage": "https://www.rollstack.com",
+  "repository": "https://github.com/Rollstack/skills",
+  "license": "MIT",
+  "logo": "assets/icon.png",
+  "keywords": ["rollstack", "slides", "presentations", "reporting", "bi", "mcp"],
+  "category": "integrations",
+  "tags": ["rollstack", "presentations", "reporting", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

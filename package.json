@@ -1,0 +1,23 @@
+{
+  "name": "@rollstack/skills",
+  "version": "1.3.0",
+  "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "keywords": ["pi-package", "dsh-plugin", "rollstack", "slides", "presentations", "reporting", "bi", "mcp", "agent-skills"],
+  "homepage": "https://www.rollstack.com",
+  "bugs": "https://github.com/Rollstack/skills/issues",
+  "repository": { "type": "git", "url": "git+https://github.com/Rollstack/skills.git" },
+  "license": "MIT",
+  "author": { "name": "Rollstack", "email": "support@rollstack.com", "url": "https://www.rollstack.com" },
+  "type": "module",
+  "main": "./dsh/index.js",
+  "icon": "./assets/icon.png",
+  "files": ["skills", "pi", "dsh", "assets/icon.png"],
+  "publishConfig": { "access": "public" },
+  "pi": {
+    "extensions": ["./pi/rollstack.js"],
+    "skills": ["./skills"]
+  },
+  "dsh": {
+    "bundle": { "patch": "./dsh/cordis.patch.yml" }
+  }
+}

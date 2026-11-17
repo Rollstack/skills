@@ -1,0 +1,18 @@
+# DeepSeek Harness bundle layer: the packaged skills, and Rollstack's MCP server.
+# dsh's MCP client has no OAuth sign-in, so it sends an API key: one the user created in Rollstack under
+# Settings → Connected apps and set as ROLLSTACK_API_KEY in the environment dsh starts in. Without the key the
+# MCP row stays off, so that dsh doesn't fail against the server on every start.
+- insert:
+    # This package's own plugin, index.js: the name must stay equal to `name` in package.json
+    - id: rollstack
+      name: '@rollstack/skills'
+
+    - id: rollstack-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js '!process.env.ROLLSTACK_API_KEY'
+      config:
+        serverName: rollstack
+        transport: streamable-http
+        url: https://api.rollstack.com/public/v1/mcp
+        headers:
+          Authorization: !!js '`Bearer ${process.env.ROLLSTACK_API_KEY}`'
