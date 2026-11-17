@@ -36,7 +36,7 @@ The plugin adds one remote MCP server, `https://api.rollstack.com/public/v1/mcp`
 **Pi package** (the MCP server and the skills together):
 
 ```bash
-pi install git:github.com/Rollstack/skills
+pi install npm:@rollstack/skills
 ```
 
 Then sign in from a Pi session with `/mcp login rollstack`.
@@ -44,7 +44,7 @@ Then sign in from a Pi session with `/mcp login rollstack`.
 **DeepSeek Harness bundle** (the MCP server and the skills together), added to the profile you run, such as `web`:
 
 ```bash
-dsh plugin --profile web add github:Rollstack/skills
+dsh plugin --profile web add @rollstack/skills
 ```
 
 dsh can't sign in to an MCP server with OAuth yet, so it connects with an API key: create one in Rollstack under Settings → Connected apps, then start dsh with it in `ROLLSTACK_API_KEY`. Without the key, the skills still load and the MCP server stays off.
