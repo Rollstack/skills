@@ -5,7 +5,7 @@ name: rollstack
 label:
   en_US: Rollstack
 description:
-  en_US: Build slide decks from your company's data with Rollstack's slides agent, in your own template, then refresh, schedule and export them.
+  en_US: Build polished presentations using AI, with advanced charts.
 icon: icon.png
 tags:
   - productivity
