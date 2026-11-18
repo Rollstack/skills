@@ -7,6 +7,6 @@ export default function (pi) {
   if (typeof pi.registerMcpServer !== "function") return
   pi.registerMcpServer("rollstack", {
     url: "https://api.rollstack.com/public/v1/mcp",
-    description: "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack"
+    description: "Create polished presentations with advanced charts, right from your favourite agent. Plug in your own data whenever you need it."
   })
 }

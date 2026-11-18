@@ -1,7 +1,7 @@
 {
   "name": "@rollstack/skills",
-  "version": "1.3.2",
-  "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "version": "1.3.3",
+  "description": "Create polished presentations with advanced charts, right from your favourite agent. Plug in your own data whenever you need it.",
   "keywords": ["pi-package", "dsh-plugin", "rollstack", "slides", "presentations", "reporting", "bi", "mcp", "agent-skills"],
   "homepage": "https://www.rollstack.com",
   "bugs": "https://github.com/Rollstack/skills/issues",

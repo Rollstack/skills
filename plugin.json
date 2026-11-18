@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "rollstack",
-  "version": "1.3.2",
-  "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "version": "1.3.3",
+  "description": "Create polished presentations with advanced charts, right from your favourite agent. Plug in your own data whenever you need it.",
   "author": { "name": "Rollstack", "email": "support@rollstack.com", "url": "https://www.rollstack.com" },
   "homepage": "https://www.rollstack.com",
   "repository": "https://github.com/Rollstack/skills",
@@ -12,25 +12,26 @@
     "com.openai": {
       "interface": {
         "displayName": "Rollstack",
-        "shortDescription": "Build decks from company data",
-        "longDescription": "Rollstack is the AI presentation platform for business reporting. Connect it to ChatGPT and ask for a deck: Rollstack's slides agent builds it in your company's template from your BI dashboards (Tableau, Power BI, Looker, Metabase, Sigma, Omni, Lightdash), spreadsheets or CSV files, with every number linked to its source. ChatGPT can then refine the slides, refresh the data, schedule recurring updates, and export or email the report. Any change the agent proposes, such as a schedule or an email send, waits for your approval. Rollstack is SOC 2 Type II, HIPAA and GDPR compliant, and access follows your Rollstack permissions.\n\nRollstack is for teams with a Rollstack account: you sign in with it when you connect. Emails and deletes wait for you to confirm them in Rollstack. Files attached in the chat can't be passed to Rollstack, so import templates and presentations in the Rollstack app. Support: support@rollstack.com.",
+        "shortDescription": "Create polished presentations",
+        "longDescription": "Rollstack creates polished presentations for you. Ask ChatGPT for a deck on any topic and Rollstack builds it: clean slides, your own template if you have one, and advanced charts. Then keep going in the chat: reword a slide, add a chart, change the colours and fonts, and export the deck to PowerPoint or PDF.\n\nWant your own numbers on the slides? Plug in the sources you already use, such as spreadsheets, data warehouses and BI tools, and your charts draw straight from them.\n\nYou sign in with your Rollstack account when you connect. Nothing is emailed or deleted until you confirm it in Rollstack. Files attached in the chat can't be passed to Rollstack, so connect data sources and import templates in the Rollstack app. Support: support@rollstack.com.",
         "developerName": "Rollstack Inc.",
         "category": "Productivity",
         "capabilities": [
-          "Build slide decks from BI dashboards and spreadsheets",
-          "Edit slides in your company template",
-          "Refresh report data",
-          "Schedule recurring updates",
-          "Export and email reports"
+          "Create polished presentations on any topic",
+          "Add advanced charts",
+          "Plug in spreadsheets, data warehouses and BI tools",
+          "Use your own template and brand",
+          "Edit any slide in the chat",
+          "Export to PowerPoint or PDF"
         ],
         "websiteURL": "https://www.rollstack.com",
         "supportURL": "https://github.com/Rollstack/skills/issues",
         "privacyPolicyURL": "https://www.rollstack.com/legal/privacy-policy",
         "termsOfServiceURL": "https://www.rollstack.com/legal/terms-of-service",
         "defaultPrompt": [
-          "Build a 5-slide sales review from my Tableau dashboard, in our company template.",
-          "Add a slide on our top 5 salespeople to my quarterly business review.",
-          "Refresh my weekly sales report and schedule it every Monday at 9:00."
+          "Create a 5-slide presentation on the electric car market, with a chart on each slide.",
+          "Give this deck my brand's colours and fonts, then export it to PowerPoint.",
+          "Which of my data sources can I build a presentation from?"
         ],
         "composerIcon": "./assets/icon.png",
         "logo": "./assets/icon.png"
