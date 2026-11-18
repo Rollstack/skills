@@ -25,13 +25,15 @@ uv venv --python 3.12 .venv && uv pip install --python .venv -r requirements-dev
 .venv/bin/python -m pytest tests
 ```
 
-The tests answer for Rollstack with scripted responses. Four more call Rollstack's real server and need no account, since it lists its tools and refuses a wrong key without one:
+The tests answer for Rollstack with scripted responses. Four more call Rollstack's real server:
 
 ```bash
 ROLLSTACK_LIVE=1 .venv/bin/python -m pytest tests/test_live.py
 ```
 
-`tests/fixtures/mcp_tools.json` is the definition of the plugin's tools as Rollstack's MCP server lists them, and `tests/test_contract.py` keeps the tool files true to it. When the live test says the reference changed, refresh it with `.venv/bin/python tests/update_fixture.py`, read the diff, and bring `tools/*.yaml` and `operations.py` in line. A description may only drop whole sentences of the reference, or add one of the notes listed in `test_contract.py`.
+Two of them send a wrong key and need no account. The other two are skipped unless `ROLLSTACK_API_KEY` holds a Rollstack API key, because the server answers a request only when it carries a key: without one it neither lists its tools nor opens a session. It lists for a key only the tools that key may call, so give the key the scopes `slide_decks:read`, `slide_decks:write` and `slide_decks:run`, as the README's Setup says. When the server leaves one of the plugin's tools out of its list, the comparison fails rather than check the rest, and names each missing tool with the scope it needs. The key is read from the environment and nowhere else: keep it out of the files of this repo.
+
+`tests/fixtures/mcp_tools.json` is the definition of the plugin's tools as Rollstack's MCP server lists them, with the scope each one needs, and `tests/test_contract.py` keeps the tool files true to it. When the live test says the reference changed, refresh it with `.venv/bin/python tests/update_fixture.py`, which needs the same key and saves nothing when a tool is left out, read the diff, and bring `tools/*.yaml` and `operations.py` in line. A description may only drop whole sentences of the reference, or add one of the notes listed in `test_contract.py`.
 
 ## Try it in Dify
 

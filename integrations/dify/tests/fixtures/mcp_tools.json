@@ -68,6 +68,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -102,6 +112,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -119,6 +139,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -191,6 +221,16 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:write"
+            ]
+          }
+        ]
       }
     },
     {
@@ -329,6 +369,16 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": true
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:run"
+            ]
+          }
+        ]
       }
     },
     {
@@ -381,6 +431,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -440,6 +500,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -516,6 +586,16 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": true
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:run"
+            ]
+          }
+        ]
       }
     },
     {
@@ -568,6 +648,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -602,6 +692,16 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     },
     {
@@ -753,6 +853,16 @@
         "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:write"
+            ]
+          }
+        ]
       }
     },
     {
@@ -822,6 +932,16 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "slide_decks:read"
+            ]
+          }
+        ]
       }
     }
   ]

@@ -8,6 +8,8 @@ Before opening it:
    "How to test" steps under "Reviewer notes", and correct any step that doesn't go as written.
 2. Tick the three boxes left open under "Required checks": the first two are your own statement, the third is that run.
 3. Replace the "Not yet run in a Dify workspace" paragraph under "Reviewer notes" with what you tested and on which Dify version.
+4. Run the live tests with a Rollstack API key in ROLLSTACK_API_KEY (see "Test" in DEVELOPMENT.md): two of the four are
+   skipped without one. Then replace their output and the line about them under "Local validation".
 These comments are not shown on the pull request.
 -->
 
@@ -126,14 +128,14 @@ Tests, on Python 3.12 with the pinned dependencies:
 
 ```text
 $ python -m pytest tests
-170 passed, 4 skipped in 0.77s
+182 passed, 4 skipped, 2 warnings in 0.81s
 
 $ ROLLSTACK_LIVE=1 python -m pytest tests/test_live.py
-4 passed in 1.77s
+2 passed, 2 skipped in 0.62s
 ```
 
 - The unit tests run every tool, loaded the way the plugin runtime loads it, against scripted Rollstack answers, and check the tool files against Rollstack's published tool definitions.
-- The live tests call `api.rollstack.com` without an account: the tool definitions the plugin was written from are still the ones the server lists, and a call with a wrong key is refused with a clear error.
+- The live tests call `api.rollstack.com`. The two that ran need no account: a tool call and the key check, each sent with a wrong key, are refused with a clear error. The two that were skipped need a Rollstack API key, because Rollstack's server lists its tools and opens a session only for a key: they check that the tool definitions the plugin was written from are still the ones the server lists, and that the plugin's client can open a session. They have not been run with a key. The definitions were last compared with the server's list on 18 November 2026, when it still listed its tools without a key, and they matched.
 - The packaged plugin was also started with `dify plugin run` (the CLI's local runtime, which installs the pinned dependencies). Credential validation and tool calls reached Rollstack and returned the expected errors for a wrong key and for bad parameters.
 
 ## Reviewer notes
