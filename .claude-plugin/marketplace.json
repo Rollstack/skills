@@ -1,6 +1,6 @@
 {
   "name": "rollstack",
-  "description": "Build beautiful presentations with advanced charts, directly from your favorite agent. Plug in your own data whenever you need it.",
+  "description": "Build polished presentations using AI, with advanced charts and data connections built in.",
   "owner": {
     "name": "Rollstack",
     "url": "https://www.rollstack.com"
@@ -9,7 +9,7 @@
     {
       "name": "rollstack",
       "source": "./",
-      "description": "Build beautiful presentations with advanced charts, directly from your favorite agent. Plug in your own data whenever you need it."
+      "description": "Build polished presentations using AI, with advanced charts and data connections built in."
     }
   ]
 }
