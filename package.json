@@ -1,7 +1,7 @@
 {
   "name": "@rollstack/skills",
   "version": "1.3.3",
-  "description": "Build beautiful presentations with advanced charts, directly from your favourite agent. Plug in your own data whenever you need it.",
+  "description": "Build beautiful presentations with advanced charts, directly from your favorite agent. Plug in your own data whenever you need it.",
   "keywords": ["pi-package", "dsh-plugin", "rollstack", "slides", "presentations", "reporting", "bi", "mcp", "agent-skills"],
   "homepage": "https://www.rollstack.com",
   "bugs": "https://github.com/Rollstack/skills/issues",

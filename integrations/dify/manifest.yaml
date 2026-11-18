@@ -5,7 +5,7 @@ name: rollstack
 label:
   en_US: Rollstack
 description:
-  en_US: Build beautiful presentations with advanced charts, directly from your favourite agent.
+  en_US: Build beautiful presentations with advanced charts, directly from your favorite agent.
 icon: icon.png
 tags:
   - productivity
