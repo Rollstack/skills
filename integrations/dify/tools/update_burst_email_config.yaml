@@ -1,0 +1,198 @@
+identity:
+  name: updateBurstEmailConfig
+  author: rollstack
+  label:
+    en_US: Update burst email configuration
+description:
+  human:
+    en_US: Changes the fields passed of a burst's email configuration and answers it.
+  llm: Changes the fields passed of a burst's email configuration and answers it. Sends nothing. Only the burst's owner and admins may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: configId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Config ID
+  human_description:
+    en_US: The email configuration, by its id from listBurstEmailConfigs.
+  llm_description: The email configuration, by its `id` from `listBurstEmailConfigs`.
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: The configuration's name, as shown in the burst's Emailing tab in the app.
+  llm_description: The configuration's name, as shown in the burst's Emailing tab in the app.
+- name: variantIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Variant IDs
+  human_description:
+    en_US: The variants the email includes, by their id in listBurstVariants.
+  llm_description: The variants the email includes, by their `id` in `listBurstVariants`. Empty includes every variant, also those added later. Pass them as text, separated by commas, or as a JSON array.
+- name: sharingFormat
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Sharing format
+  human_description:
+    en_US: How the email delivers the report.
+  llm_description: How the email delivers the report. `pdf` and `ppt` send it as a PDF or PowerPoint file, attached or behind a download button (see `sendAttachmentAsLink`); a slide deck leaves its hidden slides out. `link` sends a link to the Google Drive or OneDrive file an older report updates, shared with the recipients as set in the app; an email report sends its content in the email itself, and a slide deck has no such file, so one whose settings still contain `link` is emailed as a PDF behind a download button. `cloudLink` (Exported link in the app), for slide decks only, sends a link to the copy exported to Google Drive or OneDrive and shares it with the addresses in `to`, `cc` and `bcc` with the sharing permission set in the app, viewer unless changed there; if no permission is set, as after PDF or PPT was picked in the app, the copy isn't shared with them.
+  options:
+  - value: link
+    label:
+      en_US: link
+  - value: pdf
+    label:
+      en_US: pdf
+  - value: ppt
+    label:
+      en_US: ppt
+  - value: cloudLink
+    label:
+      en_US: cloudLink
+- name: sendAttachmentAsLink
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Send attachment as link
+  human_description:
+    en_US: Whether the email puts the pdf or ppt file behind a Download PDF or Download PPT button instead of attaching it.
+  llm_description: Whether the email puts the `pdf` or `ppt` file behind a Download PDF or Download PPT button instead of attaching it. When `false`, the file is attached. Has no effect with `cloudLink`.
+- name: zipAttachments
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Zip attachments
+  human_description:
+    en_US: Whether the variants' files come in one zip file, with a file format.
+  llm_description: Whether the variants' files come in one zip file, with a file format.
+- name: emailAnalyticsEnabled
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Email analytics enabled
+  human_description:
+    en_US: Whether opens of the email are tracked.
+  llm_description: Whether opens of the email are tracked.
+- name: smtpServerId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: SMTP server ID
+  human_description:
+    en_US: The SMTP connection the email is sent through, from listSmtpConnections; null sends from Rollstack's own address.
+  llm_description: The SMTP connection the email is sent through, from `listSmtpConnections`; `null` sends from Rollstack's own address.
+- name: to
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: To
+  human_description:
+    en_US: The addresses the email goes to.
+  llm_description: The addresses the email goes to. Pass them as text, separated by commas, or as a JSON array.
+- name: cc
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: CC
+  human_description:
+    en_US: The addresses copied on the email, which every recipient can see.
+  llm_description: The addresses copied on the email, which every recipient can see. Pass them as text, separated by commas, or as a JSON array.
+- name: bcc
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: BCC
+  human_description:
+    en_US: The addresses that also receive the email without the others seeing them.
+  llm_description: The addresses that also receive the email without the others seeing them. Pass them as text, separated by commas, or as a JSON array.
+- name: replyTo
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Reply to
+  human_description:
+    en_US: Where replies to the email go.
+  llm_description: Where replies to the email go. Pass them as text, separated by commas, or as a JSON array.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Identifies the configuration.
+    name:
+      type: string
+      description: The configuration's name, as shown in the burst's Emailing tab in the app.
+    variantIds:
+      type: array
+      items:
+        type: string
+      description: The variants the email includes, by their `id` in `listBurstVariants`.
+    sharingFormat:
+      type: string
+      description: How the email delivers the report.
+    sendAttachmentAsLink:
+      type: boolean
+      description: Whether the email puts the `pdf` or `ppt` file behind a Download PDF or Download PPT button instead of attaching it.
+    zipAttachments:
+      type: boolean
+      description: Whether the variants' files come in one zip file, with a file format.
+    emailAnalyticsEnabled:
+      type: boolean
+      description: Whether opens of the email are tracked.
+    smtpServerId:
+      type: string
+      description: The SMTP connection the email is sent through, from `listSmtpConnections`; `null` sends from Rollstack's own address.
+    to:
+      type: array
+      items:
+        type: string
+      description: The addresses the email goes to.
+    cc:
+      type: array
+      items:
+        type: string
+      description: The addresses copied on the email, which every recipient can see.
+    bcc:
+      type: array
+      items:
+        type: string
+      description: The addresses that also receive the email without the others seeing them.
+    replyTo:
+      type: array
+      items:
+        type: string
+      description: Where replies to the email go.
+    createdAt:
+      type: string
+      description: When the configuration was created.
+    updatedAt:
+      type: string
+      description: When the configuration last changed.
+extra:
+  python:
+    source: tools/update_burst_email_config.py

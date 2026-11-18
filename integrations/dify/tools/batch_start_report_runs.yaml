@@ -1,0 +1,45 @@
+identity:
+  name: batchStartReportRuns
+  author: rollstack
+  label:
+    en_US: Start report runs in a batch
+description:
+  human:
+    en_US: 'Starts a run of each of up to 50 reports of any type, as startReportRun does for one: each run updates its whole report, and a run of a report of another type than SlideDeck emails it when its email trigger is all.'
+  llm: 'Starts a run of each of up to 50 reports of any type, as startReportRun does for one: each run updates its whole report, and a run of a report of another type than SlideDeck emails it when its email trigger is `all`. To update only some datasheets or syncs of a report, call startReportRun. Answers one result per report, each naming its id, with its run''s id at once: follow each run with getReportRun. A report already running answers that run with started false, and a report you can''t run fails on its own while the others still start. From an AI client, a batch of runs that emails any of the reports only asks the user to confirm it in Rollstack: it answers `confirmation-required` and runs once they confirm.'
+parameters:
+- name: ids
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: IDs
+  human_description:
+    en_US: The reports to act on, of any type, by their id from listReports.
+  llm_description: The reports to act on, of any `type`, by their `id` from `listReports`. From 1 to 50 ids; an id listed twice is acted on once. Pass them as text, separated by commas, or as a JSON array.
+- name: repairSlides
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Repair slides
+  human_description:
+    en_US: 'Whether Rollstack repairs the slides with AI once the data is in: failed calculations, and text the new data made wrong.'
+  llm_description: 'Whether Rollstack repairs the slides with AI once the data is in: failed calculations, and text the new data made wrong. Pass `false` to read the data only, when you check and fix the slides yourself. If omitted, the slides are repaired. Only on reports whose `type` is `SlideDeck`.'
+output_schema:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+      description: One result per report, each naming its `id`.
+    code:
+      type: string
+      description: '`confirmation-required` when Rollstack holds the call until you confirm it in Rollstack. Empty when it ran.'
+    message:
+      type: string
+      description: What you are asked to confirm, with the link you confirm it at. Set with `code`.
+extra:
+  python:
+    source: tools/batch_start_report_runs.py

@@ -1,0 +1,46 @@
+identity:
+  name: sendBurstEmailConfig
+  author: rollstack
+  label:
+    en_US: Send burst email configuration
+description:
+  human:
+    en_US: 'Sends a burst''s email configuration now: one email to its recipients with each variant it selects.'
+  llm: 'Sends a burst''s email configuration now: one email to its recipients with each variant it selects. Building it outlasts the request, so it goes out after the answer. Send a test with sendBurstEmailConfigTest first to check how it looks. Only the burst''s owner and admins may. Sends have a low rate limit. From an AI client, the send only asks the user to confirm it in Rollstack: it answers `confirmation-required` and runs once they confirm.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: configId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Config ID
+  human_description:
+    en_US: The email configuration, by its id from listBurstEmailConfigs.
+  llm_description: The email configuration, by its `id` from `listBurstEmailConfigs`.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The email configuration.
+    name:
+      type: string
+      description: The email configuration's name.
+    code:
+      type: string
+      description: '`confirmation-required` when Rollstack holds the call until you confirm it in Rollstack. Empty when it ran.'
+    message:
+      type: string
+      description: What you are asked to confirm, with the link you confirm it at. Set with `code`.
+extra:
+  python:
+    source: tools/send_burst_email_config.py

@@ -1,0 +1,76 @@
+identity:
+  name: updateReportTheme
+  author: rollstack
+  label:
+    en_US: Change theme
+description:
+  human:
+    en_US: 'Changes a slide deck''s theme: its colours, its heading font and its body font.'
+  llm: 'Changes a slide deck''s theme: its colours, its heading font and its body font. This is how a deck takes a brand''s colours, such as the ones the user names or the ones of a presentation they gave you: read the colours yourself and send each in the slot whose job it does. Every slide follows wherever it uses the theme''s colours, and so do the template''s layouts and the slides you write next, which keep using the theme variables that getReportDesign lists. Call it before you write slides, then call getReportDesign again for the colours as they are now. A slot sent with a colour another slot already has is saved one step of blue away from it (#2D6A4F and #2D6A50), which looks the same: saved slides tell theme colours apart by their value, so the answer can differ from what you sent by that step. A change that would leave text unreadable on its background changes nothing and answers the pair to fix, and so does a font the editor does not have. A new font sets text wider or narrower than the old one: on a deck that already has slides, look at each with getReportSlideImages afterwards and save again the ones whose text no longer fits. It changes colours and fonts only: for a presentation''s layouts and logo, the user imports it as a template in Rollstack, which answers in listTemplates. Only the report''s editors may. Answers the theme after the change and the version saved before it.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: colors
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Colors
+  human_description:
+    en_US: 'The theme colours to change, each as #RRGGBB.'
+  llm_description: |-
+    The theme colours to change, each as `#RRGGBB`. The ones left out stay as they are. Each has a job on the slides, so put a brand's colours where they belong: its dark text colour in `dark1`, its background in `light1`, its main brand colour in `accent1`.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"type":"object","properties":{"dark1":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"Main text: titles and body text on the slide background."},"dark2":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"Secondary text: captions, sources and muted labels, quieter than dark1 but readable."},"light1":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The slide background."},"light2":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The second surface: cards, panels and table header rows. Close to light1 but visibly different from it."},"accent1":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The main highlight: key numbers, accent bars and rules, the first chart series."},"accent2":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The second chart series and highlight."},"accent3":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The third chart series and highlight."},"accent4":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The fourth chart series and highlight."},"accent5":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The fifth chart series and highlight."},"accent6":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"The sixth chart series and highlight."},"hyperlink":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"Link text, readable on light1."},"followedHyperlink":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$","description":"Visited link text, readable on light1."}},"additionalProperties":false}
+- name: headingFont
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Heading font
+  human_description:
+    en_US: The font family for titles and headings, by its published name, such as Inter.
+  llm_description: The font family for titles and headings, by its published name, such as `Inter`. A font the editor does not have is refused.
+- name: bodyFont
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Body font
+  human_description:
+    en_US: The font family for all other text, by its published name.
+  llm_description: The font family for all other text, by its published name.
+output_schema:
+  type: object
+  properties:
+    changed:
+      type: boolean
+      description: Changed
+    versionBeforeId:
+      type: string
+      description: 'The version saved just before the change: restore it with `restoreReportVersion` to take the change back.'
+    colors:
+      type: object
+      description: The report's theme colours after the change, by slot, as `getReportDesign` lists them in `theme`.
+    headingFont:
+      type: string
+      description: The font of titles and headings after the change.
+    bodyFont:
+      type: string
+      description: The font of all other text after the change.
+    refused:
+      type: string
+      description: '`invalid`: fix what `reason` names and send the change again.'
+    reason:
+      type: string
+      description: 'Why nothing changed: the pairs of colours the change would leave unreadable, a font the editor lacks, or a background picture that could not be read.'
+extra:
+  python:
+    source: tools/update_report_theme.py

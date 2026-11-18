@@ -1,0 +1,37 @@
+identity:
+  name: deleteBurst
+  author: rollstack
+  label:
+    en_US: Delete burst
+description:
+  human:
+    en_US: Deletes a burst with every report in it, the template included, as the app does, and can't be undone.
+  llm: 'Deletes a burst with every report in it, the template included, as the app does, and can''t be undone. A Rollstack report''s burst uses the report it was made from as its template, so that report is deleted too. Files in Google Drive or OneDrive stay. Only the burst''s owner may. From an AI client, the deletion only asks the user to confirm it in Rollstack: it answers `confirmation-required` and runs once they confirm.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The deleted burst.
+    name:
+      type: string
+      description: The deleted burst's name.
+    code:
+      type: string
+      description: '`confirmation-required` when Rollstack holds the call until you confirm it in Rollstack. Empty when it ran.'
+    message:
+      type: string
+      description: What you are asked to confirm, with the link you confirm it at. Set with `code`.
+extra:
+  python:
+    source: tools/delete_burst.py

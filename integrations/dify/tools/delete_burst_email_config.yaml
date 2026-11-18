@@ -1,0 +1,40 @@
+identity:
+  name: deleteBurstEmailConfig
+  author: rollstack
+  label:
+    en_US: Delete burst email configuration
+description:
+  human:
+    en_US: Deletes a burst's email configuration.
+  llm: Deletes a burst's email configuration. Its past sends stay. Only the burst's owner and admins may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: configId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Config ID
+  human_description:
+    en_US: The email configuration, by its id from listBurstEmailConfigs.
+  llm_description: The email configuration, by its `id` from `listBurstEmailConfigs`.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The email configuration.
+    name:
+      type: string
+      description: The email configuration's name.
+extra:
+  python:
+    source: tools/delete_burst_email_config.py

@@ -1,0 +1,55 @@
+identity:
+  name: convertReport
+  author: rollstack
+  label:
+    en_US: Convert report to slide deck
+description:
+  human:
+    en_US: Turns an older report of type GoogleSlides or MicrosoftPowerPoint, which updates a Google Slides presentation or a PowerPoint file in OneDrive or SharePoint, into a new report of type SlideDeck, as Convert to Rollstack slides in the app does.
+  llm: 'Turns an older report of type GoogleSlides or MicrosoftPowerPoint, which updates a Google Slides presentation or a PowerPoint file in OneDrive or SharePoint, into a new report of type SlideDeck, as Convert to Rollstack slides in the app does. The new report gets the file''s slides, and each sync that can be converted becomes a datasheet reading the same source, drawn by a tile where the sync''s chart, table or picture was. The older report and its file stay as they are. The file is read with the older report''s owner''s account. Answers the new report and what became of each sync, with the reason for one not converted, such as a burst variant''s (convert a whole burst with convertBurst) or one of a source with no datasheets: the conversion starts the new report''s update to fill its charts, answered as runId: follow it with getReportRun, or start one with startReportRun when runId is null. Only the older report''s editors may. It answers once the conversion ends, which can take a few minutes for a large report: send an Idempotency-Key (MCP: idempotencyKey) so a retry doesn''t convert it twice. Counts against the 10 imports a minute per user.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: Name for the new report, as members will see it in Rollstack.
+  llm_description: Name for the new report, as members will see it in Rollstack. Leading and trailing spaces are removed, and it can't be blank. If omitted, it takes the older report's name.
+- name: folderId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Folder ID
+  human_description:
+    en_US: The folder to put the new report in, by its id from listFolders; it must be one you can add reports to.
+  llm_description: The folder to put the new report in, by its `id` from `listFolders`; it must be one you can add reports to. If omitted, it goes at the top level, as in the app.
+output_schema:
+  type: object
+  properties:
+    report:
+      type: object
+      description: The new report, of type `SlideDeck`.
+    conversion:
+      type: object
+      description: What became of the older report's syncs, or null when converting them failed.
+    conversionError:
+      type: string
+      description: Why the syncs could not be converted, when they couldn't.
+    runId:
+      type: string
+      description: The run the conversion started to fill the new report's charts with data, to follow with `getReportRun`.
+extra:
+  python:
+    source: tools/convert_report.py

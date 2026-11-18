@@ -1,0 +1,51 @@
+identity:
+  name: createFolder
+  author: rollstack
+  label:
+    en_US: Create folder
+description:
+  human:
+    en_US: 'Creates a folder owned by the user: at the top level, which only owners and admins of the organization may, or inside a folder the user owns or has manage on.'
+  llm: 'Creates a folder owned by the user: at the top level, which only owners and admins of the organization may, or inside a folder the user owns or has manage on. Then file reports in it with updateReport''s folderId, or create them there with createReport. Each call creates another folder, even with the same name.'
+parameters:
+- name: name
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: The folder's name, as members will see it in Rollstack.
+  llm_description: The folder's name, as members will see it in Rollstack. Leading and trailing spaces are removed, and it can't be blank.
+- name: parentFolderId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Parent folder ID
+  human_description:
+    en_US: 'The folder to create it in, by its id from listFolders: one you own or have manage on.'
+  llm_description: 'The folder to create it in, by its `id` from `listFolders`: one you own or have `manage` on. Omit it or pass `null` to create it at the top level, which only owners and admins of the organization may.'
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the folder.
+    name:
+      type: string
+      description: The folder's name, as shown in Rollstack.
+    parentFolderId:
+      type: string
+      description: The folder this one is nested in.
+    permission:
+      type: string
+      description: 'What you can do in the folder: `view`, `edit` or `manage`, as in `listFolders`.'
+    access:
+      type: array
+      items:
+        type: object
+      description: Everyone with access to the folder, the owner first.
+extra:
+  python:
+    source: tools/create_folder.py

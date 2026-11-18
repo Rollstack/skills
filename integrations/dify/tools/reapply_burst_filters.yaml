@@ -1,0 +1,39 @@
+identity:
+  name: reapplyBurstFilters
+  author: rollstack
+  label:
+    en_US: Reapply burst filters
+description:
+  human:
+    en_US: 'Writes each variant''s filter values into its syncs again, as the app''s Reapply does: after syncs were added to the template, or a filter changed on its dashboard.'
+  llm: 'Writes each variant''s filter values into its syncs again, as the app''s Reapply does: after syncs were added to the template, or a filter changed on its dashboard. It reads the dashboards with your access to their connections, and runs nothing: run the variants afterwards with startBurstRun. Members who only contribute reapply their own variants. A Rollstack report''s burst returns 400.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: variantIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Variant IDs
+  human_description:
+    en_US: The variants to act on, by their id in listBurstVariants, instead of every variant.
+  llm_description: The variants to act on, by their `id` in `listBurstVariants`, instead of every variant. Each must be a variant of this burst. 1 to 500 ids. Pass them as text, separated by commas, or as a JSON array.
+output_schema:
+  type: object
+  properties:
+    reapplied:
+      type: array
+      items:
+        type: object
+      description: The variants whose filter values were written into their syncs again.
+extra:
+  python:
+    source: tools/reapply_burst_filters.py

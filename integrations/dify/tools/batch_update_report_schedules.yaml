@@ -1,0 +1,42 @@
+identity:
+  name: batchUpdateReportSchedules
+  author: rollstack
+  label:
+    en_US: Replace schedules of reports in a batch
+description:
+  human:
+    en_US: Gives up to 50 reports of any type the same schedules, replacing all of each report's current ones, as updateReportSchedules does for one; an empty list removes them all.
+  llm: 'Gives up to 50 reports of any type the same schedules, replacing all of each report''s current ones, as updateReportSchedules does for one; an empty list removes them all. Each schedule updates its whole report. Only the reports'' editors may. Answers one result per report, each naming its id, with its new schedules: a report you can''t edit fails on its own and keeps its schedules, while the others are still changed.'
+parameters:
+- name: ids
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: IDs
+  human_description:
+    en_US: The reports to act on, of any type, by their id from listReports.
+  llm_description: The reports to act on, of any `type`, by their `id` from `listReports`. From 1 to 50 ids; an id listed twice is acted on once. Pass them as text, separated by commas, or as a JSON array.
+- name: schedules
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Schedules
+  human_description:
+    en_US: The new schedules of every report.
+  llm_description: |-
+    The new schedules of every report. They replace all of each report's current schedules; send an empty list to remove them all. Each schedule updates the whole report: to update only some syncs of a report, set its schedules with `updateReportSchedules`. Up to 10.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"maxItems":10,"type":"array","items":{"type":"object","properties":{"frequency":{"type":"string","enum":["hourly","daily","weekly","monthly","quarterly"],"description":"How often the schedule runs. `hourly` runs every day at each time in `selectedTimes`, and takes no `cronExpression`. `daily`, `weekly`, `monthly` and `quarterly` run whenever `cronExpression` fires, and take no `selectedTimes`. For those, the frequency doesn't change when the report runs, but the app uses it to describe and edit the schedule, so pick the one that matches your cron expression."},"cronExpression":{"description":"When a `daily`, `weekly`, `monthly` or `quarterly` schedule runs: a five-field cron expression (minute, hour, day of month, month, day of week) in the schedule's `timezone`, such as `0 9 * * 1` for every Monday at 9:00, or `0 9 L * *` for 9:00 on the last day of each month. Required for those frequencies; omit it for `hourly`. Rollstack checks schedules every 15 minutes, so the minute field must include 0, 15, 30 or 45, and runs at other minutes are skipped. At most 100 characters.","examples":["0 9 * * 1"],"type":"string","maxLength":100},"selectedTimes":{"description":"The times of day an `hourly` schedule runs, every day, as 24-hour `HH:mm` in the schedule's `timezone`, such as `09:00` or `13:45`. Required for `hourly`; omit it for other frequencies. Each time must be on the quarter hour (`:00`, `:15`, `:30` or `:45`). From 1 to 96 times.","minItems":1,"maxItems":96,"type":"array","items":{"type":"string","pattern":"^([01]\\d|2[0-3]):(00|15|30|45)$","examples":["09:00"]}},"startDate":{"type":"string","format":"date-time","pattern":"^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$","description":"When the schedule starts: it never runs the report before this date and time. This is a local date and time in the schedule's `timezone`, written as if it were UTC: `2026-11-02T09:00:00Z` means 9:00 on November 2, 2026 in that timezone, not 9:00 UTC. For frequencies other than `hourly`, set it to the date and time of the first run: the app shows its time as the schedule's time, and when someone changes the schedule's frequency or days there, it rebuilds `cronExpression` at that time.","examples":["2026-11-02T09:00:00Z"]},"endDate":{"default":null,"description":"When the schedule ends: it never runs the report after this date and time. Omit it or pass `null` for a schedule that never ends. Like `startDate`, this is a local date and time in the schedule's `timezone`, written as if it were UTC. Must be later than `startDate`. Set it later than the last run you want: a run at exactly this time may be skipped.","examples":["2027-11-02T09:00:00Z"],"anyOf":[{"type":"string","format":"date-time","pattern":"^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"},{"type":"null"}]},"timezone":{"type":"string","minLength":1,"description":"The timezone the schedule runs in. Its run times (`cronExpression` or `selectedTimes`), `startDate` and `endDate` are all local times in this timezone, so a schedule set for 9:00 keeps running at 9:00 local time when daylight saving time starts or ends. Given as an IANA timezone name, such as `America/New_York`. UTC offsets such as `+05:30` aren't accepted.","examples":["America/New_York"]}},"required":["frequency","startDate","timezone"],"additionalProperties":false}}
+output_schema:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+      description: One result per report, each naming its `id`.
+extra:
+  python:
+    source: tools/batch_update_report_schedules.py

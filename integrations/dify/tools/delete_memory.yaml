@@ -1,0 +1,22 @@
+identity:
+  name: deleteMemory
+  author: rollstack
+  label:
+    en_US: Forget memory
+description:
+  human:
+    en_US: 'Has the slides agent forget a memory: its runs stop reading it, as forgetting it in the app''s Slides settings does.'
+  llm: 'Has the slides agent forget a memory: its runs stop reading it, as forgetting it in the app''s Slides settings does.'
+parameters:
+- name: memoryId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Memory ID
+  human_description:
+    en_US: The memory to act on, by its id from listMemories.
+  llm_description: The memory to act on, by its `id` from `listMemories`.
+extra:
+  python:
+    source: tools/delete_memory.py

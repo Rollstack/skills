@@ -1,0 +1,49 @@
+identity:
+  name: saveReportVersion
+  author: rollstack
+  label:
+    en_US: Save report version
+description:
+  human:
+    en_US: Saves a report of type SlideDeck as it is now in its Version history, with an optional name, so it can be restored later with restoreReportVersion, for example before a change the user may want to take back.
+  llm: Saves a report of type SlideDeck as it is now in its Version history, with an optional name, so it can be restored later with restoreReportVersion, for example before a change the user may want to take back. Rollstack already saves one before each change of the slides agent, each run and each template apply. Only its editors may. Each call saves another version.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: A name for the version, as members will see it in the report's Version history, from 1 to 100 characters.
+  llm_description: A name for the version, as members will see it in the report's Version history, from 1 to 100 characters. Without one, the app names it after the time it was saved.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Identifies the version.
+    name:
+      type: string
+      description: The name the version was saved with, such as `Before applying Acme` for the one a template apply saves.
+    kind:
+      type: string
+      description: What saved the version.
+    savedBy:
+      type: object
+      description: The member whose edit, run, message or call saved it.
+    createdAt:
+      type: string
+      description: When the version was saved.
+extra:
+  python:
+    source: tools/save_report_version.py

@@ -1,7 +1,8 @@
-"""How the reference is read from Rollstack's server, by tests/update_fixture.py and by the live test.
+"""How the reference is read from Rollstack, by tests/update_fixture.py and by the live test.
 
 The server lists its tools only for a key, and for a key only the tools it may call. These tests answer for it: what
-is sent, what is kept of its list, and what happens when the key is missing, refused or not shown every tool.
+is sent, what is kept of its list, and what happens when the key is missing, refused or not shown every tool. They
+also cover how the answers of the tools are read from Rollstack's OpenAPI document.
 """
 
 from __future__ import annotations
@@ -14,14 +15,18 @@ from typing import Any
 import pytest
 import requests
 
+import generate_tools
 import update_fixture
-from update_fixture import KEY_VARIABLE, ReferenceUnavailable, current, key_to_set, scopes
+from update_fixture import KEY_VARIABLE, ReferenceUnavailable, current, key_to_set, outputs, scopes
 
 KEY = "rsk_test_only"
 SAVED_BYTES = update_fixture.FIXTURE.read_bytes()
 SAVED = json.loads(SAVED_BYTES)["tools"]
-# The scopes the README and DEVELOPMENT.md tell people to give a key: when this changes, they change too
-SCOPES = "slide_decks:read, slide_decks:write and slide_decks:run"
+# Every scope a key needs to be shown every tool: when this changes, DEVELOPMENT.md and the README change too
+SCOPES = (
+    "slide_decks:read, slide_decks:write, slide_decks:run, slide_decks:email, connections:read, smtp:read and "
+    "users:read, made by an owner or admin"
+)
 
 
 class Answer:
@@ -38,9 +43,8 @@ class Answer:
 
 
 def listing(tools: list[dict[str, Any]]) -> Answer:
-    """The server's list of ``tools``, each with the fields the fixture doesn't keep."""
-    view = {"ui": {"resourceUri": "ui://rollstack/view-v1.html"}}
-    listed = [{**tool, "_meta": {**tool["_meta"], **view}, "outputSchema": {"type": "object"}} for tool in tools]
+    """The server's list of ``tools``, each with fields the fixture doesn't keep."""
+    listed = [{**tool, "_meta": {**tool["_meta"], "openai/outputTemplate": "x"}, "outputSchema": {"type": "object"}} for tool in tools]
     return Answer(200, {"jsonrpc": "2.0", "id": 1, "result": {"tools": listed}})
 
 
@@ -69,19 +73,24 @@ def rollstack(monkeypatch: pytest.MonkeyPatch):
 
 
 @pytest.fixture
-def fixture_copy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
-    """A copy of the fixture for the updater to write to."""
-    copy = tmp_path / "mcp_tools.json"
-    copy.write_bytes(SAVED_BYTES)
-    monkeypatch.setattr(update_fixture, "FIXTURE", copy)
-    return copy
+def files(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> SimpleNamespace:
+    """Copies of the fixtures for the updater to write to, an OpenAPI document, and a generator that records runs."""
+    tools, answers = tmp_path / "mcp_tools.json", tmp_path / "openapi_outputs.json"
+    tools.write_bytes(SAVED_BYTES)
+    monkeypatch.setattr(update_fixture, "FIXTURE", tools)
+    monkeypatch.setattr(update_fixture, "OUTPUTS", answers)
+    monkeypatch.setattr(update_fixture, "_openapi", lambda: OPENAPI)
+    generated: list[bool] = []
+    monkeypatch.setattr(generate_tools, "main", lambda: generated.append(True))
+    return SimpleNamespace(tools=tools, answers=answers, generated=generated)
 
 
-def test_the_list_is_asked_for_with_the_key_and_read_as_the_fixture_keeps_it(rollstack):
-    not_in_the_plugin = {**SAVED[0], "name": "deleteBurst"}
-    calls = rollstack(listing([not_in_the_plugin, *reversed(SAVED)]))
+def test_the_list_is_asked_for_with_the_key_and_kept_whole(rollstack):
+    new = {**SAVED[0], "name": "brandNewTool"}
+    calls = rollstack(listing([new, *SAVED]))
 
-    assert current(SAVED) == SAVED
+    # Every tool the server lists, in its order, new ones included, with only what the fixture keeps
+    assert current(SAVED) == [new, *SAVED]
     (call,) = calls
     assert call.url == "https://api.rollstack.com/public/v1/mcp"
     assert call.json == {"jsonrpc": "2.0", "id": 1, "method": "tools/list"}
@@ -89,8 +98,8 @@ def test_the_list_is_asked_for_with_the_key_and_read_as_the_fixture_keeps_it(rol
 
 
 def test_every_saved_tool_says_which_scope_it_needs():
-    for tool in SAVED:
-        assert scopes([tool]), tool["name"]
+    # submitFeedback works with any key, so it names no scope
+    assert [tool["name"] for tool in SAVED if not scopes([tool])] == ["submitFeedback", "confirmAction"]
     assert key_to_set(SAVED) == f"a Rollstack API key with the scopes {SCOPES}"
 
 
@@ -135,43 +144,133 @@ def test_a_server_that_does_not_answer_is_reported_without_the_key(rollstack, an
 
 
 def test_a_tool_the_key_is_not_shown_is_named_with_the_scope_it_needs(rollstack):
-    # What the server lists for a key that has only slide_decks:read
-    rollstack(listing([tool for tool in SAVED if scopes([tool]) == ["slide_decks:read"]]))
+    # What the server lists for a key that isn't an admin's: everything but listMembers
+    rollstack(listing([tool for tool in SAVED if tool["name"] != "listMembers"]))
 
     with pytest.raises(ReferenceUnavailable) as raised:
         current(SAVED)
 
     assert str(raised.value).startswith(
-        "Rollstack's server left createReport (slide_decks:write), sendReportMessage (slide_decks:run), "
-        "startReportRun (slide_decks:run) and updateReportSchedules (slide_decks:write) out of the list it gave the "
-        "key in ROLLSTACK_API_KEY. It lists for a key only the tools that key may call, so use a Rollstack API key "
-        f"with the scopes {SCOPES}. If the key has them, these tools were renamed or removed"
+        "Rollstack's server left listMembers (users:read) out of the list it gave the key in ROLLSTACK_API_KEY. It "
+        f"lists for a key only the tools that key may call, so use a Rollstack API key with the scopes {SCOPES}."
     )
 
 
-def test_the_updater_saves_nothing_when_a_tool_is_left_out(rollstack, fixture_copy):
+def test_the_updater_saves_nothing_when_a_tool_is_left_out(rollstack, files):
     rollstack(listing(SAVED[1:]))
 
     with pytest.raises(SystemExit, match=r"left listReports \(slide_decks:read\) out of the list .* Nothing was saved\.$"):
         update_fixture.main()
 
-    assert fixture_copy.read_bytes() == SAVED_BYTES
+    assert files.tools.read_bytes() == SAVED_BYTES
+    assert not files.answers.exists() and files.generated == []
 
 
-def test_the_updater_saves_what_the_server_lists_now(rollstack, fixture_copy, capsys):
+def test_the_updater_saves_what_rollstack_says_now_and_generates_the_tools(rollstack, files, capsys):
     changed = {**SAVED[0], "description": "A new description."}
-    rollstack(listing([changed, *SAVED[1:]]))
+    new = {**SAVED[1], "name": "brandNewTool"}
+    rollstack(listing([changed, new, *SAVED[1:]]))
 
     update_fixture.main()
 
-    assert json.loads(fixture_copy.read_text())["tools"] == [changed, *SAVED[1:]]
-    assert KEY not in fixture_copy.read_text() + capsys.readouterr().out
+    assert json.loads(files.tools.read_text())["tools"] == [changed, new, *SAVED[1:]]
+    assert json.loads(files.answers.read_text())["listReports"] == {
+        "group": "Reports",
+        "answer": "object",
+        "fields": {"data": {"type": "array", "description": "The reports on this page.", "items": "object"}},
+    }
+    assert files.generated == [True]
+    out = capsys.readouterr().out
+    assert "new: brandNewTool" in out
+    assert KEY not in files.tools.read_text() + out
 
 
-def test_the_updater_writes_the_file_back_as_it_was_when_nothing_changed(rollstack, fixture_copy):
+def test_the_updater_writes_the_file_back_as_it_was_when_nothing_changed(rollstack, files):
     rollstack(listing(SAVED))
 
     update_fixture.main()
 
     # So the diff of a refresh shows only what Rollstack changed
-    assert fixture_copy.read_bytes() == SAVED_BYTES
+    assert files.tools.read_bytes() == SAVED_BYTES
+
+
+# A small OpenAPI document with each shape of answer the plugin reads
+OPENAPI = {
+    "paths": {
+        "/reports": {
+            "get": {
+                "operationId": "listReports",
+                "tags": ["Reports"],
+                "responses": {
+                    "200": {"$ref": "#/components/responses/Page"},
+                    "default": {"content": {"application/json": {"schema": {"type": "object"}}}},
+                },
+            }
+        },
+        "/reports/{id}/schedules": {
+            "get": {
+                "operationId": "getReportSchedules",
+                "tags": ["Schedules"],
+                "responses": {"200": {"content": {"application/json": {"schema": {"type": "array", "items": {"type": "object"}}}}}},
+            }
+        },
+        "/memories/{id}": {"delete": {"operationId": "deleteMemory", "tags": ["Memories"], "responses": {"204": {"description": "Deleted"}}}},
+        "/reports/{id}/theme": {
+            "patch": {
+                "operationId": "updateReportTheme",
+                "tags": ["Content"],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {"properties": {"changed": {"type": "boolean", "description": "Whether it changed."}}},
+                                        {"properties": {"reason": {"type": ["string", "null"], "description": "Why not. Only then."}}},
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+            }
+        },
+    },
+    "components": {
+        "responses": {
+            "Page": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {"type": "array", "items": {"$ref": "#/components/schemas/Report"}, "description": "The reports on this page."},
+                                "mixed": {"anyOf": [{"type": "string"}, {"type": "array"}], "description": "Kept out."},
+                            },
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {"Report": {"type": "object"}},
+    },
+}
+
+
+def test_what_each_tool_answers_is_read_from_the_openapi_document():
+    names = ["listReports", "getReportSchedules", "deleteMemory", "updateReportTheme", "showReport"]
+
+    described = outputs(OPENAPI, [{"name": name} for name in names])
+
+    assert described == {
+        # A field that can be of more than one type is left to the json output
+        "listReports": {"group": "Reports", "answer": "object", "fields": {"data": {"type": "array", "description": "The reports on this page.", "items": "object"}}},
+        "getReportSchedules": {"group": "Schedules", "answer": "list", "items": "object", "fields": {}},
+        "deleteMemory": {"group": "Memories", "answer": "none", "fields": {}},
+        "updateReportTheme": {
+            "group": "Content",
+            "answer": "variants",
+            "fields": {"changed": {"type": "boolean", "description": "Whether it changed."}, "reason": {"type": "string", "description": "Why not."}},
+        },
+        "showReport": {"group": None, "answer": "unknown", "fields": {}},
+    }

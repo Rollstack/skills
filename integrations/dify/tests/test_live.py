@@ -4,8 +4,8 @@ They cover what a mocked answer can't: that the reference the plugin was written
 lists, and that the client's requests are ones the server accepts.
 
 The server answers a request only when it carries a key: without one it neither lists its tools nor opens a session.
-So the two checks that read an answer need ROLLSTACK_API_KEY, a Rollstack API key with the scope of every tool the
-plugin has, and are skipped without it. The two that send a wrong key need no account.
+So the two checks that read an answer need ROLLSTACK_API_KEY, a Rollstack API key with every scope, made by an owner
+or admin so that it is shown listMembers, and are skipped without it. The two that send a wrong key need no account.
 """
 
 from __future__ import annotations
@@ -39,8 +39,11 @@ def test_the_reference_has_not_changed():
         # can't say that nothing changed, so it fails here with the scope the key lacks rather than pass in part
         pytest.fail(str(error), pytrace=False)
 
-    for tool, now in zip(SAVED, listed):
-        assert now == tool, f"{tool['name']} changed on Rollstack's server: run tests/update_fixture.py and review"
+    now = {tool["name"]: tool for tool in listed}
+    added = [name for name in now if name not in {tool["name"] for tool in SAVED}]
+    assert not added, f"Rollstack's server has new tools, {', '.join(added)}: run tests/update_fixture.py and review"
+    for tool in SAVED:
+        assert now[tool["name"]] == tool, f"{tool['name']} changed on Rollstack's server: run tests/update_fixture.py and review"
 
 
 def test_a_tool_call_reaches_rollstack_and_a_wrong_key_is_refused():

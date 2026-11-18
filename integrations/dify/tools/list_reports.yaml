@@ -2,81 +2,81 @@ identity:
   name: listReports
   author: rollstack
   label:
-    en_US: "List reports"
+    en_US: List reports
 description:
   human:
-    en_US: "The reports the user can see, of every type, newest first."
-  llm: "The reports the user can see, of every type, newest first. Each report's type tells which endpoints work on it: the slides agent, exports, content, datasheets, parameters, templates, duplicating and ownership transfer take SlideDeck reports only, and syncs take the other types only. You can filter by folderId, name and type; when several are set, all must match, and name matching ignores case. Answers up to limit reports, 50 by default and 200 at most, and a nextCursor: pass it as cursor for the next page, until it is null."
+    en_US: The reports the user can see, of every type, newest first.
+  llm: 'The reports the user can see, of every type, newest first. Each report''s type tells which endpoints work on it: the slides agent, exports, content, datasheets, parameters, templates, duplicating and ownership transfer take SlideDeck reports only, and syncs take the other types only. You can filter by folderId, name and type; when several are set, all must match, and name matching ignores case. Answers up to limit reports, 50 by default and 200 at most, and a nextCursor: pass it as cursor for the next page, until it is null.'
 parameters:
-  - name: name
-    type: string
-    required: false
-    form: llm
+- name: folderId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Folder ID
+  human_description:
+    en_US: Only return reports directly in this folder, by its id from listFolders.
+  llm_description: Only return reports directly in this folder, by its `id` from `listFolders`. Reports in its subfolders aren't included.
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: 'Only return reports whose name contains this text, ignoring case: review matches Q3 Business Review.'
+  llm_description: 'Only return reports whose name contains this text, ignoring case: `review` matches `Q3 Business Review`.'
+- name: type
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Type
+  human_description:
+    en_US: Only return reports of this type, such as SlideDeck for the reports that the slides agent, exports and datasheets work on.
+  llm_description: Only return reports of this `type`, such as `SlideDeck` for the reports that the slides agent, exports and datasheets work on.
+  options:
+  - value: GoogleDocs
     label:
-      en_US: "Name"
-    human_description:
-      en_US: "Only return reports whose name contains this text, ignoring case: review matches Q3 Business Review."
-    llm_description: "Only return reports whose name contains this text, ignoring case: `review` matches `Q3 Business Review`."
-  - name: type
-    type: select
-    required: false
-    form: llm
+      en_US: GoogleDocs
+  - value: GoogleSlides
     label:
-      en_US: "Type"
-    human_description:
-      en_US: "Only return reports of this type, such as SlideDeck for the reports that the slides agent, exports and datasheets work on."
-    llm_description: "Only return reports of this `type`, such as `SlideDeck` for the reports that the slides agent, exports and datasheets work on."
-    options:
-      - value: GoogleDocs
-        label:
-          en_US: "GoogleDocs"
-      - value: GoogleSlides
-        label:
-          en_US: "GoogleSlides"
-      - value: MicrosoftPowerPoint
-        label:
-          en_US: "MicrosoftPowerPoint"
-      - value: MicrosoftWord
-        label:
-          en_US: "MicrosoftWord"
-      - value: Email
-        label:
-          en_US: "Email"
-      - value: UploadedPPTXFile
-        label:
-          en_US: "UploadedPPTXFile"
-      - value: SlideDeck
-        label:
-          en_US: "SlideDeck"
-  - name: folderId
-    type: string
-    required: false
-    form: llm
+      en_US: GoogleSlides
+  - value: MicrosoftPowerPoint
     label:
-      en_US: "Folder ID"
-    human_description:
-      en_US: "Only return reports directly in this folder, by its id from listFolders."
-    llm_description: "Only return reports directly in this folder, by its `id` from `listFolders`. Reports in its subfolders aren't included."
-  - name: limit
-    type: number
-    required: false
-    form: llm
+      en_US: MicrosoftPowerPoint
+  - value: MicrosoftWord
     label:
-      en_US: "Limit"
-    human_description:
-      en_US: "Maximum number of reports to return on this page, from 1 to 200."
-    llm_description: "Maximum number of reports to return on this page, from 1 to 200. Defaults to `50`."
-    min: 1
-    max: 200
-  - name: cursor
-    type: string
-    required: false
-    form: llm
+      en_US: MicrosoftWord
+  - value: Email
     label:
-      en_US: "Cursor"
-    human_description:
-      en_US: "Where to continue the list: pass the nextCursor returned with the previous page to get the next one."
-    llm_description: "Where to continue the list: pass the `nextCursor` returned with the previous page to get the next one. Omit it for the first page."
+      en_US: Email
+  - value: UploadedPPTXFile
+    label:
+      en_US: UploadedPPTXFile
+  - value: SlideDeck
+    label:
+      en_US: SlideDeck
+- name: limit
+  type: number
+  required: false
+  form: llm
+  label:
+    en_US: Limit
+  human_description:
+    en_US: Maximum number of reports to return on this page, from 1 to 200.
+  llm_description: Maximum number of reports to return on this page, from 1 to 200. Defaults to `50`.
+  min: 1
+  max: 200
+- name: cursor
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Cursor
+  human_description:
+    en_US: 'Where to continue the list: pass the nextCursor returned with the previous page to get the next one.'
+  llm_description: 'Where to continue the list: pass the `nextCursor` returned with the previous page to get the next one. Omit it for the first page.'
 output_schema:
   type: object
   properties:
@@ -84,10 +84,10 @@ output_schema:
       type: array
       items:
         type: object
-      description: "The reports on this page, of every `type`, most recently created first."
+      description: The reports on this page, of every `type`, most recently created first.
     nextCursor:
       type: string
-      description: "Pass it as `cursor` to get the next page of reports."
+      description: Pass it as `cursor` to get the next page of reports.
 extra:
   python:
     source: tools/list_reports.py

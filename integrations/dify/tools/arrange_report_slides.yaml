@@ -1,0 +1,69 @@
+identity:
+  name: arrangeReportSlides
+  author: rollstack
+  label:
+    en_US: Arrange slides
+description:
+  human:
+    en_US: Moves, removes, hides or shows slides of a slide deck, with nothing on them changed.
+  llm: 'Moves, removes, hides or shows slides of a slide deck, with nothing on them changed. Read the slides'' ids with getReportContent. order puts the slides in a new order and names every slide that stays, once each; remove takes slides out of the report; hide keeps a slide in the report but out of what is presented and exported, and show brings it back. Take the change back by restoring versionBeforeId with restoreReportVersion. Called with nothing to change, it answers every slide in order with whether it is hidden: getReportContent leaves hidden slides out. Only the report''s editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: order
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Order
+  human_description:
+    en_US: 'The report''s slides in their new order, by their id from getReportContent: every slide that stays, once each.'
+  llm_description: 'The report''s slides in their new order, by their `id` from `getReportContent`: every slide that stays, once each. Leave it out to keep the order. Pass them as text, separated by commas, or as a JSON array.'
+- name: remove
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Remove
+  human_description:
+    en_US: The slides to remove from the report, by their ids.
+  llm_description: The slides to remove from the report, by their ids. Pass them as text, separated by commas, or as a JSON array.
+- name: hide
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Hide
+  human_description:
+    en_US: 'The slides to hide, by their ids: they stay in the report and are left out when it is presented or exported.'
+  llm_description: 'The slides to hide, by their ids: they stay in the report and are left out when it is presented or exported. Pass them as text, separated by commas, or as a JSON array.'
+- name: show
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Show
+  human_description:
+    en_US: The hidden slides to show again, by their ids.
+  llm_description: The hidden slides to show again, by their ids. Pass them as text, separated by commas, or as a JSON array.
+output_schema:
+  type: object
+  properties:
+    versionBeforeId:
+      type: string
+      description: 'The version saved just before the change: restore it with `restoreReportVersion` to take the change back.'
+    slides:
+      type: array
+      items:
+        type: object
+      description: The report's slides after the change, in order.
+extra:
+  python:
+    source: tools/arrange_report_slides.py

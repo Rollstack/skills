@@ -1,0 +1,60 @@
+identity:
+  name: shareFolder
+  author: rollstack
+  label:
+    en_US: Share folder
+description:
+  human:
+    en_US: Shares a folder and everything in it with a member of the organization, or changes their permission, as Share in the app does.
+  llm: Shares a folder and everything in it with a member of the organization, or changes their permission, as Share in the app does. A member new to the folder gets an email. Needs manage on the folder, or owning it.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Folder ID
+  human_description:
+    en_US: The folder to act on, by its id from listFolders or createFolder.
+  llm_description: The folder to act on, by its `id` from `listFolders` or `createFolder`.
+- name: userId
+  type: number
+  required: true
+  form: llm
+  label:
+    en_US: User ID
+  human_description:
+    en_US: 'The member to share the folder with, or to unshare it from: their id from listMembers, which only owners and admins can call, or their userId in access from getFolder.'
+  llm_description: 'The member to share the folder with, or to unshare it from: their `id` from `listMembers`, which only owners and admins can call, or their `userId` in `access` from `getFolder`. Only active members of the organization. Anyone the folder is shared with can unshare it from themselves.'
+  max: 9007199254740991
+- name: permission
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Permission
+  human_description:
+    en_US: What the member can do with the folder and everything in it.
+  llm_description: What the member can do with the folder and everything in it. `view` lets them open its reports, `edit` also lets them change them, and `manage` also lets them rename, move and share the folder and add folders to it. If the folder is already shared with the member, this replaces their permission and they aren't notified again. Rollstack also shares the files of its reports that update a Google Drive or OneDrive file with them, as the app does.
+  options:
+  - value: view
+    label:
+      en_US: view
+  - value: edit
+    label:
+      en_US: edit
+  - value: manage
+    label:
+      en_US: manage
+output_schema:
+  type: object
+  properties:
+    userId:
+      type: number
+      description: 'The member the folder is now shared with: the `userId` from the path.'
+    permission:
+      type: string
+      description: 'What the member can now do with the folder: the `permission` you sent.'
+extra:
+  python:
+    source: tools/share_folder.py

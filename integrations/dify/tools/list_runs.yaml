@@ -1,0 +1,81 @@
+identity:
+  name: listRuns
+  author: rollstack
+  label:
+    en_US: List runs of all reports
+description:
+  human:
+    en_US: 'The runs that ended of every report the user can see, of any type, newest first, each with its report, for questions such as what failed overnight: pass status failed and since.'
+  llm: 'The runs that ended of every report the user can see, of any type, newest first, each with its report, for questions such as what failed overnight: pass status failed and since. Same fields as listReportRuns. Answers up to limit runs, 20 by default and 200 at most, and a nextCursor: pass it as cursor for the next page, until it is null.'
+parameters:
+- name: limit
+  type: number
+  required: false
+  form: llm
+  label:
+    en_US: Limit
+  human_description:
+    en_US: Maximum number of runs to return on this page, from 1 to 200.
+  llm_description: Maximum number of runs to return on this page, from 1 to 200. Defaults to `20`.
+  min: 1
+  max: 200
+- name: cursor
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Cursor
+  human_description:
+    en_US: 'Where to continue the list: pass the nextCursor returned with the previous page to get the next one.'
+  llm_description: 'Where to continue the list: pass the `nextCursor` returned with the previous page to get the next one. Omit it for the first page.'
+- name: status
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Status
+  human_description:
+    en_US: Only the runs that ended this way, such as failed, as status in the runs.
+  llm_description: Only the runs that ended this way, such as `failed`, as `status` in the runs. If omitted, every run.
+  options:
+  - value: succeeded
+    label:
+      en_US: succeeded
+  - value: partiallySucceeded
+    label:
+      en_US: partiallySucceeded
+  - value: failed
+    label:
+      en_US: failed
+  - value: cancelled
+    label:
+      en_US: cancelled
+  - value: inactive
+    label:
+      en_US: inactive
+  - value: skipped
+    label:
+      en_US: skipped
+- name: since
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Since
+  human_description:
+    en_US: Only what happened at or after this time, as an ISO 8601 date and time in UTC, such as 2026-11-08T18:00:00Z.
+  llm_description: Only what happened at or after this time, as an ISO 8601 date and time in UTC, such as `2026-11-08T18:00:00Z`. If omitted, from the start.
+output_schema:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+      description: The runs that ended of every report you can see, of any type, newest first, whoever started them.
+    nextCursor:
+      type: string
+      description: Pass it as `cursor` to get the next page of runs.
+extra:
+  python:
+    source: tools/list_runs.py

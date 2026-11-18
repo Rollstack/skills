@@ -1,0 +1,21 @@
+identity:
+  name: listSmtpConnections
+  author: rollstack
+  label:
+    en_US: List SMTP connections
+description:
+  human:
+    en_US: The user's SMTP connections and the ones shared with the organization, without their credentials.
+  llm: The user's SMTP connections and the ones shared with the organization, without their credentials.
+parameters: []
+output_schema:
+  type: object
+  properties:
+    smtpConnections:
+      type: array
+      items:
+        type: object
+      description: The user's SMTP connections and the ones shared with the organization, without their credentials.
+extra:
+  python:
+    source: tools/list_smtp_connections.py

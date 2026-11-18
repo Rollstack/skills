@@ -1,0 +1,229 @@
+identity:
+  name: updateReportEmailConfig
+  author: rollstack
+  label:
+    en_US: Replace email settings
+description:
+  human:
+    en_US: Sets who a report's email goes to and how it is sent, for a report of any type, replacing the settings this endpoint covers; Drive sharing, attachment folders and the email's subject and body stay as set in the app.
+  llm: 'Sets who a report''s email goes to and how it is sent, for a report of any type, replacing the settings this endpoint covers; Drive sharing, attachment folders and the email''s subject and body stay as set in the app. Only its editors may. The sender must be the user''s own or shared with the organization. A report that sends to several recipient groups returns 400: change those in the app.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+- name: to
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: To
+  human_description:
+    en_US: The addresses to send the report's email to.
+  llm_description: 'The addresses to send the report''s email to. If empty, no one receives it: the report''s runs send no email and `sendReportEmail` returns 400. At most 100 addresses across `to`, `cc` and `bcc`. Pass them as text, separated by commas, or as a JSON array.'
+- name: cc
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: CC
+  human_description:
+    en_US: The addresses to copy on the report's email, which every recipient can see.
+  llm_description: The addresses to copy on the report's email, which every recipient can see. If omitted, no one is copied. Counts toward the 100 addresses allowed across `to`, `cc` and `bcc`. Pass them as text, separated by commas, or as a JSON array.
+- name: bcc
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: BCC
+  human_description:
+    en_US: The addresses to also send the report's email to without the other recipients seeing them.
+  llm_description: The addresses to also send the report's email to without the other recipients seeing them. If omitted, no one is blind-copied. Counts toward the 100 addresses allowed across `to`, `cc` and `bcc`. Pass them as text, separated by commas, or as a JSON array.
+- name: replyTo
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Reply to
+  human_description:
+    en_US: The addresses recipients' replies should go to instead of the sender.
+  llm_description: The addresses recipients' replies should go to instead of the sender. They don't receive the email themselves. If omitted, replies go to the sender. Pass them as text, separated by commas, or as a JSON array.
+- name: groupRecipients
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Group recipients
+  human_description:
+    en_US: Whether to send one email to all the addresses in to together.
+  llm_description: Whether to send one email to all the addresses in `to` together. Set it to `false` to send each address in `to` its own email with the same `cc`, `bcc` and `replyTo`; the addresses in `cc` and `bcc` then receive one copy per address in `to`. Defaults to `true`.
+- name: smtpServerId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: SMTP server ID
+  human_description:
+    en_US: The SMTP connection to send the report's email through, from listSmtpConnections; recipients see its from address as the sender.
+  llm_description: The SMTP connection to send the report's email through, from `listSmtpConnections`; recipients see its `from` address as the sender. If `null` or omitted, the email is sent from Rollstack's own address. A connection `listSmtpConnections` doesn't list, or a Google or Microsoft account Rollstack can no longer send from, returns 403 unless it is already the report's sender.
+- name: sharingFormat
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Sharing format
+  human_description:
+    en_US: How the email delivers the report.
+  llm_description: How the email delivers the report. `pdf` and `ppt` send it as a PDF or PowerPoint file, attached or behind a download button (see `sendAttachmentAsLink`); a slide deck leaves its hidden slides out. `link` sends a link to the Google Drive or OneDrive file an older report updates, shared with the recipients as set in the app; an email report sends its content in the email itself, and a slide deck has no such file, so one whose settings still contain `link` is emailed as a PDF behind a download button. `cloudLink` (Exported link in the app), for slide decks only, sends a link to the copy exported to Google Drive or OneDrive and shares it with the addresses in `to`, `cc` and `bcc` with the sharing permission set in the app, viewer unless changed there; if no permission is set, as after PDF or PPT was picked in the app, the copy isn't shared with them. `cloudLink` on an older report, `link` on a slide deck, or `ppt` on a Google Docs or Word report returns 400. For `cloudLink`, set up the export in the report's Update runs settings in the app first. If omitted, keeps the current format, or for a report whose email isn't set up yet, `pdf` on a slide deck and `link` on an older report.
+  options:
+  - value: link
+    label:
+      en_US: link
+  - value: pdf
+    label:
+      en_US: pdf
+  - value: ppt
+    label:
+      en_US: ppt
+  - value: cloudLink
+    label:
+      en_US: cloudLink
+- name: sendAttachmentAsLink
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Send attachment as link
+  human_description:
+    en_US: Whether the email puts the pdf or ppt file behind a Download PDF or Download PPT button instead of attaching it.
+  llm_description: Whether the email puts the `pdf` or `ppt` file behind a Download PDF or Download PPT button instead of attaching it. When `false`, the file is attached. Has no effect with `cloudLink`. If omitted, keeps the current setting, or for a report whose email isn't set up yet, `true` on a slide deck and `false` on an older report.
+- name: trigger
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Trigger
+  human_description:
+    en_US: Which of the report's runs email it automatically.
+  llm_description: 'Which of the report''s runs email it automatically. A run emails it when it updates everything, or when all its failures are in `ignoredFailureStatusMessages`. On a slide deck, `all` and `scheduled` work the same way: only runs started by its schedules (see `getReportSchedules`) send the email, and a slide deck with no datasheets is never emailed by its runs. On an older report, `all` emails after every run of the whole report, whether started by a schedule, with `startReportRun` or in the app, and `scheduled` only after runs its schedules start; a run of only some syncs never emails it. With `none` (Manual in the app), no run sends it: the email goes out only when sent with `sendReportEmail` or from the app. Defaults to `all`.'
+  options:
+  - value: all
+    label:
+      en_US: all
+  - value: none
+    label:
+      en_US: none
+  - value: scheduled
+    label:
+      en_US: scheduled
+- name: ignoredFailureStatusMessages
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Ignored failure status messages
+  human_description:
+    en_US: The failures that shouldn't stop a run from emailing the report (see trigger).
+  llm_description: |-
+    The failures that shouldn't stop a run from emailing the report (see `trigger`). A run with failures still sends the email when all of them are in this list. On a slide deck, a run in which every datasheet fails never does. On a slide deck, include `internal_server_error` to email the report even when some of its datasheets fail. On an older report, include the `error.code` values from `listReportSyncs` to ignore. Defaults to `slide_not_found` alone, so by default a slide deck's run with any failed datasheet sends no email, and an older report's run still emails when only syncs on a missing slide fail.
+
+    The other values describe why a sync of an older report failed, and have an effect only on older reports:
+
+    - `dashboard_not_found`, or the older `tableau_view_not_found`: the dashboard, Tableau workbook, Power BI report or spreadsheet could not be found.
+    - `dashboard_tab_not_found`: the dashboard tab, Tableau view, Power BI report page or spreadsheet sheet could not be found.
+    - `dashboard_not_ready`: the dashboard took too long to load.
+    - `dashboard_has_errors`: the dashboard or spreadsheet failed to load because of an error in the tool it comes from.
+    - `dashboard_invalid_layout`: the dashboard's layout is invalid, and it needs to be saved again.
+    - `element_not_found`, or the older `metabase_element_not_found` and `looker_element_not_found`: the visualization could not be found.
+    - `slide_not_found`, or the older `google_slide_not_found`: the slide that shows the visualization could not be found.
+    - `file_not_found`: the spreadsheet file the visualization comes from could not be found.
+    - `sheet_not_found`: the spreadsheet sheet could not be found.
+    - `sheet_hidden`: the spreadsheet sheet is hidden and needs to be unhidden.
+    - `range_not_found`: the spreadsheet range could not be found.
+    - `duplicate_file_failed`: Rollstack could not prepare the spreadsheet file for the update.
+    - `merged_range_on_filter_range`: the visualization has merged cells, which filters can't be applied to.
+    - `insufficient_permissions`: the owner doesn't have edit access to the file.
+    - `image_cropping_failed`: Rollstack could not crop the visualization's image.
+    - `visualization_not_found`: the visualization could not be found in the dashboard.
+    - `visualization_not_ready`: the visualization took too long to load.
+    - `visualization_has_errors`: the visualization failed to load because of an error in the tool it comes from.
+    - `visualization_empty`, or the older `empty_data`: the visualization is empty.
+    - `invalid_credentials`: the connection's credentials are invalid.
+    - `missing_credentials`: the connection's credentials were deleted, or the owner's access to it was suspended.
+    - `instance_unavailable`: the data source's instance is temporarily unavailable.
+    - `column_not_found`: a column the native chart uses is missing from its data.
+    - `fetch_summary_data_error`, `fetch_visual_specification_error`, `missing_data`, `missing_formatted_value` and `viz_not_ready`: Rollstack could not fetch the data of a native chart.
+    - `incorrect_data_structure`: the native chart's structure doesn't fit its data.
+    - `malformed_data`: Rollstack could not fetch the data of a native chart or, from Snowflake, Databricks or BigQuery, the query is invalid.
+    - `worksheet_not_found`: the Tableau worksheet could not be found.
+    - `sync_not_found`: the visualization was deleted.
+    - `file_update_failed`: the data was fetched but could not be written into the file. Pass them as text, separated by commas, or as a JSON array. Each one of: tableau_view_not_found, dashboard_not_found, dashboard_tab_not_found, dashboard_not_ready, dashboard_has_errors, dashboard_invalid_layout, metabase_element_not_found, looker_element_not_found, element_not_found, google_slide_not_found, slide_not_found, file_not_found, sheet_not_found, sheet_hidden, range_not_found, duplicate_file_failed, merged_range_on_filter_range, insufficient_permissions, image_cropping_failed, visualization_not_found, visualization_not_ready, visualization_has_errors, visualization_empty, invalid_credentials, missing_credentials, instance_unavailable, column_not_found, empty_data, fetch_summary_data_error, fetch_visual_specification_error, incorrect_data_structure, missing_data, missing_formatted_value, malformed_data, viz_not_ready, worksheet_not_found, sync_not_found, file_update_failed, internal_server_error.
+- name: emailAnalyticsEnabled
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Email analytics enabled
+  human_description:
+    en_US: Whether to track when recipients open the report's email; opened emails show as Opened in the report's Email sends panel in the app.
+  llm_description: Whether to track when recipients open the report's email; opened emails show as Opened in the report's Email sends panel in the app. Setting it to `true` returns 403 unless email analytics is on for the organization (`emailAnalyticsEnabled` from `getOrganization`). Defaults to `false`.
+output_schema:
+  type: object
+  properties:
+    to:
+      type: array
+      items:
+        type: string
+      description: The addresses the report's email is sent to.
+    cc:
+      type: array
+      items:
+        type: string
+      description: The addresses copied on the report's email, which every recipient can see.
+    bcc:
+      type: array
+      items:
+        type: string
+      description: The addresses that also receive the report's email without the other recipients seeing them.
+    replyTo:
+      type: array
+      items:
+        type: string
+      description: The addresses recipients' replies go to instead of the sender.
+    groupRecipients:
+      type: boolean
+      description: Whether all the addresses in `to` receive one email together.
+    smtpServerId:
+      type: string
+      description: The SMTP connection the report's email is sent through, from `listSmtpConnections`; recipients see its `from` address as the sender.
+    sharingFormat:
+      type: string
+      description: How the email delivers the report.
+    sendAttachmentAsLink:
+      type: boolean
+      description: Whether the email puts the `pdf` or `ppt` file behind a Download PDF or Download PPT button instead of attaching it.
+    trigger:
+      type: string
+      description: Which of the report's runs email it automatically.
+    ignoredFailureStatusMessages:
+      type: array
+      items:
+        type: string
+      description: The failures that don't stop a run from emailing the report (see `trigger`).
+    emailAnalyticsEnabled:
+      type: boolean
+      description: Whether Rollstack tracks when recipients open the report's email; opened emails show as Opened in the report's Email sends panel in the app.
+    createdAt:
+      type: string
+      description: When the report's email settings were created.
+    updatedAt:
+      type: string
+      description: When the report's email settings were last saved.
+extra:
+  python:
+    source: tools/update_report_email_config.py

@@ -1,0 +1,47 @@
+identity:
+  name: updateBurstVariantRecipients
+  author: rollstack
+  label:
+    en_US: Set variant recipients
+description:
+  human:
+    en_US: Sets who each variant's email goes to, replacing its to, cc and bcc.
+  llm: Sets who each variant's email goes to, replacing its to, cc and bcc. Its other email settings, such as its sender and which runs send it, stay as copied from the template; a variant without email settings gets the defaults. Sends no email. As in the app, the burst's owner and admins can set any variant's recipients, other members only those of variants they own or can edit; the others are skipped, as is a variant with several recipient groups, which the app asks to reconcile first.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: variants
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Variants
+  human_description:
+    en_US: The variants whose recipients to replace, 1 to 500.
+  llm_description: |-
+    The variants whose recipients to replace, 1 to 500. The other variants, and the rest of each variant's email settings, stay as they are.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"minItems":1,"maxItems":500,"type":"array","items":{"type":"object","properties":{"id":{"type":"string","description":"The variant, by its `id` in `listBurstVariants`."},"to":{"type":"array","items":{"type":"string","format":"email","pattern":"^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$","examples":["jane@acme.com"]},"description":"The addresses to send the variant's email to. If empty, no one receives it. At most 100 addresses across `to`, `cc` and `bcc`."},"cc":{"default":[],"description":"The addresses to copy on the variant's email, which every recipient can see. If omitted, no one is copied.","type":"array","items":{"type":"string","format":"email","pattern":"^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$","examples":["jane@acme.com"]}},"bcc":{"default":[],"description":"The addresses to also send the variant's email to without the other recipients seeing them. If omitted, no one is blind-copied.","type":"array","items":{"type":"string","format":"email","pattern":"^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$","examples":["jane@acme.com"]}}},"required":["id","to"],"additionalProperties":false}}
+output_schema:
+  type: object
+  properties:
+    updated:
+      type: array
+      items:
+        type: string
+      description: The variants whose recipients were replaced, by their `id`.
+    skipped:
+      type: array
+      items:
+        type: string
+      description: 'The variants passed that were left as they were, by their `id`: those you can''t edit, since you only contribute to the burst, and ids that aren''t variants of it.'
+extra:
+  python:
+    source: tools/update_burst_variant_recipients.py

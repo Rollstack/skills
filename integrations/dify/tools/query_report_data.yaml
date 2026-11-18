@@ -1,0 +1,58 @@
+identity:
+  name: queryReportData
+  author: rollstack
+  label:
+    en_US: Query report data
+description:
+  human:
+    en_US: Runs one read-only SQL query over the tables of a report's datasheets, to check a figure before it goes on a slide or to explore data before shaping it.
+  llm: 'Runs one read-only SQL query over the tables of a report''s datasheets, to check a figure before it goes on a slide or to explore data before shaping it. It reads the copies stored at the sources'' last reads, never a source, and saves nothing: a datasheet''s table is the one getReportDatasheetData answers. Only the report''s editors may. At most 200 rows and 30 seconds a query. Your queries run one at a time, together with your previewReportDatasheetChanges and saveReportDatasheetChanges calls and the renderReportSlides calls that carry datasheetChanges: send the next only once this one answers, never several at once, and check several figures in one query, as columns of one row or rows of a UNION ALL. At most 30 queries and previewReportDatasheetChanges calls a minute per user, counted together.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: sql
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: SQL
+  human_description:
+    en_US: One read-only DuckDB query (SELECT or WITH).
+  llm_description: 'One read-only DuckDB query (`SELECT` or `WITH`). Its tables are the report''s datasheets, named by their `id` from `listReportDatasheets` in double quotes, as in `SELECT region, SUM(revenue) AS revenue FROM "<id>" GROUP BY region`. A column is a number when every value is one, else text, dates included: `CAST` an ISO date (`YYYY-MM-DD`) to `DATE` before `year()`, `date_trunc()` or date arithmetic. Give every computed column a name with `AS`.'
+output_schema:
+  type: object
+  properties:
+    columns:
+      type: array
+      items:
+        type: object
+      description: The columns of the table, in the same order as the cells of each row in `rows`.
+    rows:
+      type: array
+      items:
+        type: array
+      description: The rows of the table, starting from the first, at most `limit` of them.
+    totalRow:
+      type: boolean
+      description: Total row
+    subtotals:
+      type: object
+      description: 'When the datasheet''s query adds subtotals: `rowFields` are the columns its rows are grouped by, outermost first, and `levels` has one number per row in `rows`, how many of those columns the row is grouped by.'
+    rowFields:
+      type: array
+      items:
+        type: string
+      description: Row fields
+    truncated:
+      type: boolean
+      description: Whether the table has more rows than `limit`, so `rows` doesn't contain all of them.
+extra:
+  python:
+    source: tools/query_report_data.py

@@ -1,0 +1,61 @@
+identity:
+  name: getReportCloudExport
+  author: rollstack
+  label:
+    en_US: Get cloud save
+description:
+  human:
+    en_US: Where a report is saved after its runs, in Google Drive, OneDrive or SharePoint, and how its last save went, with a link to the saved file.
+  llm: Where a report is saved after its runs, in Google Drive, OneDrive or SharePoint, and how its last save went, with a link to the saved file. Answers 404 until it is set up with updateReportCloudExport or in the app's scheduling panel.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+output_schema:
+  type: object
+  properties:
+    provider:
+      type: string
+      description: 'Where the report is saved: `google` saves it to Google Drive as a Google Slides presentation, with its charts as linked Google Sheets charts, and `microsoft` saves it to OneDrive or SharePoint as a PowerPoint file with native charts.'
+    folder:
+      type: object
+      description: The folder the report is saved in.
+    fileName:
+      type: string
+      description: The saved file's name.
+    trigger:
+      type: string
+      description: 'Which runs save it: `all` after every run that doesn''t fail, `scheduled` only after the report''s scheduled runs, and `none` never, which stops saving it and keeps the setting.'
+    updateMethod:
+      type: string
+      description: '`update` replaces the saved file with the new version.'
+    datestampSuffix:
+      type: string
+      description: How `archive` dates the copies it keeps, as a moment.js format such as `MM/DD/YYYY` or `YYYY-MM-DD`.
+    ignoreFailuresOnArchive:
+      type: boolean
+      description: With `archive`, whether a copy that fails still lets the save go on.
+    fileUrl:
+      type: string
+      description: A link to the saved file, which its sharing in Google Drive, OneDrive or SharePoint lets people open.
+    runsAsUserId:
+      type: number
+      description: 'The member whose Google or Microsoft account saves it, as `id` in `listMembers`: the one who last chose its folder.'
+    lastStatus:
+      type: string
+      description: Whether the last save worked.
+    lastStatusMessage:
+      type: string
+      description: Why the last save failed.
+    lastExportedAt:
+      type: string
+      description: When the report was last saved.
+extra:
+  python:
+    source: tools/get_report_cloud_export.py

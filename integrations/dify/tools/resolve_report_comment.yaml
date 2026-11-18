@@ -1,0 +1,67 @@
+identity:
+  name: resolveReportComment
+  author: rollstack
+  label:
+    en_US: Resolve comment thread
+description:
+  human:
+    en_US: Resolves a comment thread once what it asked for is done, or opens it again, as the user.
+  llm: Resolves a comment thread once what it asked for is done, or opens it again, as the user. Only a thread's first comment can be resolved. Members who can comment on the report may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: commentId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Comment ID
+  human_description:
+    en_US: The thread to act on, by its first comment's id from listReportComments, the one whose threadId is null.
+  llm_description: The thread to act on, by its first comment's `id` from `listReportComments`, the one whose `threadId` is `null`.
+- name: resolved
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Resolved
+  human_description:
+    en_US: true to resolve the thread, false to open it again.
+  llm_description: '`true` to resolve the thread, `false` to open it again. Defaults to `true`.'
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the comment.
+    threadId:
+      type: string
+      description: The thread the comment replies to, by its first comment's `id`.
+    slideId:
+      type: string
+      description: The slide the thread is on, as `slideId` in `getReportContent`.
+    author:
+      type: object
+      description: Who wrote it.
+    byAgent:
+      type: boolean
+      description: Whether the Rollstack Agent posted it, answering a comment that tagged @Rollstack.
+    createdAt:
+      type: string
+      description: When the comment was posted.
+    resolvedAt:
+      type: string
+      description: When its thread was resolved.
+    resolvedBy:
+      type: object
+      description: Who resolved the thread.
+extra:
+  python:
+    source: tools/resolve_report_comment.py

@@ -1,0 +1,76 @@
+identity:
+  name: createReportComment
+  author: rollstack
+  label:
+    en_US: Add comment
+description:
+  human:
+    en_US: Starts a comment thread on a slide of a report, or replies to a thread, as the user.
+  llm: Starts a comment thread on a slide of a report, or replies to a thread, as the user. A reply notifies the thread's other participants who can still open the report. Members who can comment on the report may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: text
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Text
+  human_description:
+    en_US: 'The comment, as plain text: each line becomes a paragraph, and Markdown marks such as ** and # are removed.'
+  llm_description: 'The comment, as plain text: each line becomes a paragraph, and Markdown marks such as `**` and `#` are removed. Mentions and @Rollstack requests can only be written in the app. At most 5000 characters.'
+- name: slideId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Slide ID
+  human_description:
+    en_US: The slide to start a new thread on, as slideId in getReportContent.
+  llm_description: The slide to start a new thread on, as `slideId` in `getReportContent`. Leave it out with `threadId`.
+- name: threadId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Thread ID
+  human_description:
+    en_US: The thread to reply to, by its first comment's id from listReportComments.
+  llm_description: The thread to reply to, by its first comment's `id` from `listReportComments`. The reply goes on the thread's slide, and the thread's other participants are notified.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the comment.
+    threadId:
+      type: string
+      description: The thread the comment replies to, by its first comment's `id`.
+    slideId:
+      type: string
+      description: The slide the thread is on, as `slideId` in `getReportContent`.
+    author:
+      type: object
+      description: Who wrote it.
+    byAgent:
+      type: boolean
+      description: Whether the Rollstack Agent posted it, answering a comment that tagged @Rollstack.
+    createdAt:
+      type: string
+      description: When the comment was posted.
+    resolvedAt:
+      type: string
+      description: When its thread was resolved.
+    resolvedBy:
+      type: object
+      description: Who resolved the thread.
+extra:
+  python:
+    source: tools/create_report_comment.py

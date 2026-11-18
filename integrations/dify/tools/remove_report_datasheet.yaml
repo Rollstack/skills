@@ -1,0 +1,39 @@
+identity:
+  name: removeReportDatasheet
+  author: rollstack
+  label:
+    en_US: Remove datasheet from report
+description:
+  human:
+    en_US: Removes a datasheet the report's slides no longer show, such as a source that was added and not used, or one whose read keeps failing.
+  llm: 'Removes a datasheet the report''s slides no longer show, such as a source that was added and not used, or one whose read keeps failing. A datasheet a chart, table, picture or sentence still shows is refused: change or remove that slide first. The source itself, such as the dashboard or the uploaded file, is not touched. Only the report''s editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: datasheetId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Datasheet ID
+  human_description:
+    en_US: One of this report's datasheets, by its id in listReportDatasheets.
+  llm_description: One of this report's datasheets, by its `id` in `listReportDatasheets`.
+output_schema:
+  type: object
+  properties:
+    removed:
+      type: array
+      items:
+        type: string
+      description: The datasheet removed.
+extra:
+  python:
+    source: tools/remove_report_datasheet.py

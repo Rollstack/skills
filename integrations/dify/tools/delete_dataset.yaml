@@ -1,0 +1,22 @@
+identity:
+  name: deleteDataset
+  author: rollstack
+  label:
+    en_US: Delete an uploaded file
+description:
+  human:
+    en_US: Deletes an uploaded CSV file or workbook.
+  llm: Deletes an uploaded CSV file or workbook. Reports built on it keep what they last showed, and their datasheets fail on the next read. Only the user who created it may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Uploaded file ID
+  human_description:
+    en_US: 'The uploaded file to replace or delete: the id returned by createDataset.'
+  llm_description: 'The uploaded file to replace or delete: the `id` returned by `createDataset`. Only the user who uploaded the file can replace or delete it; for anyone else, the request fails with a `404`, as if the file did not exist.'
+extra:
+  python:
+    source: tools/delete_dataset.py

@@ -1,0 +1,34 @@
+identity:
+  name: createDatasetUpload
+  author: rollstack
+  label:
+    en_US: Get a link to upload a file
+description:
+  human:
+    en_US: 'Answers a link to send a CSV file or an Excel workbook (.xlsx) to from a shell, as it is on disk, at most 10 MB: use it when the user gives you a file, in place of writing a CSV into createDataset, and for every workbook.'
+  llm: 'Answers a link to send a CSV file or an Excel workbook (.xlsx) to from a shell, as it is on disk, at most 10 MB: use it when the user gives you a file, in place of writing a CSV into createDataset, and for every workbook. Run the command it answers with the path of the file. The upload answers the uploaded file with its id, as createDataset does: add it to a report with addReportDatasheets, a workbook after reading its sheets with getDataset. With datasetId, the file replaces the content of that uploaded file. The link works for 10 minutes and for one file: a file that is refused uses it up, so ask for another. Without a shell, write the CSV into createDataset. At most 20 links a minute per user.'
+parameters:
+- name: datasetId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Dataset ID
+  human_description:
+    en_US: 'An uploaded file to replace the content of: its id from createDataset, or a datasheet''s datasetId in listReportDatasheets.'
+  llm_description: 'An uploaded file to replace the content of: its `id` from `createDataset`, or a datasheet''s `datasetId` in `listReportDatasheets`. The file sent must be of its kind, a CSV for a CSV and a workbook for a workbook, and it keeps its id and name. Only the user who uploaded it may. Omit it to upload a new file.'
+output_schema:
+  type: object
+  properties:
+    uploadUrl:
+      type: string
+      description: 'Where to send the file, as `multipart/form-data` in the `file` field, with no API key: the link is the permission, for one file.'
+    command:
+      type: string
+      description: 'A curl command that sends the file: replace `PATH_TO_FILE` with the file''s path and run it in a shell.'
+    expiresAt:
+      type: string
+      description: When the link stops working, 10 minutes after it was made.
+extra:
+  python:
+    source: tools/create_dataset_upload.py

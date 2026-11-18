@@ -1,0 +1,30 @@
+identity:
+  name: listReportSyncs
+  author: rollstack
+  label:
+    en_US: List report syncs
+description:
+  human:
+    en_US: 'The syncs of a report other than a SlideDeck, such as a Google Slides presentation or an email report: each chart, table or text it pulls from a source, with how it did the last time it updated and why it failed.'
+  llm: 'The syncs of a report other than a SlideDeck, such as a Google Slides presentation or an email report: each chart, table or text it pulls from a source, with how it did the last time it updated and why it failed. Pass the failed ones'' ids as `syncIds` to `startReportRun` to update only those. A SlideDeck report has datasheets instead and returns `400`.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+output_schema:
+  type: object
+  properties:
+    syncs:
+      type: array
+      items:
+        type: object
+      description: 'The syncs of a report other than a SlideDeck, such as a Google Slides presentation or an email report: each chart, table or text it pulls from a source, with how it did the last time it updated and why it failed.'
+extra:
+  python:
+    source: tools/list_report_syncs.py

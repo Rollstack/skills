@@ -1,0 +1,99 @@
+identity:
+  name: updateReportParameter
+  author: rollstack
+  label:
+    en_US: Update report parameter
+description:
+  human:
+    en_US: 'Changes a parameter of a report, such as its value to show the report for another region, as the app''s report parameters editor does: what you send changes and the rest stays.'
+  llm: 'Changes a parameter of a report, such as its value to show the report for another region, as the app''s report parameters editor does: what you send changes and the rest stays. A new value is written into the filters and columns it links and their datasheets are read again, so the report''s slides change; follow that read with runId. Answers the parameter. Only the report''s editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: parameterId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Parameter ID
+  human_description:
+    en_US: The parameter to act on, by its id in parameters from getReportParameters.
+  llm_description: The parameter to act on, by its `id` in `parameters` from `getReportParameters`.
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: The parameter's new name, as shown in Rollstack.
+  llm_description: The parameter's new name, as shown in Rollstack. It can't be the name of another parameter of the report.
+- name: filterIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Filter IDs
+  human_description:
+    en_US: 'All the filters the parameter links from now on, by their id in filters from getReportParameters, replacing the ones it links: a filter left out keeps the value it holds, and a filter added must have no other parameterId.'
+  llm_description: 'All the filters the parameter links from now on, by their `id` in `filters` from `getReportParameters`, replacing the ones it links: a filter left out keeps the value it holds, and a filter added must have no other `parameterId`. If omitted, it links the same filters. Pass them as text, separated by commas, or as a JSON array.'
+- name: columns
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Columns
+  human_description:
+    en_US: 'All the columns the parameter links from now on, by datasheetId and column as columns in getReportParameters lists them, replacing the ones it links: a column left out keeps the row filter it holds, and a column added must have no other parameterId.'
+  llm_description: |-
+    All the columns the parameter links from now on, by `datasheetId` and `column` as `columns` in `getReportParameters` lists them, replacing the ones it links: a column left out keeps the row filter it holds, and a column added must have no other `parameterId`. If omitted, it links the same columns.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"maxItems":200,"type":"array","items":{"type":"object","properties":{"datasheetId":{"type":"string","format":"uuid","pattern":"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$","description":"The datasheet's id, as `datasheetId` in `columns` from `getReportParameters`."},"column":{"type":"string","minLength":1,"maxLength":255,"description":"The column's name, as `column` in `columns` from `getReportParameters`."}},"required":["datasheetId","column"],"additionalProperties":false}}
+- name: value
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Value
+  human_description:
+    en_US: The parameter's new value, of the valueType of the filters it links.
+  llm_description: |-
+    The parameter's new value, of the `valueType` of the filters it links. It is written into those filters and their datasheets are read again with it, so the report's slides change. `null` clears it, and the filters keep the values they hold. If omitted, the value stays. A value of a report parameter, in the shape of its type. Copy the shape of the parameter's `value` in `listBursts`, or of a variant's in `listBurstVariants`:
+
+    - A list of values: `{ "type": "categorical", "values": ["EMEA"] }`, with at least one value. `operator` can also be `is_not`, `contains` or `doesnt_contain`; it is `is` when left out.
+    - A number: `{ "type": "number", "value": 10 }`. Text: `{ "type": "text", "value": "EMEA" }`.
+    - A date range: `{ "type": "date", "subtype": "date_range", "startDate": "2026-01-01", "endDate": "2026-03-31" }`. One date: `{ "type": "date", "subtype": "date_single", "date": "2026-03-31" }`.
+    - A month or a quarter: `{ "type": "date", "subtype": "date_month_year", "month": 3, "year": 2026 }` (months 1 to 12), `{ "type": "date", "subtype": "date_quarter_year", "quarter": 1, "year": 2026 }`.
+    - A relative period: `{ "type": "date", "subtype": "date_relative", "rangeType": "lastN", "rangeN": 3, "periodType": "months" }`. `rangeType` is `current`, `lastN` or `nextN`; `periodType` is `days`, `weeks`, `months`, `quarters` or `years`, or `completeDays` through `completeYears` for whole periods only.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"anyOf":[{"anyOf":[{"type":"object","properties":{"type":{"type":"string","const":"categorical"},"values":{"type":"array","items":{"anyOf":[{"type":"string"},{"type":"number"}]}},"operator":{"type":"string","enum":["is","is_not","contains","doesnt_contain"]}},"required":["type","values"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_range"},"startDate":{"type":"string"},"endDate":{"type":"string"}},"required":["type","subtype","startDate","endDate"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_relative"},"rangeType":{"type":"string","enum":["current","lastN","nextN"]},"rangeN":{"type":"number"},"periodType":{"type":"string","enum":["days","weeks","months","quarters","years","completeDays","completeWeeks","completeMonths","completeQuarters","completeYears"]}},"required":["type","subtype","rangeType","rangeN","periodType"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_month_year"},"month":{"type":"number"},"year":{"type":"number"}},"required":["type","subtype","month","year"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_quarter_year"},"quarter":{"type":"number"},"year":{"type":"number"}},"required":["type","subtype","quarter","year"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_single"},"date":{"type":"string"}},"required":["type","subtype","date"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_null"}},"required":["type","subtype"]},{"type":"object","properties":{"type":{"type":"string","const":"number"},"value":{"type":"number"}},"required":["type","value"]},{"type":"object","properties":{"type":{"type":"string","const":"text"},"value":{"type":"string","minLength":1}},"required":["type","value"]}]},{"type":"null"}]}
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The report parameter's id.
+    name:
+      type: string
+      description: The report parameter's name, as shown in Rollstack.
+    columns:
+      type: array
+      items:
+        type: object
+      description: 'The columns of datasheets the parameter links: its value is written into each as a row filter, in that datasheet only.'
+    burstable:
+      type: boolean
+      description: 'Whether a burst can vary by the parameter: it links at least one filter whose `valueType` isn''t `null`, or at least one column that is still linked.'
+    runId:
+      type: string
+      description: The run that reads again the datasheets the value was written into, as `runId` in `getReportRun`.
+extra:
+  python:
+    source: tools/update_report_parameter.py

@@ -1,0 +1,133 @@
+identity:
+  name: updateBurstSettings
+  author: rollstack
+  label:
+    en_US: Update burst settings
+description:
+  human:
+    en_US: Changes the settings passed and answers them all.
+  llm: Changes the settings passed and answers them all. A Rollstack report's burst takes only variantNaming. An older report's run settings, such as updateMethod, also apply to its existing variants. Only the burst's owner and admins may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: variantNaming
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Variant naming
+  human_description:
+    en_US: 'How each variant''s report is named from the burst''s name and the name the variant is added with, EMEA in a burst named Regional Review: suffix gives Regional Review - EMEA, prefix gives EMEA - Regional Review, and sameName gives EMEA.'
+  llm_description: 'How each variant''s report is named from the burst''s name and the name the variant is added with, `EMEA` in a burst named `Regional Review`: `suffix` gives `Regional Review - EMEA`, `prefix` gives `EMEA - Regional Review`, and `sameName` gives `EMEA`. It applies to variants added from then on.'
+  options:
+  - value: sameName
+    label:
+      en_US: sameName
+  - value: prefix
+    label:
+      en_US: prefix
+  - value: suffix
+    label:
+      en_US: suffix
+- name: updateMethod
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Update method
+  human_description:
+    en_US: How each variant's run changes its file.
+  llm_description: 'How each variant''s run changes its file. `update` updates the same file with the latest data. `archive` first saves a copy of the file, named with the date of its previous run, then updates the original. `updateVisualizations` is the method email reports are created with. It applies to new variants and to the existing ones. For an older report''s burst only: a Rollstack report''s burst returns 400.'
+  options:
+  - value: update
+    label:
+      en_US: update
+  - value: archive
+    label:
+      en_US: archive
+  - value: updateVisualizations
+    label:
+      en_US: updateVisualizations
+- name: variantEmptyVisualizations
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Variant empty visualizations
+  human_description:
+    en_US: What a variant's run does with a chart or table that has no data for its values.
+  llm_description: 'What a variant''s run does with a chart or table that has no data for its values. `show` places it empty, `hideNoCascade` leaves it out of the file, `hideCascade` hides its slide when every visualization on the slide is empty, and `hideCascadeIfAtLeastOneVisualizationIsEmpty` hides its slide when any of them is. For an older report''s burst only: a Rollstack report''s burst returns 400.'
+  options:
+  - value: show
+    label:
+      en_US: show
+  - value: hideNoCascade
+    label:
+      en_US: hideNoCascade
+  - value: hideCascade
+    label:
+      en_US: hideCascade
+  - value: hideCascadeIfAtLeastOneVisualizationIsEmpty
+    label:
+      en_US: hideCascadeIfAtLeastOneVisualizationIsEmpty
+- name: archiveVariantsInFolder
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Archive variants in folder
+  human_description:
+    en_US: 'With updateMethod archive: whether each variant''s archived copies go in an archive folder next to its file, rather than beside it.'
+  llm_description: 'With `updateMethod` `archive`: whether each variant''s archived copies go in an archive folder next to its file, rather than beside it. For an older report''s burst only: a Rollstack report''s burst returns 400.'
+- name: datestampSuffix
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Datestamp suffix
+  human_description:
+    en_US: 'With updateMethod archive: the date format added to the name of each archived copy.'
+  llm_description: 'With `updateMethod` `archive`: the date format added to the name of each archived copy. For an older report''s burst only: a Rollstack report''s burst returns 400.'
+- name: caseInsensitiveFilters
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Case insensitive filters
+  human_description:
+    en_US: Whether a variant's filter values match the dashboard's values whatever their case.
+  llm_description: 'Whether a variant''s filter values match the dashboard''s values whatever their case. It applies when filters are next applied, such as with `reapplyBurstFilters`. For an older report''s burst only: a Rollstack report''s burst returns 400.'
+output_schema:
+  type: object
+  properties:
+    kind:
+      type: string
+      description: What the burst's variants differ by, as `kind` in `listBursts`.
+    variantNaming:
+      type: string
+      description: 'How each variant''s report is named from the burst''s name and the name the variant is added with, `EMEA` in a burst named `Regional Review`: `suffix` gives `Regional Review - EMEA`, `prefix` gives `EMEA - Regional Review`, and `sameName` gives `EMEA`.'
+    updateMethod:
+      type: string
+      description: How each variant's run changes its file.
+    variantEmptyVisualizations:
+      type: string
+      description: What a variant's run does with a chart or table that has no data for its values.
+    archiveVariantsInFolder:
+      type: boolean
+      description: 'With `updateMethod` `archive`: whether each variant''s archived copies go in an archive folder next to its file, rather than beside it.'
+    datestampSuffix:
+      type: string
+      description: 'With `updateMethod` `archive`: the date format added to the name of each archived copy.'
+    caseInsensitiveFilters:
+      type: boolean
+      description: Whether a variant's filter values match the dashboard's values whatever their case.
+extra:
+  python:
+    source: tools/update_burst_settings.py

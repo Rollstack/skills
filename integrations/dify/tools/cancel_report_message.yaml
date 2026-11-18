@@ -1,0 +1,31 @@
+identity:
+  name: cancelReportMessage
+  author: rollstack
+  label:
+    en_US: Cancel slides agent message
+description:
+  human:
+    en_US: 'Stops a message to the slides agent: a queued one leaves the queue, and a running one stops.'
+  llm: 'Stops a message to the slides agent: a queued one leaves the queue, and a running one stops. A finished one stays as it is. Only the user who sent it may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: messageId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Message ID
+  human_description:
+    en_US: 'The message to the slides agent: the messageId that sendReportMessage returned.'
+  llm_description: 'The message to the slides agent: the `messageId` that `sendReportMessage` returned. Only the user who sent the message can read, cancel or decide its proposals, and only while they can edit the report.'
+extra:
+  python:
+    source: tools/cancel_report_message.py

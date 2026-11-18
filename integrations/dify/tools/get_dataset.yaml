@@ -1,0 +1,71 @@
+identity:
+  name: getDataset
+  author: rollstack
+  label:
+    en_US: Get an uploaded file
+description:
+  human:
+    en_US: An uploaded CSV file or Excel workbook.
+  llm: 'An uploaded CSV file or Excel workbook. A workbook comes with its sheets, the range each one uses and its named ranges: pass a sheet''s id as sheetId to also read its cells as text, which shows where a table''s header row is. Then add the sheet, or a range of it that starts at the header row, to a report with addReportDatasheets. Cells show what the workbook saved: nothing is recalculated.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Uploaded file ID
+  human_description:
+    en_US: 'The uploaded file to read: the id returned by createDataset, or a datasheet''s datasetId in listReportDatasheets.'
+  llm_description: 'The uploaded file to read: the `id` returned by `createDataset`, or a datasheet''s `datasetId` in `listReportDatasheets`. It can be any uploaded file of your organization, including one another member uploaded.'
+- name: sheetId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Sheet ID
+  human_description:
+    en_US: 'A sheet of an uploaded workbook whose cells to read: one of the sheets[].id values of an earlier call.'
+  llm_description: 'A sheet of an uploaded workbook whose cells to read: one of the `sheets[].id` values of an earlier call. The answer''s `cells` then holds them. Omit it to list the workbook''s sheets only.'
+- name: range
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Range
+  human_description:
+    en_US: The cells to read from the sheet, in A1 notation without the sheet's name, such as A1:H40.
+  llm_description: The cells to read from the sheet, in A1 notation without the sheet's name, such as `A1:H40`. Omit it to read from the start of the range the sheet uses. Only with `sheetId`.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the uploaded file.
+    name:
+      type: string
+      description: 'The uploaded file''s name: the `name` it was created with for a CSV file, or the workbook''s file name for an Excel workbook, such as `Q3 pipeline.xlsx`.'
+    createdAt:
+      type: string
+      description: When the file was uploaded.
+    updatedAt:
+      type: string
+      description: When the file's content was last replaced with `replaceDataset`, or when it was uploaded if it has never been replaced.
+    kind:
+      type: string
+      description: What the uploaded file is.
+    sheets:
+      type: array
+      items:
+        type: object
+      description: A workbook's sheets (tabs), in the order Excel shows them, hidden ones included.
+    namedRanges:
+      type: array
+      items:
+        type: object
+      description: A workbook's named ranges that lie on one of its sheets.
+    cells:
+      type: object
+      description: The cells of the sheet asked for with `sheetId`.
+extra:
+  python:
+    source: tools/get_dataset.py

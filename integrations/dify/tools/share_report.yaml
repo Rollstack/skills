@@ -1,0 +1,60 @@
+identity:
+  name: shareReport
+  author: rollstack
+  label:
+    en_US: Share report
+description:
+  human:
+    en_US: Shares a report of any type with a member of the organization to view or edit it, or changes their permission.
+  llm: Shares a report of any type with a member of the organization to view or edit it, or changes their permission. They get an email. A report that updates a file, such as a Google Slides presentation, also shares the file with them, as the app does.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+- name: userId
+  type: number
+  required: true
+  form: llm
+  label:
+    en_US: User ID
+  human_description:
+    en_US: The member to share the report with, or to unshare it from.
+  llm_description: The member to share the report with, or to unshare it from. Use their `id` from `listMembers`, which only owners and admins can call, or their `userId` in `sharedWith` from `getReport` if the report is already shared with them. You can share a report only with active members of the organization, and not with yourself. Anyone the report is shared with can unshare it from themselves, even with `view` permission.
+  max: 9007199254740991
+- name: permission
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Permission
+  human_description:
+    en_US: What the member can do with the report.
+  llm_description: What the member can do with the report. `view` lets them open, export and duplicate it. `comment` also lets them add, reply to and resolve comments on its slides. `edit` also lets them change its slides, data, schedules, email and other settings, run it, send its email, chat with the slides agent about it, and manage who it's shared with. Neither lets them delete the report or transfer its ownership. If the report is already shared with the member, this replaces their permission and they aren't notified again. On a report that updates a file in Google Drive or OneDrive, Rollstack also shares the file with them, as the app does.
+  options:
+  - value: view
+    label:
+      en_US: view
+  - value: comment
+    label:
+      en_US: comment
+  - value: edit
+    label:
+      en_US: edit
+output_schema:
+  type: object
+  properties:
+    userId:
+      type: number
+      description: 'The member the report is now shared with: the `userId` from the path.'
+    permission:
+      type: string
+      description: 'What the member can now do with the report: the `permission` you sent.'
+extra:
+  python:
+    source: tools/share_report.py

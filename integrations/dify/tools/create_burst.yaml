@@ -1,0 +1,129 @@
+identity:
+  name: createBurst
+  author: rollstack
+  label:
+    en_US: Create burst
+description:
+  human:
+    en_US: Makes a report the template of a new burst, and answers the burst, named after the report and with no variants yet.
+  llm: 'Makes a report the template of a new burst, and answers the burst, named after the report and with no variants yet. Add them with addBurstVariants. A Rollstack report''s variants differ by the report parameters in parameterIds, found with getReportParameters. An older report''s variants differ by the filters in filters, found with listReportSyncFilters: a folder is made for the burst in Google Drive or OneDrive and the report''s file is copied into it as the template, which can take a minute. Only the report''s editors may.'
+parameters:
+- name: templateReportId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Template report ID
+  human_description:
+    en_US: The report to make the template of the burst, by its id from listReports.
+  llm_description: 'The report to make the template of the burst, by its `id` from `listReports`. You must be able to edit it, and it can''t already be part of a burst. A Rollstack report must have datasheets, and becomes the template as it is. An older report must have syncs: its file is copied into a new folder for the burst, and the copy becomes the template.'
+- name: parameterIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Parameter IDs
+  human_description:
+    en_US: 'For a Rollstack report: the template report''s parameters the variants differ by, by their id from getReportParameters, in the order their values name a variant.'
+  llm_description: 'For a Rollstack report: the template report''s parameters the variants differ by, by their `id` from `getReportParameters`, in the order their values name a variant. Each must be `burstable` there. At least one. Pass them as text, separated by commas, or as a JSON array.'
+- name: filters
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Filters
+  human_description:
+    en_US: 'For an older report, such as a Google Slides or PowerPoint file: the filters of its syncs the variants differ by.'
+  llm_description: |-
+    For an older report, such as a Google Slides or PowerPoint file: the filters of its syncs the variants differ by.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"type":"object","properties":{"primaryIds":{"minItems":1,"maxItems":3,"type":"array","items":{"type":"string"},"description":"The filters that name the variants, by their `id` from `listReportSyncFilters`, in the order their values name a variant. 1 to 3. With more than one, each variant's file goes in a folder per value, one level per filter."},"secondaryIds":{"default":[],"description":"Filters a variant can also set, which don't name it, by their `id` from `listReportSyncFilters`.","type":"array","items":{"type":"string"}}},"required":["primaryIds"],"additionalProperties":false}
+- name: parentFolderId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Parent folder ID
+  human_description:
+    en_US: 'For an older report: the Google Drive or OneDrive folder to create the burst''s folder in, by its id in that drive.'
+  llm_description: 'For an older report: the Google Drive or OneDrive folder to create the burst''s folder in, by its id in that drive. The template and the variants'' files go in the burst''s folder. Defaults to the top of your drive.'
+- name: driveId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Drive ID
+  human_description:
+    en_US: 'For an older report: the shared drive parentFolderId is in.'
+  llm_description: 'For an older report: the shared drive `parentFolderId` is in. Leave it out for a folder in your own drive.'
+- name: variantNaming
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Variant naming
+  human_description:
+    en_US: 'How each variant''s report is named from the burst''s name and the name the variant is added with, EMEA in a burst named Regional Review: suffix gives Regional Review - EMEA, prefix gives EMEA - Regional Review, and sameName gives EMEA.'
+  llm_description: 'How each variant''s report is named from the burst''s name and the name the variant is added with, `EMEA` in a burst named `Regional Review`: `suffix` gives `Regional Review - EMEA`, `prefix` gives `EMEA - Regional Review`, and `sameName` gives `EMEA`. It applies to variants added from then on. Defaults to `suffix`.'
+  options:
+  - value: sameName
+    label:
+      en_US: sameName
+  - value: prefix
+    label:
+      en_US: prefix
+  - value: suffix
+    label:
+      en_US: suffix
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the burst.
+    name:
+      type: string
+      description: Name of the burst, as members see it in Rollstack.
+    folderId:
+      type: string
+      description: The folder the burst is in, by its `id` in `listFolders`.
+    owner:
+      type: object
+      description: 'The member who owns the burst: whoever created it, unless ownership has since been transferred in the app.'
+    templateReportId:
+      type: string
+      description: The template report, which every variant was copied from when it was added, by its `id` for `getReport` and the other `/reports/{id}` endpoints.
+    variantNaming:
+      type: string
+      description: 'How each variant''s report is named from the burst''s name and the name the variant is added with, `EMEA` in a burst named `Regional Review`: `suffix` gives `Regional Review - EMEA`, `prefix` gives `EMEA - Regional Review`, and `sameName` gives `EMEA`.'
+    kind:
+      type: string
+      description: What the variants differ by.
+    reportType:
+      type: string
+      description: 'The type of report the burst copies, as `type` in `listReports`: `SlideDeck` for a Rollstack report, which bursts by `parameters`, any other type for an older report, which bursts by `filters`.'
+    parameters:
+      type: array
+      items:
+        type: object
+      description: The template report's parameters the variants differ by, in the order their values name a variant.
+    filters:
+      type: array
+      items:
+        type: object
+      description: The filters of the template report's syncs that the variants differ by, primary ones first in the order their values name a variant.
+    variantCount:
+      type: number
+      description: How many variants the burst has, including any you can't open.
+    appUrl:
+      type: string
+      description: Link that opens the burst in Rollstack.
+    createdAt:
+      type: string
+      description: When the burst was created.
+    updatedAt:
+      type: string
+      description: When the burst's details last changed.
+extra:
+  python:
+    source: tools/create_burst.py
