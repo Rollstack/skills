@@ -30,6 +30,13 @@ for (const path of FILES) cpSync(path, `${STAGING}/${path}`, { recursive: true }
 // from its description: without it, from the first line of the README, which is only the repo's title. The name in
 // it has to be the published one
 writeFileSync(`${STAGING}/package.json`, `${JSON.stringify({ name: NAME, version, description }, null, 2)}\n`)
+// OpenClaw signs in to an MCP server, and shows a Sign in button for it, only when the server says "auth": "oauth".
+// Its own plugins, such as Linear's, add it in .mcp.json, and OpenClaw keeps every field of a Claude bundle's entries.
+// It goes in the copy only: the repo's .mcp.json is read by other clients as it is
+const mcp = JSON.parse(readFileSync(".mcp.json", "utf8"))
+for (const server of Object.values(mcp.mcpServers))
+  Object.assign(server, { auth: "oauth", description: "Sign in with your Rollstack account to build and send decks." })
+writeFileSync(`${STAGING}/.mcp.json`, `${JSON.stringify(mcp, null, 2)}\n`)
 
 // An npm tarball is ClawHub's current package format, a ClawPack. A folder would be uploaded as a "legacy ZIP",
 // which the listing flags as a compatibility risk
