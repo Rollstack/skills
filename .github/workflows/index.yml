@@ -23,6 +23,8 @@ jobs:
       - run: node scripts/check-versions.mjs
       # Fails when mcp.json has a field Agent Plugins v1 doesn't allow, which makes strict clients skip the server
       - run: node scripts/build-chatgpt-zip.mjs
+      # Fails when the plugin breaks a limit of Perplexity's importer, which would drop the server or refuse the plugin
+      - run: node scripts/build-perplexity-zip.mjs
 
   # The checks Claude's plugin directory runs on its manifests, skills and .mcp.json
   validate-plugin:
