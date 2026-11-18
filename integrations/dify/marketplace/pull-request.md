@@ -30,7 +30,7 @@ These comments are not shown on the pull request.
 
 ## What changed
 
-New plugin for [Rollstack](https://www.rollstack.com): create polished presentations with advanced charts, right from your favourite agent, and plug in your own data whenever you need it. No Marketplace plugin connects to Rollstack today.
+New plugin for [Rollstack](https://www.rollstack.com): build polished presentations using AI, with advanced charts and data connections built in. No Marketplace plugin connects to Rollstack today.
 
 It gives a Dify agent or workflow the 121 tools of Rollstack's [MCP server](https://docs.rollstack.com/api/mcp-server) that a model calls, the same tools every other client of that server gets, with Rollstack's own names, inputs and descriptions:
 

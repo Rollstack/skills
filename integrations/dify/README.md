@@ -1,6 +1,6 @@
 # Rollstack
 
-Create polished presentations with advanced charts, right from your favourite agent. Plug in your own data whenever you need it.
+Build polished presentations using AI, with advanced charts and data connections built in.
 
 This plugin brings [Rollstack](https://www.rollstack.com) to Dify agents and workflows, with every tool of Rollstack's MCP server:
 

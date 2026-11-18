@@ -4,7 +4,7 @@ identity:
   label:
     en_US: Rollstack
   description:
-    en_US: Create polished presentations with advanced charts, right from your favourite agent. Plug in your own data whenever you need it.
+    en_US: Build polished presentations using AI, with advanced charts and data connections built in.
   icon: icon.png
   tags:
     - productivity
