@@ -33,6 +33,20 @@ Or in two steps, on Claude Code before 2.1.275:
 
 The plugin adds one remote MCP server, `https://api.rollstack.com/public/v1/mcp`, which you sign in to with your Rollstack account. It runs nothing on your machine.
 
+**Perplexity plugin** (the MCP server and the skills together), in [Perplexity Computer](https://www.perplexity.ai/computer): open **Plugins**, select **Add custom**, then **Import plugin from GitHub**, and paste:
+
+```
+https://github.com/Rollstack/skills
+```
+
+Then open the plugin and select **Connect** next to the Rollstack connector. Perplexity asks for an API key rather than a sign-in: create one in Rollstack under Settings → Connected apps and paste it. Computer can't reach Rollstack until the connector shows **Connected**. Use it from Computer, not from a regular search thread, which doesn't get the Rollstack connector: open **Computer** in the sidebar, type `/` in the message box and choose the plugin.
+
+It needs a Perplexity Pro, Max or Enterprise plan. On a free account, Perplexity imports the skills and leaves the Rollstack connector out without saying so: the plugin's page then has no **Connectors** section. In an organization, an administrator first has to let members add custom connectors and upload plugins.
+
+To upload a file instead, which is also how you update a plugin you imported (**More actions**, then **Replace file**), build it with `node scripts/build-perplexity-zip.mjs` and upload `dist/rollstack-perplexity.zip`.
+
+For the MCP server without the skills: **Add custom**, then **Add MCP connector**, **Remote**, with the URL `https://api.rollstack.com/public/v1/mcp` and, under **Advanced**, OAuth 2.0 as the authentication.
+
 **Pi package** (the MCP server and the skills together):
 
 ```bash

@@ -24,7 +24,9 @@ for (const [name, extensions] of Object.entries(readJson("scripts/chatgpt-mcp-ex
   mcp.mcpServers[name].extensions = extensions
 }
 
-rmSync("dist", { recursive: true, force: true })
+// Only this script's own output: dist also holds the other clients' packages
+rmSync(STAGING, { recursive: true, force: true })
+rmSync(ZIP, { force: true })
 mkdirSync(STAGING, { recursive: true })
 for (const path of ["plugin.json", "skills", "assets", "LICENSE"]) cpSync(path, `${STAGING}/${path}`, { recursive: true })
 writeFileSync(`${STAGING}/mcp.json`, `${JSON.stringify(mcp, null, 2)}\n`)
