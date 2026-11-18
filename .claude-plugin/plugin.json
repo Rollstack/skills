@@ -1,8 +1,8 @@
 {
   "name": "rollstack",
   "displayName": "Rollstack",
-  "version": "1.3.2",
-  "description": "Build decks from your company's data, and refresh, schedule and send reports, with Rollstack's MCP server and skills.",
+  "version": "1.3.3",
+  "description": "Build polished presentations using AI, with advanced charts and data connections built in.",
   "author": { "name": "Rollstack", "url": "https://www.rollstack.com" },
   "homepage": "https://www.rollstack.com",
   "repository": "https://github.com/Rollstack/skills",
