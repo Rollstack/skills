@@ -13,9 +13,9 @@
       "interface": {
         "displayName": "Rollstack",
         "shortDescription": "Presentations from your data",
-        "longDescription": "Rollstack is an AI presentation tool for business teams. It builds slide decks for meetings and reports right in ChatGPT, on any topic or from your company's data, and keeps recurring reports up to date.\n\nAsk ChatGPT for a deck and it comes back with clean slides, your own template if you have one, and advanced charts. Then keep going in the chat: reword a slide, add a chart, change the colors and fonts, and export the deck to PowerPoint or PDF.\n\nWant your own numbers on the slides? Plug in the sources you already use, such as spreadsheets, data warehouses and BI tools, and your charts draw straight from them.\n\nYou sign in with your Rollstack account when you connect. Nothing is emailed or deleted until you confirm it in Rollstack. Files attached in the chat can't be passed to Rollstack, so connect data sources and import templates in the Rollstack app. Support: support@rollstack.com.",
+        "longDescription": "Rollstack turns your company's data into presentations and recurring reports. It connects to your BI tools, data warehouses and spreadsheets, builds slide decks with charts drawn from that data right in ChatGPT, and keeps the reports up to date on a schedule.\n\nAsk ChatGPT for a deck and it comes back with clean slides, your own template if you have one, and advanced charts. Then keep going in the chat: reword a slide, add a chart, change the colors and fonts, and export the deck to PowerPoint or PDF.\n\nWant your own numbers on the slides? Plug in the sources you already use, such as spreadsheets, data warehouses and BI tools, and your charts draw straight from them.\n\nYou sign in with your Rollstack account when you connect. Nothing is emailed or deleted until you confirm it in Rollstack. Files attached in the chat can't be passed to Rollstack, so connect data sources and import templates in the Rollstack app. Support: support@rollstack.com.",
         "developerName": "Rollstack Inc.",
-        "category": "Productivity",
+        "category": "Data & Analytics",
         "capabilities": [
           "Build polished presentations on any topic",
           "Add advanced charts",
