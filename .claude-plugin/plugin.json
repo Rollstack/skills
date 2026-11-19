@@ -1,7 +1,7 @@
 {
   "name": "rollstack",
   "displayName": "Rollstack",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "description": "Build polished presentations using AI, with advanced charts and data connections built in.",
   "author": { "name": "Rollstack", "url": "https://www.rollstack.com" },
   "homepage": "https://www.rollstack.com",
