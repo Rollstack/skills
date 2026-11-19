@@ -1,0 +1,73 @@
+identity:
+  name: searchDashboards
+  author: rollstack
+  label:
+    en_US: Search dashboards
+description:
+  human:
+    en_US: 'The dashboards of a Looker, Metabase, Omni, Lightdash, Sigma, Tableau or Power BI connection whose name holds any word of query or its singular, in any case, at most 50: those the most of the organization''s reports read first, copies, old and personal ones last, then most words first, read with the user''s access to the connection.'
+  llm: 'The dashboards of a Looker, Metabase, Omni, Lightdash, Sigma, Tableau or Power BI connection whose name holds any word of query or its singular, in any case, at most 50: those the most of the organization''s reports read first, copies, old and personal ones last, then most words first, read with the user''s access to the connection. A Tableau dashboard is a workbook, its views its tabs; a Power BI one a report, its pages its tabs; a Sigma one a workbook, its pages its tabs. On a Sigma connection, query can be a link to a workbook the user pasted: it finds only that workbook, with the page the link opens on as tabId, but not the link''s control values, saved view or tag, and a link to another Sigma organization is rejected. On a Salesforce connection it finds reports the same way, the most recently run first among equals, each with its format: a report has no tabs, so add a tabular or summary one to a report with addReportDatasheets by its reportId, without getDashboard, and tell the user a matrix or joined one can''t be added yet. Search by the name the user gives, confirm the dashboard with the user, then check its tabs and charts with getDashboard or add it to a report with addReportDatasheets. listConnections gives the connection''s type and id.'
+parameters:
+- name: type
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Type
+  human_description:
+    en_US: 'The type of connection, as type in listConnections: the BI tool it connects to.'
+  llm_description: 'The type of connection, as `type` in `listConnections`: the BI tool it connects to. Only Looker, Metabase, Omni, Lightdash, Sigma, Tableau and Power BI (`PowerBI`) connections have dashboards, and on a `Salesforce` connection the search finds its reports.'
+  options:
+  - value: Looker
+    label:
+      en_US: Looker
+  - value: Metabase
+    label:
+      en_US: Metabase
+  - value: Omni
+    label:
+      en_US: Omni
+  - value: Lightdash
+    label:
+      en_US: Lightdash
+  - value: Tableau
+    label:
+      en_US: Tableau
+  - value: PowerBI
+    label:
+      en_US: PowerBI
+  - value: Sigma
+    label:
+      en_US: Sigma
+  - value: Salesforce
+    label:
+      en_US: Salesforce
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Connection ID
+  human_description:
+    en_US: Unique identifier for the connection, from listConnections, which also returns its type.
+  llm_description: Unique identifier for the connection, from `listConnections`, which also returns its `type`.
+- name: query
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Query
+  human_description:
+    en_US: 'Words to search for in names, separated by spaces: a dashboard, table, model or spreadsheet is returned when its name contains any of them, case-insensitively, a table''s full name with its database and schema.'
+  llm_description: 'Words to search for in names, separated by spaces: a dashboard, table, model or spreadsheet is returned when its name contains any of them, case-insensitively, a table''s full name with its database and schema. If omitted, results aren''t filtered by name. At most 50 results are returned either way.'
+output_schema:
+  type: object
+  properties:
+    dashboards:
+      type: array
+      items:
+        type: object
+      description: 'The dashboards of a Looker, Metabase, Omni, Lightdash, Sigma, Tableau or Power BI connection whose name holds any word of query or its singular, in any case, at most 50: those the most of the organization''s reports read first, copies, old and personal ones last, then most words first, read with the user''s access to the connection.'
+extra:
+  python:
+    source: tools/search_dashboards.py

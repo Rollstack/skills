@@ -1,0 +1,46 @@
+identity:
+  name: getBurstSettings
+  author: rollstack
+  label:
+    en_US: Get burst settings
+description:
+  human:
+    en_US: 'A burst''s settings, as its Settings tab in the app shows them: how its variants are named, and for an older report''s burst, how each variant''s run updates its file, what it does with empty charts, how it archives and how its filters match.'
+  llm: 'A burst''s settings, as its Settings tab in the app shows them: how its variants are named, and for an older report''s burst, how each variant''s run updates its file, what it does with empty charts, how it archives and how its filters match. Its folders and schedules are set in the app.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+output_schema:
+  type: object
+  properties:
+    kind:
+      type: string
+      description: What the burst's variants differ by, as `kind` in `listBursts`.
+    variantNaming:
+      type: string
+      description: 'How each variant''s report is named from the burst''s name and the name the variant is added with, `EMEA` in a burst named `Regional Review`: `suffix` gives `Regional Review - EMEA`, `prefix` gives `EMEA - Regional Review`, and `sameName` gives `EMEA`.'
+    updateMethod:
+      type: string
+      description: How each variant's run changes its file.
+    variantEmptyVisualizations:
+      type: string
+      description: What a variant's run does with a chart or table that has no data for its values.
+    archiveVariantsInFolder:
+      type: boolean
+      description: 'With `updateMethod` `archive`: whether each variant''s archived copies go in an archive folder next to its file, rather than beside it.'
+    datestampSuffix:
+      type: string
+      description: 'With `updateMethod` `archive`: the date format added to the name of each archived copy.'
+    caseInsensitiveFilters:
+      type: boolean
+      description: Whether a variant's filter values match the dashboard's values whatever their case.
+extra:
+  python:
+    source: tools/get_burst_settings.py

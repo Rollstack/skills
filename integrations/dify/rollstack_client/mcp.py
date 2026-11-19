@@ -46,10 +46,12 @@ class RollstackError(Exception):
 
 @dataclass(frozen=True)
 class ToolResult:
-    """What a tool answered: its text blocks, and its structured content when the server sends one."""
+    """What a tool answered: its text blocks, its image blocks, and its structured content when the server sends one."""
 
     texts: tuple[str, ...] = ()
     structured: dict[str, Any] | None = None
+    # Each image block's base64 data and MIME type
+    images: tuple[tuple[str, str], ...] = ()
 
     @property
     def payload(self) -> Any:
@@ -248,8 +250,16 @@ def _tool_result(reply: _Reply) -> ToolResult:
         for block in (blocks if isinstance(blocks, list) else [])
         if isinstance(block, dict) and block.get("type") == "text" and isinstance(block.get("text"), str)
     )
+    images = tuple(
+        (block["data"], block["mimeType"])
+        for block in (blocks if isinstance(blocks, list) else [])
+        if isinstance(block, dict)
+        and block.get("type") == "image"
+        and isinstance(block.get("data"), str)
+        and isinstance(block.get("mimeType"), str)
+    )
     structured = result.get("structuredContent")
-    answer = ToolResult(texts=texts, structured=structured if isinstance(structured, dict) else None)
+    answer = ToolResult(texts=texts, structured=structured if isinstance(structured, dict) else None, images=images)
 
     # A call that waits for the user's confirmation didn't fail: its answer carries the link they confirm it at
     if result.get("isError") and answer.code != CONFIRMATION_REQUIRED:

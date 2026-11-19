@@ -1,0 +1,67 @@
+identity:
+  name: getReportDatasheet
+  author: rollstack
+  label:
+    en_US: Get a datasheet
+description:
+  human:
+    en_US: 'What a datasheet''s data is written as: its query, in the shape set-query takes, its one SQL statement, or its join and the steps after it, and its formats.'
+  llm: 'What a datasheet''s data is written as: its query, in the shape set-query takes, its one SQL statement, or its join and the steps after it, and its formats. Read it before you change a datasheet with previewReportDatasheetChanges: set-query replaces the whole query, so start from this one. For the picture of a Tableau view or Power BI page added with addReportDatasheets, it also lists the charts on it, which addReportDashboardElements adds as data. Only the report''s editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: datasheetId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Datasheet ID
+  human_description:
+    en_US: One of this report's datasheets, by its id in listReportDatasheets.
+  llm_description: One of this report's datasheets, by its `id` in `listReportDatasheets`.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The datasheet's id.
+    name:
+      type: string
+      description: The datasheet's name, as the report's editor shows it.
+    kind:
+      type: string
+      description: '`data` for a table, `picture` for an image, which has no query.'
+    elements:
+      type: array
+      items:
+        type: object
+      description: For the picture of a whole Tableau view or Power BI page, the charts on it, which `addReportDashboardElements` adds as data or pictures.
+    elementsNote:
+      type: string
+      description: Why `elements` is empty or partial, such as charts not listed yet, or `null`.
+    query:
+      type: object
+      description: 'Its data as a query, the Edit data editor''s model, in the shape `set-query` takes: change what you need and send it whole.'
+    sql:
+      type: string
+      description: Its data as one SQL statement over its reads, or `null`.
+    ops:
+      type: array
+      items:
+        type: object
+      description: 'For a datasheet that joins its reads: the join and the steps after it, each by the `ref` `set-ops` keeps it by.'
+    formats:
+      type: array
+      items:
+        type: object
+      description: 'How its columns'' numbers are shown: a numfmt pattern for each output column.'
+extra:
+  python:
+    source: tools/get_report_datasheet.py

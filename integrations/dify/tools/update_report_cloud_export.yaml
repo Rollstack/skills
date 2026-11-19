@@ -1,0 +1,157 @@
+identity:
+  name: updateReportCloudExport
+  author: rollstack
+  label:
+    en_US: Set cloud save
+description:
+  human:
+    en_US: Saves a report to a Google Drive, OneDrive or SharePoint folder after its runs, as the app's scheduling panel does, replacing the setting it had.
+  llm: 'Saves a report to a Google Drive, OneDrive or SharePoint folder after its runs, as the app''s scheduling panel does, replacing the setting it had. Each save replaces the same file, or archives a dated copy first with `archive`. The folder is opened with the user''s own Google or Microsoft account, which saves the report from then on. To save it now, start a run with startReportRun: a run that doesn''t fail then tries to save it when `trigger` is `all`, and getReportCloudExport tells whether the save worked, since a failed save doesn''t fail the run. Set `trigger` to `none` to stop saving it. Only its editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: provider
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Provider
+  human_description:
+    en_US: 'Where the report is saved: google saves it to Google Drive as a Google Slides presentation, with its charts as linked Google Sheets charts, and microsoft saves it to OneDrive or SharePoint as a PowerPoint file with native charts.'
+  llm_description: 'Where the report is saved: `google` saves it to Google Drive as a Google Slides presentation, with its charts as linked Google Sheets charts, and `microsoft` saves it to OneDrive or SharePoint as a PowerPoint file with native charts.'
+  options:
+  - value: google
+    label:
+      en_US: google
+  - value: microsoft
+    label:
+      en_US: microsoft
+- name: folderUrl
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Folder URL
+  human_description:
+    en_US: 'The folder to save the report in, by its link: a Google Drive folder''s link (or its id) with google, or a OneDrive or SharePoint folder''s link with microsoft.'
+  llm_description: 'The folder to save the report in, by its link: a Google Drive folder''s link (or its id) with `google`, or a OneDrive or SharePoint folder''s link with `microsoft`. It''s opened with your own Google or Microsoft account connected to Rollstack, which then saves the report, so you must be able to add files to it.'
+- name: fileName
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: File name
+  human_description:
+    en_US: The saved file's name.
+  llm_description: The saved file's name. If omitted, the report's name.
+- name: trigger
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Trigger
+  human_description:
+    en_US: 'Which runs save it: all after every run that doesn''t fail, scheduled only after the report''s scheduled runs, and none never, which stops saving it and keeps the setting.'
+  llm_description: 'Which runs save it: `all` after every run that doesn''t fail, `scheduled` only after the report''s scheduled runs, and `none` never, which stops saving it and keeps the setting.'
+  options:
+  - value: all
+    label:
+      en_US: all
+  - value: scheduled
+    label:
+      en_US: scheduled
+  - value: none
+    label:
+      en_US: none
+- name: updateMethod
+  type: select
+  required: false
+  form: llm
+  label:
+    en_US: Update method
+  human_description:
+    en_US: update replaces the saved file with the new version.
+  llm_description: '`update` replaces the saved file with the new version. `archive` first copies the saved file, named with the date of its last save in `datestampSuffix`, then replaces it. Defaults to `update`.'
+  options:
+  - value: update
+    label:
+      en_US: update
+  - value: archive
+    label:
+      en_US: archive
+- name: datestampSuffix
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Datestamp suffix
+  human_description:
+    en_US: How archive dates the copies it keeps, as a moment.js format such as MM/DD/YYYY or YYYY-MM-DD.
+  llm_description: How `archive` dates the copies it keeps, as a moment.js format such as `MM/DD/YYYY` or `YYYY-MM-DD`. Defaults to `MM/DD/YYYY`.
+- name: ignoreFailuresOnArchive
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Ignore failures on archive
+  human_description:
+    en_US: With archive, whether a copy that fails still lets the save go on.
+  llm_description: With `archive`, whether a copy that fails still lets the save go on. Defaults to `false`.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    provider:
+      type: string
+      description: 'Where the report is saved: `google` saves it to Google Drive as a Google Slides presentation, with its charts as linked Google Sheets charts, and `microsoft` saves it to OneDrive or SharePoint as a PowerPoint file with native charts.'
+    folder:
+      type: object
+      description: The folder the report is saved in.
+    fileName:
+      type: string
+      description: The saved file's name.
+    trigger:
+      type: string
+      description: 'Which runs save it: `all` after every run that doesn''t fail, `scheduled` only after the report''s scheduled runs, and `none` never, which stops saving it and keeps the setting.'
+    updateMethod:
+      type: string
+      description: '`update` replaces the saved file with the new version.'
+    datestampSuffix:
+      type: string
+      description: How `archive` dates the copies it keeps, as a moment.js format such as `MM/DD/YYYY` or `YYYY-MM-DD`.
+    ignoreFailuresOnArchive:
+      type: boolean
+      description: With `archive`, whether a copy that fails still lets the save go on.
+    fileUrl:
+      type: string
+      description: A link to the saved file, which its sharing in Google Drive, OneDrive or SharePoint lets people open.
+    runsAsUserId:
+      type: number
+      description: 'The member whose Google or Microsoft account saves it, as `id` in `listMembers`: the one who last chose its folder.'
+    lastStatus:
+      type: string
+      description: Whether the last save worked.
+    lastStatusMessage:
+      type: string
+      description: Why the last save failed.
+    lastExportedAt:
+      type: string
+      description: When the report was last saved.
+extra:
+  python:
+    source: tools/update_report_cloud_export.py

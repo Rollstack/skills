@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import json
 import uuid
 from typing import Any
 
@@ -12,27 +14,19 @@ from dify_plugin.entities.tool import ToolInvokeMessage
 from dify_plugin.errors.tool import ToolProviderCredentialValidationError
 from dify_plugin.interfaces.tool import ToolProvider
 
-from conftest import FakeResponse, FakeSession, tool_answer
+import generate_tools
+from conftest import FakeResponse, FakeSession, rpc, tool_answer
 from rollstack_client import mcp
 from rollstack_client.mcp import RollstackError
-from rollstack_client.operations import OPERATIONS, InputError
+from rollstack_client.operations import BOOLEAN, INTEGER, JSON, LIST, NUMBER, OPERATIONS, InputError
+from rollstack_client.tooling import IMAGE_SENT, IMAGE_UNREADABLE
 
 MessageType = ToolInvokeMessage.MessageType
 
-FILES = {
-    "listReports": "list_reports",
-    "getReport": "get_report",
-    "listTemplates": "list_templates",
-    "createReport": "create_report",
-    "sendReportMessage": "send_report_message",
-    "getReportMessage": "get_report_message",
-    "getReportContent": "get_report_content",
-    "startReportRun": "start_report_run",
-    "getReportRun": "get_report_run",
-    "getReportSchedules": "get_report_schedules",
-    "updateReportSchedules": "update_report_schedules",
-    "exportReport": "export_report",
-}
+FILES = {operation: generate_tools.file_name(operation) for operation in OPERATIONS}
+
+# A value of each kind of input that the plugin accepts, to call every tool with its required parameters
+SAMPLES = {INTEGER: 1, NUMBER: 1, BOOLEAN: True, LIST: "a", JSON: "[]"}
 
 
 @pytest.fixture
@@ -76,10 +70,9 @@ def sent(session: FakeSession) -> dict[str, Any]:
 
 
 def test_every_tool_has_a_class_that_calls_its_own_rollstack_tool(rollstack):
-    assert set(FILES) == set(OPERATIONS)
-    for operation in OPERATIONS:
+    for operation, spec in OPERATIONS.items():
         session = rollstack(tool_answer({}))
-        parameters = {"id": "rep-1", "messageId": "m-1", "runId": "r-1", "format": "pdf", "schedules": "[]"}
+        parameters = {param.name: SAMPLES.get(param.kind, "x") for param in spec.params if param.required}
         run(operation, parameters)
         assert sent(session)["name"] == operation
 
@@ -135,7 +128,11 @@ def test_create_a_report_in_a_template(rollstack):
     messages = run("createReport", {"name": "Weekly sales", "templateId": "tpl-1"})
 
     assert sent(session)["arguments"]["body"] == {"name": "Weekly sales", "templateId": "tpl-1"}
-    assert variables(messages) == {**created, "folderId": ""}
+    returned = variables(messages)
+    # Every field of the answer is a variable, empty when the answer has no value for it
+    assert list(returned) == list(OPERATIONS["createReport"].variable_types)
+    assert {name: returned[name] for name in created} == {**created, "folderId": ""}
+    assert (returned["owner"], returned["running"], returned["sharedWith"], returned["fileUrl"]) == ({}, False, [], "")
 
 
 def test_refresh_a_report(rollstack):
@@ -144,7 +141,7 @@ def test_refresh_a_report(rollstack):
     messages = run("startReportRun", {"id": "rep-1"})
 
     arguments = sent(session)["arguments"]
-    assert (arguments["params"], arguments["body"]) == ({"id": "rep-1"}, {})
+    assert arguments["params"] == {"id": "rep-1"} and "body" not in arguments
     assert variables(messages) == {"runId": "run-1", "started": True, "code": "", "message": ""}
 
 
@@ -240,10 +237,124 @@ def test_the_connection_is_closed_after_a_call(rollstack):
 def test_a_bad_parameter_fails_before_anything_is_sent(rollstack):
     session = rollstack()
 
-    with pytest.raises(InputError, match="schedules must be a JSON array"):
+    with pytest.raises(InputError, match="schedules must be JSON text"):
         run("updateReportSchedules", {"id": "rep-1", "schedules": "every Monday"})
 
     assert session.calls == []
+
+
+def test_an_email_held_for_confirmation_answers_the_link(rollstack):
+    waiting = {"code": "confirmation-required", "message": "Confirm it in Rollstack: https://rollstack.example/confirm"}
+    session = rollstack(tool_answer(waiting, is_error=True))
+
+    messages = run("sendReportEmail", {"id": "rep-1"})
+
+    assert sent(session)["name"] == "sendReportEmail"
+    assert [m.text for m in of_type(messages, MessageType.TEXT)] == [waiting["message"]]
+    assert variables(messages) == waiting
+
+
+def test_upload_a_csv_then_add_it_to_a_deck(rollstack):
+    session = rollstack(tool_answer({"id": "ds-1", "name": "Sales", "columns": ["region", "revenue"]}))
+
+    messages = run("createDataset", {"name": "Sales", "csv": "region,revenue\nNorth,120\n"})
+
+    assert sent(session)["arguments"]["body"] == {"name": "Sales", "csv": "region,revenue\nNorth,120"}
+    assert variables(messages)["id"] == "ds-1"
+
+    session = rollstack(tool_answer({"datasheetIds": ["dsh-1"]}))
+
+    messages = run("addReportDatasheets", {"id": "rep-1", "sources": '[{"datasetId": "ds-1"}]'})
+
+    assert sent(session)["arguments"]["body"] == {"sources": [{"datasetId": "ds-1"}]}
+    assert variables(messages) == {"datasheetIds": ["dsh-1"]}
+
+
+def test_a_list_answer_is_one_variable(rollstack):
+    connections = [{"id": "c-1", "type": "Tableau", "name": "Tableau"}, {"id": "c-2", "type": "Snowflake", "name": "Warehouse"}]
+    rollstack(tool_answer(connections))
+
+    messages = run("listConnections", {})
+
+    assert [m.json_object for m in of_type(messages, MessageType.JSON)] == connections
+    assert variables(messages) == {"connections": connections}
+
+
+def test_a_field_dify_names_itself_stays_in_the_json_output(rollstack):
+    memory = {"id": "mem-1", "text": "Our fiscal year starts in February.", "category": "general"}
+    rollstack(tool_answer(memory))
+
+    messages = run("createMemory", {"text": memory["text"]})
+
+    assert [m.json_object for m in of_type(messages, MessageType.JSON)] == [memory]
+    assert "text" not in variables(messages)
+
+
+def test_slide_images_in_the_answer_are_sent_as_image_files(rollstack):
+    jpeg = b"\xff\xd8\xff\xe0 a slide"
+    slide = {"id": "s-1", "mimeType": "image/jpeg", "data": base64.b64encode(jpeg).decode()}
+    rollstack(tool_answer({"slides": [slide, {**slide, "id": "s-2", "data": "not base64!"}]}))
+
+    messages = run("getReportSlideImages", {"id": "rep-1", "slideIds": "s-1, s-2"})
+
+    # The model gets the slides without their base64 data, and the user each one as a file. A slide whose data
+    # isn't base64 goes out as no file, and says so
+    (shown,) = [m.json_object for m in of_type(messages, MessageType.JSON)]
+    assert [item["data"] for item in shown["slides"]] == [IMAGE_SENT, IMAGE_UNREADABLE]
+    blobs = [m for m in messages if m.type == MessageType.BLOB]
+    assert [(m.message.blob, m.meta) for m in blobs] == [(jpeg, {"mime_type": "image/jpeg"})]
+    assert variables(messages)["slides"][0]["data"] == IMAGE_SENT
+
+
+def test_an_image_block_that_is_not_base64_is_reported(rollstack):
+    rollstack(rpc({"content": [{"type": "image", "data": "not base64!", "mimeType": "image/png"}]}))
+
+    messages = run("getReportSlideImages", {"id": "rep-1", "slideIds": "s-1"})
+
+    assert [m.text for m in of_type(messages, MessageType.TEXT)] == ["Rollstack sent an image (image/png) that could not be read."]
+    assert [m for m in messages if m.type == MessageType.BLOB] == []
+
+
+def test_an_idempotency_key_the_agent_gives_is_sent_as_it_is(rollstack):
+    # Rollstack's descriptions tell the agent to send one, so that a call it sends again runs once
+    session = rollstack(tool_answer({"id": "rep-2"}))
+
+    run("convertReport", {"id": "rep-1", "idempotencyKey": "convert-rep-1"})
+
+    assert sent(session)["arguments"]["idempotencyKey"] == "convert-rep-1"
+
+
+def test_null_moves_a_folder_to_the_top_level(rollstack):
+    session = rollstack(tool_answer({"id": "fold-1", "parentFolderId": None}))
+
+    run("updateFolder", {"id": "fold-1", "parentFolderId": " null "})
+
+    assert sent(session)["arguments"]["body"] == {"parentFolderId": None}
+
+
+def test_an_image_block_is_sent_as_an_image_file(rollstack):
+    png = b"\x89PNG a slide"
+    blocks = [{"type": "text", "text": "Slide 1"}, {"type": "image", "data": base64.b64encode(png).decode(), "mimeType": "image/png"}]
+    rollstack(rpc({"content": blocks}))
+
+    messages = run("getReportSlideImages", {"id": "rep-1", "slideIds": "s-1"})
+
+    assert [m.text for m in of_type(messages, MessageType.TEXT)] == ["Slide 1"]
+    assert [(m.message.blob, m.meta) for m in messages if m.type == MessageType.BLOB] == [(png, {"mime_type": "image/png"})]
+
+
+def test_a_boolean_and_a_select_reach_rollstack(rollstack):
+    session = rollstack(tool_answer({"runId": "run-1", "started": True}))
+
+    run("startReportRun", {"id": "rep-1", "repairSlides": "false"})
+
+    assert sent(session)["arguments"]["body"] == {"repairSlides": False}
+
+    session = rollstack(tool_answer([]))
+
+    run("searchDashboards", {"type": "Tableau", "id": "conn-1", "query": "Sales"})
+
+    assert sent(session)["arguments"] == {"params": {"type": "Tableau", "id": "conn-1"}, "query": {"query": "Sales"}}
 
 
 def load_provider() -> ToolProvider:

@@ -4,7 +4,7 @@ identity:
   label:
     en_US: Rollstack
   description:
-    en_US: Build polished presentations using AI, with advanced charts.
+    en_US: Build polished presentations using AI, with advanced charts and data connections built in.
   icon: icon.png
   tags:
     - productivity
@@ -23,16 +23,125 @@ credentials_for_provider:
 tools:
   - tools/list_reports.yaml
   - tools/get_report.yaml
-  - tools/list_templates.yaml
+  - tools/convert_report.yaml
   - tools/create_report.yaml
-  - tools/send_report_message.yaml
+  - tools/duplicate_report.yaml
+  - tools/update_report.yaml
+  - tools/batch_get_reports.yaml
+  - tools/list_templates.yaml
+  - tools/show_templates.yaml
+  - tools/create_template.yaml
+  - tools/update_template.yaml
+  - tools/delete_template.yaml
+  - tools/apply_report_template.yaml
+  - tools/list_report_versions.yaml
+  - tools/save_report_version.yaml
+  - tools/restore_report_version.yaml
   - tools/get_report_message.yaml
-  - tools/get_report_content.yaml
-  - tools/start_report_run.yaml
+  - tools/send_report_message.yaml
+  - tools/approve_report_message_proposal.yaml
+  - tools/cancel_report_message.yaml
+  - tools/reject_report_message_proposal.yaml
+  - tools/list_memories.yaml
+  - tools/create_memory.yaml
+  - tools/update_memory.yaml
+  - tools/delete_memory.yaml
+  - tools/list_report_runs.yaml
   - tools/get_report_run.yaml
+  - tools/list_report_syncs.yaml
+  - tools/list_runs.yaml
+  - tools/start_report_run.yaml
+  - tools/batch_start_report_runs.yaml
+  - tools/cancel_report_run.yaml
+  - tools/get_report_cloud_export.yaml
+  - tools/update_report_cloud_export.yaml
+  - tools/export_report.yaml
+  - tools/get_report_content.yaml
+  - tools/get_report_design.yaml
+  - tools/get_report_slide_html.yaml
+  - tools/get_report_slide_images.yaml
+  - tools/show_report.yaml
+  - tools/arrange_report_slides.yaml
+  - tools/update_report_theme.yaml
+  - tools/render_report_slides.yaml
+  - tools/save_report_slides.yaml
+  - tools/get_dataset.yaml
+  - tools/create_dataset_upload.yaml
+  - tools/create_document.yaml
+  - tools/create_dataset.yaml
+  - tools/replace_dataset.yaml
+  - tools/delete_dataset.yaml
+  - tools/get_report_data_guide.yaml
+  - tools/list_report_datasheets.yaml
+  - tools/get_report_datasheet.yaml
+  - tools/get_report_datasheet_data.yaml
+  - tools/add_report_datasheets.yaml
+  - tools/remove_report_datasheet.yaml
+  - tools/add_report_dashboard_elements.yaml
+  - tools/preview_report_datasheet_changes.yaml
+  - tools/query_report_data.yaml
+  - tools/save_report_datasheet_changes.yaml
+  - tools/get_report_parameters.yaml
+  - tools/create_report_parameter.yaml
+  - tools/update_report_parameter.yaml
+  - tools/delete_report_parameter.yaml
+  - tools/get_report_views.yaml
+  - tools/share_report.yaml
+  - tools/unshare_report.yaml
+  - tools/batch_share_reports.yaml
+  - tools/list_report_comments.yaml
+  - tools/create_report_comment.yaml
+  - tools/resolve_report_comment.yaml
   - tools/get_report_schedules.yaml
   - tools/update_report_schedules.yaml
-  - tools/export_report.yaml
+  - tools/batch_update_report_schedules.yaml
+  - tools/list_emails.yaml
+  - tools/get_report_email_config.yaml
+  - tools/list_report_emails.yaml
+  - tools/update_report_email_config.yaml
+  - tools/send_report_email.yaml
+  - tools/send_report_test_email.yaml
+  - tools/list_bursts.yaml
+  - tools/list_burst_email_configs.yaml
+  - tools/get_burst_run.yaml
+  - tools/get_burst_settings.yaml
+  - tools/list_burst_variants.yaml
+  - tools/get_burst_variant_batch.yaml
+  - tools/list_report_sync_filters.yaml
+  - tools/add_burst_variants.yaml
+  - tools/convert_burst.yaml
+  - tools/create_burst.yaml
+  - tools/create_burst_email_config.yaml
+  - tools/start_burst_run.yaml
+  - tools/send_burst_email_config.yaml
+  - tools/send_burst_variant_emails.yaml
+  - tools/rename_burst.yaml
+  - tools/update_burst_variant_email_settings.yaml
+  - tools/update_burst_email_config.yaml
+  - tools/update_burst_settings.yaml
+  - tools/update_burst_variant_recipients.yaml
+  - tools/update_burst_filters.yaml
+  - tools/delete_burst.yaml
+  - tools/delete_burst_email_config.yaml
+  - tools/reapply_burst_filters.yaml
+  - tools/remove_burst_variants.yaml
+  - tools/send_burst_email_config_test.yaml
+  - tools/list_connections.yaml
+  - tools/search_dashboards.yaml
+  - tools/get_dashboard.yaml
+  - tools/search_models.yaml
+  - tools/search_tables.yaml
+  - tools/search_spreadsheets.yaml
+  - tools/get_spreadsheet.yaml
+  - tools/list_smtp_connections.yaml
+  - tools/list_folders.yaml
+  - tools/get_folder.yaml
+  - tools/create_folder.yaml
+  - tools/update_folder.yaml
+  - tools/share_folder.yaml
+  - tools/unshare_folder.yaml
+  - tools/submit_feedback.yaml
+  - tools/list_members.yaml
 extra:
   python:
     source: provider/rollstack.py

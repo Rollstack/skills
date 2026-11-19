@@ -1,0 +1,54 @@
+identity:
+  name: addBurstVariants
+  author: rollstack
+  label:
+    en_US: Add burst variants
+description:
+  human:
+    en_US: 'Adds variants to a burst by their values of its report parameters, or of its filters for an older report''s burst: each is a copy of the template report with its own values, then runs once to fetch its data.'
+  llm: 'Adds variants to a burst by their values of its report parameters, or of its filters for an older report''s burst: each is a copy of the template report with its own values, then runs once to fetch its data. An older report''s variant is a copy of its file in the burst''s folder. Report parameter values and filter ids are checked first, so a request with one the burst can''t take adds nothing. Answers at once with the batch''s batchId and the names the variants are added with: follow the batch with getBurstVariantBatch until it ends.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: variants
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Variants
+  human_description:
+    en_US: The variants to add, 1 to 500.
+  llm_description: |-
+    The variants to add, 1 to 500. Variants may hold the same values as one another or as an existing variant: each is added as its own report.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"minItems":1,"maxItems":500,"type":"array","items":{"type":"object","properties":{"name":{"description":"The variant's name, which its report's name is built from as the burst's `variantNaming` says. If omitted, it is named after the values it sets, like `EMEA - Q1 2026`: its parameters' values, or its primary filters' values.","type":"string","minLength":1},"parameters":{"description":"For a burst by `parameters`: the value the variant sets of each report parameter, by its `id` in the burst's `parameters`. A parameter left out keeps the template's value. A value must be one the template's datasheet filters can take, or the request returns 400 and adds nothing.","type":"object","propertyNames":{"type":"string","format":"uuid","pattern":"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$","examples":["5e7a9c1b-3d5f-4b7d-9e1a-3c5e7a9b1d3f"]},"additionalProperties":{"anyOf":[{"type":"object","properties":{"type":{"type":"string","const":"categorical"},"values":{"type":"array","items":{"anyOf":[{"type":"string"},{"type":"number"}]}},"operator":{"type":"string","enum":["is","is_not","contains","doesnt_contain"]}},"required":["type","values"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_range"},"startDate":{"type":"string"},"endDate":{"type":"string"}},"required":["type","subtype","startDate","endDate"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_relative"},"rangeType":{"type":"string","enum":["current","lastN","nextN"]},"rangeN":{"type":"number"},"periodType":{"type":"string","enum":["days","weeks","months","quarters","years","completeDays","completeWeeks","completeMonths","completeQuarters","completeYears"]}},"required":["type","subtype","rangeType","rangeN","periodType"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_month_year"},"month":{"type":"number"},"year":{"type":"number"}},"required":["type","subtype","month","year"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_quarter_year"},"quarter":{"type":"number"},"year":{"type":"number"}},"required":["type","subtype","quarter","year"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_single"},"date":{"type":"string"}},"required":["type","subtype","date"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_null"}},"required":["type","subtype"]},{"type":"object","properties":{"type":{"type":"string","const":"number"},"value":{"type":"number"}},"required":["type","value"]},{"type":"object","properties":{"type":{"type":"string","const":"text"},"value":{"type":"string","minLength":1}},"required":["type","value"]}],"description":"A value of a report parameter, in the shape of its type. Copy the shape of the parameter's `value` in `listBursts`, or of a variant's in `listBurstVariants`:\n\n- A list of values: `{ \"type\": \"categorical\", \"values\": [\"EMEA\"] }`, with at least one value. `operator` can also be `is_not`, `contains` or `doesnt_contain`; it is `is` when left out.\n- A number: `{ \"type\": \"number\", \"value\": 10 }`. Text: `{ \"type\": \"text\", \"value\": \"EMEA\" }`.\n- A date range: `{ \"type\": \"date\", \"subtype\": \"date_range\", \"startDate\": \"2026-01-01\", \"endDate\": \"2026-03-31\" }`. One date: `{ \"type\": \"date\", \"subtype\": \"date_single\", \"date\": \"2026-03-31\" }`.\n- A month or a quarter: `{ \"type\": \"date\", \"subtype\": \"date_month_year\", \"month\": 3, \"year\": 2026 }` (months 1 to 12), `{ \"type\": \"date\", \"subtype\": \"date_quarter_year\", \"quarter\": 1, \"year\": 2026 }`.\n- A relative period: `{ \"type\": \"date\", \"subtype\": \"date_relative\", \"rangeType\": \"lastN\", \"rangeN\": 3, \"periodType\": \"months\" }`. `rangeType` is `current`, `lastN` or `nextN`; `periodType` is `days`, `weeks`, `months`, `quarters` or `years`, or `completeDays` through `completeYears` for whole periods only."},"examples":[{"5e7a9c1b-3d5f-4b7d-9e1a-3c5e7a9b1d3f":{"type":"categorical","values":["EMEA"]}}]},"filters":{"description":"For a burst by `filters`: the value the variant applies to each filter, by its `id` in the burst's `filters`, at least one. A filter left out keeps its value on the dashboard. An id that isn't one of the burst's filters returns 400 and adds nothing.","type":"object","propertyNames":{"type":"string"},"additionalProperties":{"anyOf":[{"type":"object","properties":{"type":{"type":"string","const":"categorical"},"values":{"type":"array","items":{"anyOf":[{"type":"string"},{"type":"number"}]}},"operator":{"type":"string","enum":["is","is_not","contains","doesnt_contain"]}},"required":["type","values"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_range"},"startDate":{"type":"string"},"endDate":{"type":"string"}},"required":["type","subtype","startDate","endDate"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_relative"},"rangeType":{"type":"string","enum":["current","lastN","nextN"]},"rangeN":{"type":"number"},"periodType":{"type":"string","enum":["days","weeks","months","quarters","years","completeDays","completeWeeks","completeMonths","completeQuarters","completeYears"]}},"required":["type","subtype","rangeType","rangeN","periodType"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_month_year"},"month":{"type":"number"},"year":{"type":"number"}},"required":["type","subtype","month","year"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_quarter_year"},"quarter":{"type":"number"},"year":{"type":"number"}},"required":["type","subtype","quarter","year"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_single"},"date":{"type":"string"}},"required":["type","subtype","date"]},{"type":"object","properties":{"type":{"type":"string","const":"date"},"subtype":{"type":"string","const":"date_null"}},"required":["type","subtype"]},{"type":"object","properties":{"type":{"type":"string","const":"number"},"value":{"type":"number"}},"required":["type","value"]},{"type":"object","properties":{"type":{"type":"string","const":"text"},"value":{"type":"string","minLength":1}},"required":["type","value"]}],"description":"A value of a filter, in the shape of its `valueType`, the same shapes as a report parameter value. Copy the shape of a variant's value of the filter in `listBurstVariants`."},"examples":[{"3b1f8c2e-6a4d-4f1e-9b2a-7c5d8e1f2a3b":{"type":"categorical","values":["EMEA"]}}]}},"additionalProperties":false}}
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    batchId:
+      type: string
+      description: Identifies the batch of variants being added.
+    variants:
+      type: array
+      items:
+        type: object
+      description: The variants being added, in the order sent.
+extra:
+  python:
+    source: tools/add_burst_variants.py

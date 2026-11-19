@@ -1,0 +1,55 @@
+identity:
+  name: createMemory
+  author: rollstack
+  label:
+    en_US: Add memory
+description:
+  human:
+    en_US: Has the slides agent remember something of how the user likes their decks, for all their reports or one of them, as adding a preference in the app's Slides settings does.
+  llm: Has the slides agent remember something of how the user likes their decks, for all their reports or one of them, as adding a preference in the app's Slides settings does. Only add what the user asked to be remembered. Answers the memory.
+parameters:
+- name: text
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Text
+  human_description:
+    en_US: What the slides agent should remember, as one plain sentence, at most 300 characters.
+  llm_description: What the slides agent should remember, as one plain sentence, at most 300 characters.
+- name: reportId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report the memory holds for, by its id from listReports, which you must be able to edit.
+  llm_description: The report the memory holds for, by its `id` from `listReports`, which you must be able to edit. `null` for all your reports. Defaults to `null`. To send null, pass the text null.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Identifies the memory.
+    category:
+      type: string
+      description: The part of a deck it is about, so each agent reads the ones it acts on.
+    report:
+      type: object
+      description: The report it holds for.
+    updatedAt:
+      type: string
+      description: When it was last learned or changed, as an ISO 8601 date and time.
+extra:
+  python:
+    source: tools/create_memory.py

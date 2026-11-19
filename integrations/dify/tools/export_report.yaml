@@ -2,55 +2,64 @@ identity:
   name: exportReport
   author: rollstack
   label:
-    en_US: "Export report"
+    en_US: Export report
 description:
   human:
-    en_US: "Exports a report as PDF or PowerPoint and answers a download link valid for 15 minutes."
-  llm: "Exports a report as PDF or PowerPoint and answers a download link valid for 15 minutes. At most 10 exports a minute per user."
+    en_US: Exports a report as PDF or PowerPoint and answers a download link valid for 15 minutes.
+  llm: Exports a report as PDF or PowerPoint and answers a download link valid for 15 minutes. At most 10 exports a minute per user.
 parameters:
-  - name: id
-    type: string
-    required: true
-    form: llm
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: format
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Format
+  human_description:
+    en_US: The kind of file to create.
+  llm_description: The kind of file to create. `pdf` is a PDF of the report's visible slides; hidden slides are left out. `pptx` is a PowerPoint file in which hidden slides are included but stay hidden, speaker notes are kept, and charts are images rather than editable charts.
+  options:
+  - value: pdf
     label:
-      en_US: "Report ID"
-    human_description:
-      en_US: "The report to act on, by its id from listReports or createReport."
-    llm_description: "The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report's link in Rollstack: it's the part right after `/slides/`."
-  - name: format
-    type: select
-    required: true
-    form: llm
+      en_US: pdf
+  - value: pptx
     label:
-      en_US: "Format"
-    human_description:
-      en_US: "The kind of file to create."
-    llm_description: "The kind of file to create. `pdf` is a PDF of the report's visible slides; hidden slides are left out. `pptx` is a PowerPoint file in which hidden slides are included but stay hidden, speaker notes are kept, and charts are images rather than editable charts."
-    options:
-      - value: pdf
-        label:
-          en_US: "PDF"
-      - value: pptx
-        label:
-          en_US: "PowerPoint"
-  - name: slideIds
-    type: string
-    required: false
-    form: llm
-    label:
-      en_US: "Slide IDs"
-    human_description:
-      en_US: "The slides to export, from getReportContent or a reply's changedSlideIds."
-    llm_description: "The slides to export, from `getReportContent` or a reply's `changedSlideIds`. The file keeps the report's slide order whatever order you list them in. Ids that are not slides of the report are ignored, and so are hidden slides in a PDF. If omitted, the whole report is exported. Pass the ids as text, separated by commas."
+      en_US: pptx
+- name: slideIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Slide IDs
+  human_description:
+    en_US: The slides to export, from getReportContent or a reply's changedSlideIds.
+  llm_description: The slides to export, from `getReportContent` or a reply's `changedSlideIds`. The file keeps the report's slide order whatever order you list them in. Ids that are not slides of the report are ignored, and so are hidden slides in a PDF. If omitted, the whole report is exported. Pass them as text, separated by commas, or as a JSON array.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:
     url:
       type: string
-      description: "A link that downloads the exported file, named after the report."
+      description: A link that downloads the exported file, named after the report.
     expiresAt:
       type: string
-      description: "When `url` stops working, 15 minutes after the export."
+      description: When `url` stops working, 15 minutes after the export.
 extra:
   python:
     source: tools/export_report.py

@@ -1,0 +1,98 @@
+identity:
+  name: getDashboard
+  author: rollstack
+  label:
+    en_US: Get dashboard
+description:
+  human:
+    en_US: 'A dashboard of a Looker, Metabase, Omni, Lightdash, Sigma, Tableau or Power BI connection, read with the user''s access to the connection (a Salesforce report has no tabs or charts to read, so add it with addReportDatasheets directly): its tabs, and the charts and filters of the tab tabId names, one of the ids in tabs (else the one the dashboard opens on, a Power BI report''s or Sigma workbook''s first page).'
+  llm: 'A dashboard of a Looker, Metabase, Omni, Lightdash, Sigma, Tableau or Power BI connection, read with the user''s access to the connection (a Salesforce report has no tabs or charts to read, so add it with addReportDatasheets directly): its tabs, and the charts and filters of the tab tabId names, one of the ids in tabs (else the one the dashboard opens on, a Power BI report''s or Sigma workbook''s first page). Tableau and Power BI list no charts or filters here: once the tab is added to a report, its charts are listed from its picture for the slides agent to add; a Sigma page lists its charts and tables, and the workbook''s controls as its filters. Find the dashboard''s id with searchDashboards. Confirm the dashboard and tab with the user, then add it to a report with addReportDatasheets; for another tab, call it again with that tab''s id from tabs.'
+parameters:
+- name: type
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Type
+  human_description:
+    en_US: 'The type of connection, as type in listConnections: the BI tool it connects to.'
+  llm_description: 'The type of connection, as `type` in `listConnections`: the BI tool it connects to. Only Looker, Metabase, Omni, Lightdash, Sigma, Tableau and Power BI (`PowerBI`) connections have dashboards.'
+  options:
+  - value: Looker
+    label:
+      en_US: Looker
+  - value: Metabase
+    label:
+      en_US: Metabase
+  - value: Omni
+    label:
+      en_US: Omni
+  - value: Lightdash
+    label:
+      en_US: Lightdash
+  - value: Tableau
+    label:
+      en_US: Tableau
+  - value: PowerBI
+    label:
+      en_US: PowerBI
+  - value: Sigma
+    label:
+      en_US: Sigma
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Connection ID
+  human_description:
+    en_US: Unique identifier for the connection, from listConnections, which also returns its type.
+  llm_description: Unique identifier for the connection, from `listConnections`, which also returns its `type`.
+- name: dashboardId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Dashboard ID
+  human_description:
+    en_US: The dashboard to read, by the id that searchDashboards returns.
+  llm_description: The dashboard to read, by the `id` that `searchDashboards` returns.
+- name: tabId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Tab ID
+  human_description:
+    en_US: 'The dashboard tab to read, by its id from the tabs that getDashboard returns: a Looker, Metabase or Lightdash tab, a Tableau view, a Power BI page or a Sigma page.'
+  llm_description: 'The dashboard tab to read, by its `id` from the `tabs` that `getDashboard` returns: a Looker, Metabase or Lightdash tab, a Tableau view, a Power BI page or a Sigma page. If omitted, the dashboard''s first tab is used, or the whole dashboard when it has no tabs, as on Omni. A tab the dashboard doesn''t have returns a 404 error.'
+output_schema:
+  type: object
+  properties:
+    connection:
+      type: object
+      description: 'The connection the dashboard was read through: the one in the request path.'
+    dashboard:
+      type: object
+      description: The dashboard you asked for.
+    tabs:
+      type: array
+      items:
+        type: object
+      description: 'The dashboard''s tabs: a Looker, Metabase or Lightdash dashboard''s tabs, a Tableau workbook''s views, a Power BI report''s pages or a Sigma workbook''s pages, never its hidden ones.'
+    tabId:
+      type: string
+      description: 'The tab `elements` comes from: the one you passed as `tabId`, or the dashboard''s first tab if you passed none.'
+    elements:
+      type: array
+      items:
+        type: object
+      description: The charts and other elements on that tab, or on the whole dashboard when `tabId` is `null`.
+    filters:
+      type: array
+      items:
+        type: object
+      description: The dashboard's filters, and on Omni its controls too.
+extra:
+  python:
+    source: tools/get_dashboard.py

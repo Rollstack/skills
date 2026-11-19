@@ -1,0 +1,53 @@
+identity:
+  name: getReportDesign
+  author: rollstack
+  label:
+    en_US: Get report design
+description:
+  human:
+    en_US: Start here to design a slide deck's slides yourself, as HTML.
+  llm: 'Start here to design a slide deck''s slides yourself, as HTML. A call without layoutIds answers the guide to writing a slide for this report, which you follow, and what a slide is drawn on: the canvas size, the theme colours and, when the report has a template, its layouts by name. Call it again with layoutIds for the layouts you will use, to get the box each one''s title goes in and the areas to keep clear.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: layoutIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Layout IDs
+  human_description:
+    en_US: The layouts to describe in full, by their id from a first call without it.
+  llm_description: 'The layouts to describe in full, by their `id` from a first call without it. At most 10: repeat the parameter for each one, as in `?layoutIds=a&layoutIds=b`. Left out, only the template''s style is described. Pass them as text, separated by commas, or as a JSON array.'
+output_schema:
+  type: object
+  properties:
+    canvas:
+      type: object
+      description: The report's slide size in CSS pixels.
+    theme:
+      type: array
+      items:
+        type: object
+      description: The report's theme colours.
+    layouts:
+      type: array
+      items:
+        type: object
+      description: The layouts of the report's template.
+    layoutDetails:
+      type: string
+      description: 'How to write on the template, as Markdown: the type and colours its slides are set in, and for each layout named in `layoutIds` the box its title goes in, its other placeholders with their ids and boxes, and the areas to keep clear.'
+    guide:
+      type: string
+      description: 'How to write a slide for this report, as Markdown: the HTML a slide is made of, the styles that are kept, how to place charts, tables and figures from its datasheets, and how to check and save it.'
+extra:
+  python:
+    source: tools/get_report_design.py

@@ -1,0 +1,75 @@
+identity:
+  name: getReportDatasheetData
+  author: rollstack
+  label:
+    en_US: Get datasheet data
+description:
+  human:
+    en_US: 'The table a report''s chart is drawn from: the datasheet''s steps run over the copies stored at its sources'' last reads; the source is never queried.'
+  llm: 'The table a report''s chart is drawn from: the datasheet''s steps run over the copies stored at its sources'' last reads; the source is never queried. Only the report''s editors may: the table was read with an editor''s credentials, can hold columns and rows the slides never show, and skips the source''s row-level security. Fails for a `picture` datasheet (its `kind` in `listReportDatasheets`), which has no table. Also fails until every source it reads has been read, after a source''s latest read failed, and once a stored copy expires, 30 days after its read. At most 30 reads a minute per user.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: datasheetId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Datasheet ID
+  human_description:
+    en_US: 'The datasheet whose table to read: an id from listReportDatasheets, or one of the datasheetIds returned by addReportDatasheets.'
+  llm_description: 'The datasheet whose table to read: an `id` from `listReportDatasheets`, or one of the `datasheetIds` returned by `addReportDatasheets`. It must be one of this report''s datasheets. A datasheet that reads a picture, such as a dashboard tab added with `addReportDatasheets`, has no table, so the request fails: add the tab''s charts as data with `addReportDashboardElements`.'
+- name: limit
+  type: number
+  required: false
+  form: llm
+  label:
+    en_US: Limit
+  human_description:
+    en_US: The maximum number of rows to return, starting from the first row of the table.
+  llm_description: The maximum number of rows to return, starting from the first row of the table. If the table has more, `truncated` is `true`. Can range from `1` to `1000`. Defaults to `200`.
+  min: 1
+  max: 1000
+output_schema:
+  type: object
+  properties:
+    columns:
+      type: array
+      items:
+        type: object
+      description: The columns of the table, in the same order as the cells of each row in `rows`.
+    rows:
+      type: array
+      items:
+        type: array
+      description: The rows of the table, starting from the first, at most `limit` of them.
+    stacking:
+      type: string
+      description: How the chart in the datasheet's source stacks its series, such as a Looker, Metabase or Power BI chart, or a chart imported from PowerPoint.
+    totalRow:
+      type: boolean
+      description: Total row
+    subtotals:
+      type: object
+      description: 'When the datasheet''s query adds subtotals: `rowFields` are the columns its rows are grouped by, outermost first, and `levels` has one number per row in `rows`, how many of those columns the row is grouped by.'
+    rowFields:
+      type: array
+      items:
+        type: string
+      description: Row fields
+    truncated:
+      type: boolean
+      description: Whether the table has more rows than `limit`, so `rows` doesn't contain all of them.
+    readAt:
+      type: string
+      description: When Rollstack read the source data the table is built from.
+extra:
+  python:
+    source: tools/get_report_datasheet_data.py

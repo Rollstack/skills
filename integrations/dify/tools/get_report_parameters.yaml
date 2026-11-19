@@ -1,0 +1,45 @@
+identity:
+  name: getReportParameters
+  author: rollstack
+  label:
+    en_US: Get report parameters
+description:
+  human:
+    en_US: A report's parameters, with which ones a burst can vary by, the dashboard filters and the datasheet columns a parameter can link, with the parameter that already links each.
+  llm: A report's parameters, with which ones a burst can vary by, the dashboard filters and the datasheet columns a parameter can link, with the parameter that already links each.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+output_schema:
+  type: object
+  properties:
+    parameters:
+      type: array
+      items:
+        type: object
+      description: The report's parameters, oldest first.
+    filters:
+      type: array
+      items:
+        type: object
+      description: 'The filters a parameter can link: those of the dashboards the report''s datasheets read.'
+    columns:
+      type: array
+      items:
+        type: object
+      description: 'The columns a parameter can link: those of the datasheets the report has already read, from a source Rollstack can filter by rows, with a kind of value that can filter them.'
+    datasheetsToRefresh:
+      type: array
+      items:
+        type: object
+      description: The datasheets whose columns can be linked once the report is run again, as a run reads them.
+extra:
+  python:
+    source: tools/get_report_parameters.py

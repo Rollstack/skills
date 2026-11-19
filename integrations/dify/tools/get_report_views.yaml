@@ -1,0 +1,49 @@
+identity:
+  name: getReportViews
+  author: rollstack
+  label:
+    en_US: Get report views
+description:
+  human:
+    en_US: 'Who opened a report and how they read it, as its editors see under Views in the app: each person''s visits, time spent and whether they opened it since its last successful run, who it is shared with but hasn''t opened it since, and how far into it people read, slide by slide.'
+  llm: 'Who opened a report and how they read it, as its editors see under Views in the app: each person''s visits, time spent and whether they opened it since its last successful run, who it is shared with but hasn''t opened it since, and how far into it people read, slide by slide. Editors'' own time editing doesn''t count. Only its editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+output_schema:
+  type: object
+  properties:
+    visits:
+      type: number
+      description: How many times people opened the report to read it, editors' own edits left out.
+    medianVisitSeconds:
+      type: number
+      description: How long a visit lasts, as the median in seconds.
+    lastUpdatedAt:
+      type: string
+      description: When the report's last successful run ended, which `openedSinceUpdate` compares to.
+    people:
+      type: array
+      items:
+        type: object
+      description: Who opened the report, the most recent first.
+    notOpened:
+      type: array
+      items:
+        type: object
+      description: The members it is shared with who haven't opened it since its last successful run, you left out.
+    slides:
+      type: array
+      items:
+        type: object
+      description: How far into the report people read, slide by slide.
+extra:
+  python:
+    source: tools/get_report_views.py

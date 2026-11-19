@@ -1,0 +1,62 @@
+identity:
+  name: getBurstVariantBatch
+  author: rollstack
+  label:
+    en_US: Get burst variant batch
+description:
+  human:
+    en_US: 'A batch of variants being added to a burst, with where each variant stands: copied from the template report, then run once to fetch its data.'
+  llm: 'A batch of variants being added to a burst, with where each variant stands: copied from the template report, then run once to fetch its data. Waits up to waitSeconds for the batch to end and answers as soon as it does, so call it again while the status is running. Your later batch on the burst reuses the id, so this describes the latest one.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: batchId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Batch ID
+  human_description:
+    en_US: The batch, by the batchId that addBurstVariants returned.
+  llm_description: The batch, by the `batchId` that `addBurstVariants` returned. A member's batches on a burst share one id, so it always refers to their latest.
+- name: waitSeconds
+  type: number
+  required: false
+  form: llm
+  label:
+    en_US: Wait seconds
+  human_description:
+    en_US: 'How long this call waits for the work to finish, in seconds: the message to the slides agent on getReportMessage, the run on getReportRun, the batch of variants being added on getBurstVariantBatch, the runs of a burst''s variants on getBurstRun.'
+  llm_description: 'How long this call waits for the work to finish, in seconds: the message to the slides agent on `getReportMessage`, the run on `getReportRun`, the batch of variants being added on `getBurstVariantBatch`, the runs of a burst''s variants on `getBurstRun`. It returns as soon as the work is done, or as things stand once the time is up, so call it again while `status` is still `queued` or `running`. `0` returns at once. Defaults to `20`; at most `30`.'
+  min: 0
+  max: 30
+output_schema:
+  type: object
+  properties:
+    batchId:
+      type: string
+      description: Identifies the batch, as returned by `addBurstVariants`.
+    status:
+      type: string
+      description: Where the batch stands.
+    startedAt:
+      type: string
+      description: When the batch started.
+    finishedAt:
+      type: string
+      description: When the batch ended, whatever its outcome.
+    variants:
+      type: array
+      items:
+        type: object
+      description: The variants in the batch, in the order they were sent, each with where adding it stands.
+extra:
+  python:
+    source: tools/get_burst_variant_batch.py

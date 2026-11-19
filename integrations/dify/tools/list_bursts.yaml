@@ -1,0 +1,53 @@
+identity:
+  name: listBursts
+  author: rollstack
+  label:
+    en_US: List bursts
+description:
+  human:
+    en_US: 'The bursts of reports the user can see, newest first: those of Rollstack reports, whose variants differ by report parameters, and those of older reports such as Google Slides or PowerPoint files, whose variants differ by filters, as kind says.'
+  llm: 'The bursts of reports the user can see, newest first: those of Rollstack reports, whose variants differ by report parameters, and those of older reports such as Google Slides or PowerPoint files, whose variants differ by filters, as kind says. Each comes with what its variants differ by and the template report they are copied from. You can filter by name, ignoring case. Answers up to limit bursts, 50 by default and 200 at most, and a nextCursor: pass it as cursor for the next page, until it is null. listReports leaves out the reports of a burst, its template and variants.'
+parameters:
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: 'Only return bursts whose name contains this text, ignoring case: region matches Regional Review.'
+  llm_description: 'Only return bursts whose name contains this text, ignoring case: `region` matches `Regional Review`.'
+- name: limit
+  type: number
+  required: false
+  form: llm
+  label:
+    en_US: Limit
+  human_description:
+    en_US: Maximum number of bursts to return on this page, from 1 to 200.
+  llm_description: Maximum number of bursts to return on this page, from 1 to 200. Defaults to `50`.
+  min: 1
+  max: 200
+- name: cursor
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Cursor
+  human_description:
+    en_US: 'Where to continue the list: pass the nextCursor returned with the previous page to get the next one.'
+  llm_description: 'Where to continue the list: pass the `nextCursor` returned with the previous page to get the next one. Omit it for the first page.'
+output_schema:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+      description: The bursts on this page, most recently created first.
+    nextCursor:
+      type: string
+      description: Pass it as `cursor` to get the next page of bursts.
+extra:
+  python:
+    source: tools/list_bursts.py

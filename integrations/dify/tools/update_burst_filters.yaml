@@ -1,0 +1,110 @@
+identity:
+  name: updateBurstFilters
+  author: rollstack
+  label:
+    en_US: Update burst filters
+description:
+  human:
+    en_US: Replaces the filters an older report's burst varies by, then writes every variant's values into its syncs again, which can take a minute, and answers the burst.
+  llm: 'Replaces the filters an older report''s burst varies by, then writes every variant''s values into its syncs again, which can take a minute, and answers the burst. A filter left out is removed with every variant''s value of it, unless replace carries those values to its new filter: confirm with the user first. Variants keep their files and names. Only the burst''s owner and admins may. A Rollstack report''s burst varies by report parameters and returns 400.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: primaryIds
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Primary IDs
+  human_description:
+    en_US: The filters that name the variants, by their id in the burst's filters or from listReportSyncFilters, in the order their values name a variant.
+  llm_description: The filters that name the variants, by their `id` in the burst's `filters` or from `listReportSyncFilters`, in the order their values name a variant. 1 to 3. Pass them as text, separated by commas, or as a JSON array.
+- name: secondaryIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Secondary IDs
+  human_description:
+    en_US: Filters a variant can also set, which don't name it.
+  llm_description: Filters a variant can also set, which don't name it. Pass them as text, separated by commas, or as a JSON array.
+- name: replace
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Replace
+  human_description:
+    en_US: Carries every variant's value of a filter you're replacing to its new filter, such as one moved to another dashboard.
+  llm_description: |-
+    Carries every variant's value of a filter you're replacing to its new filter, such as one moved to another dashboard. Without it, a filter left out is removed together with every variant's value of it, which can't be undone.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"default":[],"type":"array","items":{"type":"object","properties":{"fromId":{"type":"string","description":"A filter the burst varies by now, by its `id` in its `filters`."},"toId":{"type":"string","description":"The new filter, among `primaryIds` or `secondaryIds`, that takes its values."}},"required":["fromId","toId"],"additionalProperties":false}}
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the burst.
+    name:
+      type: string
+      description: Name of the burst, as members see it in Rollstack.
+    folderId:
+      type: string
+      description: The folder the burst is in, by its `id` in `listFolders`.
+    owner:
+      type: object
+      description: 'The member who owns the burst: whoever created it, unless ownership has since been transferred in the app.'
+    templateReportId:
+      type: string
+      description: The template report, which every variant was copied from when it was added, by its `id` for `getReport` and the other `/reports/{id}` endpoints.
+    variantNaming:
+      type: string
+      description: 'How each variant''s report is named from the burst''s name and the name the variant is added with, `EMEA` in a burst named `Regional Review`: `suffix` gives `Regional Review - EMEA`, `prefix` gives `EMEA - Regional Review`, and `sameName` gives `EMEA`.'
+    kind:
+      type: string
+      description: What the variants differ by.
+    reportType:
+      type: string
+      description: 'The type of report the burst copies, as `type` in `listReports`: `SlideDeck` for a Rollstack report, which bursts by `parameters`, any other type for an older report, which bursts by `filters`.'
+    parameters:
+      type: array
+      items:
+        type: object
+      description: The template report's parameters the variants differ by, in the order their values name a variant.
+    filters:
+      type: array
+      items:
+        type: object
+      description: The filters of the template report's syncs that the variants differ by, primary ones first in the order their values name a variant.
+    variantCount:
+      type: number
+      description: How many variants the burst has, including any you can't open.
+    appUrl:
+      type: string
+      description: Link that opens the burst in Rollstack.
+    createdAt:
+      type: string
+      description: When the burst was created.
+    updatedAt:
+      type: string
+      description: When the burst's details last changed.
+extra:
+  python:
+    source: tools/update_burst_filters.py

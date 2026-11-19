@@ -1,0 +1,60 @@
+identity:
+  name: addReportDashboardElements
+  author: rollstack
+  label:
+    en_US: Add dashboard charts to report
+description:
+  human:
+    en_US: 'Adds charts of a Tableau view or Power BI page the report holds as a picture, each as a datasheet of its own: its data, to read with getReportDatasheetData or queryReportData and draw on a slide, its picture, or both.'
+  llm: 'Adds charts of a Tableau view or Power BI page the report holds as a picture, each as a datasheet of its own: its data, to read with getReportDatasheetData or queryReportData and draw on a slide, its picture, or both. Pass the picture''s datasheet id, from addReportDatasheets or listReportDatasheets, and the refs of the charts getReportDatasheet lists for it. Each chart is read with the dashboard''s filters and the user''s access to the connection, and a chart the report already reads that way is reused. Reading a dashboard can take a minute: past the wait the call answers that the source is still being read, so send the same call again, which reuses what the first one added. It runs one at a time with your queryReportData, previewReportDatasheetChanges and saveReportDatasheetChanges calls: send it once they answer. Only the report''s editors may.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: datasheetId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Datasheet ID
+  human_description:
+    en_US: One of this report's datasheets, by its id in listReportDatasheets.
+  llm_description: One of this report's datasheets, by its `id` in `listReportDatasheets`.
+- name: elements
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Elements
+  human_description:
+    en_US: The charts to add, only the ones the slides need, at most 12 a call.
+  llm_description: |-
+    The charts to add, only the ones the slides need, at most 12 a call.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"minItems":1,"maxItems":12,"type":"array","items":{"type":"object","properties":{"ref":{"type":"string","minLength":1,"description":"A chart's `ref` from the `elements` `getReportDatasheet` lists for this dashboard. For a table Tableau builds from several worksheets side by side, the refs of those worksheets joined by commas, like `12,15,18`, add it as one."},"as":{"type":"string","enum":["data","picture","both"],"description":"`data` for its table, to read with `getReportDatasheetData` and draw as a chart, table or figure on a slide; `picture` for its image, to place on a slide as it looks; `both` for the two. Ask only for a read the element lists in its `reads`."}},"required":["ref","as"],"additionalProperties":false}}
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    elements:
+      type: array
+      items:
+        type: object
+      description: Each chart you asked for, in the order of `elements`.
+extra:
+  python:
+    source: tools/add_report_dashboard_elements.py

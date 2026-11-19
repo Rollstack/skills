@@ -1,0 +1,55 @@
+identity:
+  name: createDataset
+  author: rollstack
+  label:
+    en_US: Upload a file
+description:
+  human:
+    en_US: 'Stores a CSV for the slides agent to build slides from: a header row, then at least one data row, at most 10 MB.'
+  llm: 'Stores a CSV for the slides agent to build slides from: a header row, then at least one data row, at most 10 MB. Add it to a report with addReportDatasheets. Over MCP the CSV is written into the tool call, so send large files to this REST endpoint instead. Or send an Excel workbook (.xlsx, at most 10 MB) as multipart/form-data in the file field: it is stored as it is, with all its sheets, formatting and charts, and the user picks its sheets and ranges for a report in the app''s editor. Legacy .xls, macro-enabled and password-protected workbooks are rejected. A workbook is read as saved: formulas show their saved results, and nothing is recalculated. When you have the file and a shell, send the file itself with createDatasetUpload instead of writing it into the tool call. List the sheets of a workbook with getDataset, then add a sheet or a range of one to a report with addReportDatasheets.'
+parameters:
+- name: name
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: A name for the uploaded file, which its datasheet takes when you add the file to a report with addReportDatasheets.
+  llm_description: 'A name for the uploaded file, which its datasheet takes when you add the file to a report with `addReportDatasheets`. Leading and trailing spaces are removed, and a name containing a `/` keeps only its last part: `exports/Q3 pipeline` is stored as `Q3 pipeline`. From 1 to 255 characters.'
+- name: csv
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: CSV
+  human_description:
+    en_US: 'The file''s data, as CSV text: a header row naming the columns, then at least one row of data.'
+  llm_description: 'The file''s data, as CSV text: a header row naming the columns, then at least one row of data. With `replaceDataset`, it replaces the file''s whole content, header included, and the uploaded file must be a CSV file. The header''s names become the column names of the datasheets made from the file: a blank one becomes `Column N`, after the column''s position, and a repeated one gets a `_2`, `_3` suffix. Values can be separated by commas, semicolons or tabs, detected from the header row. At most 10 MB.'
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the uploaded file.
+    name:
+      type: string
+      description: 'The uploaded file''s name: the `name` it was created with for a CSV file, or the workbook''s file name for an Excel workbook, such as `Q3 pipeline.xlsx`.'
+    createdAt:
+      type: string
+      description: When the file was uploaded.
+    updatedAt:
+      type: string
+      description: When the file's content was last replaced with `replaceDataset`, or when it was uploaded if it has never been replaced.
+extra:
+  python:
+    source: tools/create_dataset.py

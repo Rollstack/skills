@@ -1,0 +1,62 @@
+identity:
+  name: applyReportTemplate
+  author: rollstack
+  label:
+    en_US: Apply template
+description:
+  human:
+    en_US: Switches a report of type SlideDeck to a template's theme, slide masters, layouts and slide size, as the Templates drawer in the app does.
+  llm: 'Switches a report of type SlideDeck to a template''s theme, slide masters, layouts and slide size, as the Templates drawer in the app does. Its slides keep their content and move to the template''s matching layouts; the answer names the slides that had no match, and the version saved just before as versionBeforeId: restore it with restoreReportVersion to undo the change. Only its editors may, and not while the report is running or the slides agent is working on it.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: templateId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Template ID
+  human_description:
+    en_US: The template, by its id from listTemplates.
+  llm_description: The template, by its `id` from `listTemplates`. Rollstack's own template has the fixed id `rollstack-signature`.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    templateName:
+      type: string
+      description: The name of the template the report now uses.
+    versionName:
+      type: string
+      description: The name of the version of the report saved just before, in its Version history.
+    versionBeforeId:
+      type: string
+      description: The version saved just before.
+    closestLayoutSlides:
+      type: array
+      items:
+        type: integer
+      description: 'The slides, by number from 1, whose layout the template has no match for: they moved to the template''s closest layout, so tell the user to check them.'
+    noLayoutSlides:
+      type: array
+      items:
+        type: integer
+      description: 'The slides, by number from 1, with no layout, such as ones pasted from PowerPoint: they only got the template''s colors and fonts.'
+extra:
+  python:
+    source: tools/apply_report_template.py

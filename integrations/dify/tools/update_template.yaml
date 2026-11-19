@@ -1,0 +1,73 @@
+identity:
+  name: updateTemplate
+  author: rollstack
+  label:
+    en_US: Update template
+description:
+  human:
+    en_US: Renames a company template, or shares it with the organization or stops sharing it, as the app's Templates drawer does.
+  llm: Renames a company template, or shares it with the organization or stops sharing it, as the app's Templates drawer does. Its creator can rename it and stop sharing it, only an admin can share their own template with the organization, and admins can also rename any shared one. Reports already built in it keep their look. Answers the template as listTemplates lists it.
+parameters:
+- name: templateId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Template ID
+  human_description:
+    en_US: The company template to act on, by its id from listTemplates.
+  llm_description: The company template to act on, by its `id` from `listTemplates`. Rollstack's own template can't be changed.
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: The template's new name, as members see it in Rollstack.
+  llm_description: The template's new name, as members see it in Rollstack.
+- name: sharedWithOrganization
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Shared with organization
+  human_description:
+    en_US: Whether everyone in the organization can use the template, or only you.
+  llm_description: Whether everyone in the organization can use the template, or only you. Only admins can share a template with the organization; a template's creator can stop sharing it.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The template, by its `id` from `listTemplates`.
+    name:
+      type: string
+      description: The template's name, as members see it in Rollstack.
+    builtIn:
+      type: boolean
+      description: '`true` for Rollstack''s own template, which every organization has; `false` for a company template.'
+    source:
+      type: string
+      description: 'Where the template comes from, as Rollstack shows it: `Made by Rollstack`, `Shared by <member>` or `Only visible to you`.'
+    sharedWithOrganization:
+      type: boolean
+      description: Whether everyone in the organization can use the company template.
+    createdBy:
+      type: object
+      description: The member who imported the company template.
+    createdAt:
+      type: string
+      description: When the company template was imported.
+extra:
+  python:
+    source: tools/update_template.py

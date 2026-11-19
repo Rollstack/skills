@@ -1,0 +1,30 @@
+identity:
+  name: batchGetReports
+  author: rollstack
+  label:
+    en_US: Get reports in a batch
+description:
+  human:
+    en_US: Up to 50 reports of any type at once, each as getReport answers it, with its schedules, who it is shared with, how its latest run went and whether one is going.
+  llm: 'Up to 50 reports of any type at once, each as getReport answers it, with its schedules, who it is shared with, how its latest run went and whether one is going. Answers one result per report, each naming its id: a report you can''t see fails on its own, with the error getReport would answer, and the others still answer.'
+parameters:
+- name: ids
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: IDs
+  human_description:
+    en_US: The reports to act on, of any type, by their id from listReports.
+  llm_description: The reports to act on, of any `type`, by their `id` from `listReports`. From 1 to 50 ids; an id listed twice is acted on once. Pass them as text, separated by commas, or as a JSON array.
+output_schema:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+      description: One result per report, each naming its `id`.
+extra:
+  python:
+    source: tools/batch_get_reports.py

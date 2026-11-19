@@ -1,0 +1,80 @@
+identity:
+  name: rejectReportMessageProposal
+  author: rollstack
+  label:
+    en_US: Reject slides agent proposal
+description:
+  human:
+    en_US: 'Rejects the proposal of a settings_proposal or email_send_proposal reply, as its Reject button in the app''s chat does: nothing changes.'
+  llm: 'Rejects the proposal of a settings_proposal or email_send_proposal reply, as its Reject button in the app''s chat does: nothing changes. Answers the reply with the proposal''s status, rejected for a change and cancelled for an email send. Only the user who sent the message may, while they can edit the report. A proposal already decided answers 409.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: messageId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Message ID
+  human_description:
+    en_US: 'The message to the slides agent: the messageId that sendReportMessage returned.'
+  llm_description: 'The message to the slides agent: the `messageId` that `sendReportMessage` returned. Only the user who sent the message can read, cancel or decide its proposals, and only while they can edit the report.'
+- name: replyId
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Reply ID
+  human_description:
+    en_US: 'The reply that makes the proposal: the id of a settings_proposal or email_send_proposal reply that getReportMessage lists for the message.'
+  llm_description: 'The reply that makes the proposal: the `id` of a `settings_proposal` or `email_send_proposal` reply that `getReportMessage` lists for the message.'
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Identifies the reply.
+    status:
+      type: string
+      description: Where this reply stands.
+    type:
+      type: string
+      description: What the reply is, which tells you what to do next.
+    content:
+      type: string
+      description: 'The reply''s text, as the chat in the app shows it: what the agent did, its answer, or its questions.'
+    questions:
+      type: array
+      items:
+        type: object
+      description: 'On a `clarification` reply: the multiple-choice questions the agent needs answered before it goes on.'
+    changedSlideIds:
+      type: array
+      items:
+        type: string
+      description: 'On a `result` or `partial_result` reply: the slides the agent added or changed, in report order.'
+    versionBeforeId:
+      type: string
+      description: 'On a `result` or `partial_result` reply: the report''s version saved just before the agent changed it.'
+    proposal:
+      type: object
+      description: 'On a `settings_proposal` or `email_send_proposal` reply: what the proposal changes, or the email it sends, and where it stands.'
+extra:
+  python:
+    source: tools/reject_report_message_proposal.py

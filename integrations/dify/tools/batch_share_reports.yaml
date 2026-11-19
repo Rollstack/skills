@@ -1,0 +1,70 @@
+identity:
+  name: batchShareReports
+  author: rollstack
+  label:
+    en_US: Share reports in a batch
+description:
+  human:
+    en_US: Shares up to 50 reports of any type with the same members, with the same permission, as shareReport does for one.
+  llm: 'Shares up to 50 reports of any type with the same members, with the same permission, as shareReport does for one. Each member gets one email listing the reports newly shared with them. Answers one result per report, each naming its id: a report you may not share fails on its own and the others are still shared, but a member who is not in the organization, or yourself, fails the whole call with nothing shared.'
+parameters:
+- name: ids
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: IDs
+  human_description:
+    en_US: The reports to act on, of any type, by their id from listReports.
+  llm_description: The reports to act on, of any `type`, by their `id` from `listReports`. From 1 to 50 ids; an id listed twice is acted on once. Pass them as text, separated by commas, or as a JSON array.
+- name: userIds
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: User IDs
+  human_description:
+    en_US: The members to share every report with, by their user id from listMembers.
+  llm_description: |-
+    The members to share every report with, by their user `id` from `listMembers`. Each must be an active member of the organization other than you, or the whole call fails with nothing shared. From 1 to 50 ids.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"minItems":1,"maxItems":50,"type":"array","items":{"type":"integer","minimum":-9007199254740991,"maximum":9007199254740991}}
+- name: permission
+  type: select
+  required: true
+  form: llm
+  label:
+    en_US: Permission
+  human_description:
+    en_US: What the member can do with the report.
+  llm_description: What the member can do with the report. `view` lets them open, export and duplicate it. `comment` also lets them add, reply to and resolve comments on its slides. `edit` also lets them change its slides, data, schedules, email and other settings, run it, send its email, chat with the slides agent about it, and manage who it's shared with. Neither lets them delete the report or transfer its ownership. If the report is already shared with the member, this replaces their permission and they aren't notified again. On a report that updates a file in Google Drive or OneDrive, Rollstack also shares the file with them, as the app does.
+  options:
+  - value: view
+    label:
+      en_US: view
+  - value: comment
+    label:
+      en_US: comment
+  - value: edit
+    label:
+      en_US: edit
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+      description: One result per report, each naming its `id`.
+extra:
+  python:
+    source: tools/batch_share_reports.py

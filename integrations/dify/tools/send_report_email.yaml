@@ -1,0 +1,40 @@
+identity:
+  name: sendReportEmail
+  author: rollstack
+  label:
+    en_US: Send email
+description:
+  human:
+    en_US: Emails a report to its recipients now, as it is.
+  llm: 'Emails a report to its recipients now, as it is. Only its editors may. Answers 400 when it has no recipients. An email report needs its email template set up in the app first. Sends in the background; while the user''s send of the report is going, starts nothing. At most 5 sends a minute per user, test sends included. From an AI client, the send only asks the user to confirm it in Rollstack: it answers `confirmation-required` and runs once they confirm.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    code:
+      type: string
+      description: '`confirmation-required` when Rollstack holds the call until you confirm it in Rollstack. Empty when it ran.'
+    message:
+      type: string
+      description: What you are asked to confirm, with the link you confirm it at. Set with `code`.
+extra:
+  python:
+    source: tools/send_report_email.py

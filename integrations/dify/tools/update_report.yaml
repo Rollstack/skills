@@ -1,0 +1,142 @@
+identity:
+  name: updateReport
+  author: rollstack
+  label:
+    en_US: Update report
+description:
+  human:
+    en_US: Renames a report of any type, moves it, or changes its timezone or failure notifications.
+  llm: Renames a report of any type, moves it, or changes its timezone or failure notifications. Renaming a report that updates a file, such as a Google Slides presentation, also renames the file, as the app does. Only its editors may.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: New name for the report, as members will see it in Rollstack.
+  llm_description: New name for the report, as members will see it in Rollstack. Leading and trailing spaces are removed, and it can't be blank.
+- name: folderId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Folder ID
+  human_description:
+    en_US: The folder to move the report to, by its id from listFolders; it must be one you can see.
+  llm_description: The folder to move the report to, by its `id` from `listFolders`; it must be one you can see. Pass `null` to move it to the top level, outside any folder. Members then get access to the report through the new folder, and the folders it's in, instead of the old one. To send null, pass the text null.
+- name: timezone
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Timezone
+  human_description:
+    en_US: The report's new timezone.
+  llm_description: 'The report''s new timezone. The slides agent uses it to tell today''s date, and the report''s emails show the time of its last successful update (`{{last_updated_at}}`) in it. On a report that updates a file, it''s also the timezone of the file''s date variables, unless the organization''s `timezone` replaces it. It doesn''t change the report''s schedules, which each have their own `timezone`: change those with `updateReportSchedules`. An IANA timezone name, such as `America/New_York`.'
+- name: notifyOnFailure
+  type: boolean
+  required: false
+  form: llm
+  label:
+    en_US: Notify on failure
+  human_description:
+    en_US: Whether Rollstack should email the report's owner when a scheduled run fails or some of its datasheets fail to refresh, copying everyone in notificationMailingList.
+  llm_description: Whether Rollstack should email the report's owner when a scheduled run fails or some of its datasheets fail to refresh, copying everyone in `notificationMailingList`. Set it to `false` to stop these emails. Runs started in the app or with `startReportRun` never send them.
+- name: notificationMailingList
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Notification mailing list
+  human_description:
+    en_US: Email addresses to copy when Rollstack emails the owner about a failed scheduled run, while notifyOnFailure is true.
+  llm_description: Email addresses to copy when Rollstack emails the owner about a failed scheduled run, while `notifyOnFailure` is `true`. The list you send replaces the current one; send `[]` to clear it. Each address must belong to an active member of the organization, ignoring case. Up to 100 addresses, with no duplicates. Pass them as text, separated by commas, or as a JSON array.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the report.
+    type:
+      type: string
+      description: The kind of report, which decides the endpoints that work on it.
+    name:
+      type: string
+      description: Name of the report, as members see it in Rollstack.
+    folderId:
+      type: string
+      description: The folder the report is in, by its `id` in `listFolders`.
+    owner:
+      type: object
+      description: 'The member who owns the report: whoever created it, unless ownership has since been transferred, in the app or with `transferReportOwnership`.'
+    permission:
+      type: string
+      description: Your access to the report, as the user the API key belongs to.
+    timezone:
+      type: string
+      description: The report's timezone, such as `America/New_York`.
+    notifyOnFailure:
+      type: boolean
+      description: Whether Rollstack emails the report's owner when a scheduled run fails or some of its datasheets, or a file's visualizations, fail to refresh, copying everyone in `notificationMailingList`.
+    lastSyncedAt:
+      type: string
+      description: When the report's latest run ended, whatever its outcome.
+    lastSuccessfulUpdateAt:
+      type: string
+      description: 'When the report''s latest fully successful run ended: one that refreshed every datasheet it ran on, or every visualization on a report that updates a file, with none failing.'
+    lastRunStatus:
+      type: string
+      description: How the report's latest run ended.
+    running:
+      type: boolean
+      description: Whether a run of the report is in progress, whoever started it, such as you with `startReportRun`, a member in the app, or one of its schedules.
+    appUrl:
+      type: string
+      description: Link that opens the report in Rollstack.
+    fileUrl:
+      type: string
+      description: Link that opens the Google Slides, Google Docs, PowerPoint or Word file the report updates.
+    createdAt:
+      type: string
+      description: When the report was created.
+    updatedAt:
+      type: string
+      description: When the report's details last changed, such as its name, folder or owner, or the outcome of its latest run.
+    notificationMailingList:
+      type: array
+      items:
+        type: string
+      description: Email addresses Rollstack copies when it emails the owner about a failed scheduled run, while `notifyOnFailure` is `true`.
+    schedules:
+      type: array
+      items:
+        type: object
+      description: 'The report''s schedules: when Rollstack runs the report on its own to update it with fresh data.'
+    sharedWith:
+      type: array
+      items:
+        type: object
+      description: Members the report is shared with directly, with their access.
+extra:
+  python:
+    source: tools/update_report.py

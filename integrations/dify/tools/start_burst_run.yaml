@@ -1,0 +1,59 @@
+identity:
+  name: startBurstRun
+  author: rollstack
+  label:
+    en_US: Run burst variants
+description:
+  human:
+    en_US: 'Starts a run of every variant of a burst, or of the variants passed, as startReportRun does for each: it refreshes the variant''s data, and repairs a Rollstack report''s slides with AI.'
+  llm: 'Starts a run of every variant of a burst, or of the variants passed, as startReportRun does for each: it refreshes the variant''s data, and repairs a Rollstack report''s slides with AI. An older report''s variants run together as the app''s Update runs them, in batches and behind the organization''s other burst runs, so a variant can wait its turn before its run shows. Each such run updates the variant''s file when it has one, and emails the variant to its recipients when its email trigger is `all`, as startReportRun does. The template report isn''t run; run it with startReportRun. Answers each variant''s run at once: follow them all with getBurstRun until none is running, or one with getReportRun, passing the variant''s id and runId. A variant already running answers that run and starts nothing. From an AI client, a run that emails variants only asks the user to confirm it in Rollstack: it answers `confirmation-required` and runs once they confirm.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: variantIds
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Variant IDs
+  human_description:
+    en_US: The variants to run, by their id in listBurstVariants, instead of every variant, such as those whose last run failed.
+  llm_description: The variants to run, by their `id` in `listBurstVariants`, instead of every variant, such as those whose last run failed. Each must be a variant of this burst. 1 to 500 ids. Pass them as text, separated by commas, or as a JSON array.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    runs:
+      type: array
+      items:
+        type: object
+      description: The variants running, each as a run of its own report.
+    failed:
+      type: array
+      items:
+        type: object
+      description: The variants whose run could not start, such as those you can't run since you only contribute to the burst.
+    code:
+      type: string
+      description: '`confirmation-required` when Rollstack holds the call until you confirm it in Rollstack. Empty when it ran.'
+    message:
+      type: string
+      description: What you are asked to confirm, with the link you confirm it at. Set with `code`.
+extra:
+  python:
+    source: tools/start_burst_run.py

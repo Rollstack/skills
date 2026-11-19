@@ -1,0 +1,30 @@
+identity:
+  name: searchSpreadsheets
+  author: rollstack
+  label:
+    en_US: Search spreadsheets
+description:
+  human:
+    en_US: The Google Sheets and Excel files the user added in the app whose name holds any word of query, in any case, most words first, at most 50.
+  llm: 'The Google Sheets and Excel files the user added in the app whose name holds any word of query, in any case, most words first, at most 50. Rollstack can''t search the user''s whole Google Drive or OneDrive: for another file, ask the user to add it in the app. Confirm the file with the user, then list its sheets with getSpreadsheet.'
+parameters:
+- name: query
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Query
+  human_description:
+    en_US: 'Words to search for in names, separated by spaces: a dashboard, table, model or spreadsheet is returned when its name contains any of them, case-insensitively, a table''s full name with its database and schema.'
+  llm_description: 'Words to search for in names, separated by spaces: a dashboard, table, model or spreadsheet is returned when its name contains any of them, case-insensitively, a table''s full name with its database and schema. If omitted, results aren''t filtered by name. At most 50 results are returned either way.'
+output_schema:
+  type: object
+  properties:
+    spreadsheets:
+      type: array
+      items:
+        type: object
+      description: The Google Sheets and Excel files the user added in the app whose name holds any word of query, in any case, most words first, at most 50.
+extra:
+  python:
+    source: tools/search_spreadsheets.py

@@ -1,0 +1,53 @@
+identity:
+  name: listReportVersions
+  author: rollstack
+  label:
+    en_US: List report versions
+description:
+  human:
+    en_US: 'The Version history of a report of type SlideDeck, newest first, as the app lists it: the versions Rollstack saved while it was edited, run or changed by the slides agent, and those saved with saveReportVersion, each with what saved it.'
+  llm: 'The Version history of a report of type SlideDeck, newest first, as the app lists it: the versions Rollstack saved while it was edited, run or changed by the slides agent, and those saved with saveReportVersion, each with what saved it. Answers up to limit versions, 20 by default and 100 at most, and a nextCursor: pass it as cursor for the next page, until it is null. Pass a version''s id to restoreReportVersion to take the report back to it.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: limit
+  type: number
+  required: false
+  form: llm
+  label:
+    en_US: Limit
+  human_description:
+    en_US: Maximum number of versions to return on this page, from 1 to 100.
+  llm_description: Maximum number of versions to return on this page, from 1 to 100. Defaults to `20`.
+  min: 1
+  max: 100
+- name: cursor
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Cursor
+  human_description:
+    en_US: 'Where to continue the list: pass the nextCursor returned with the previous page to get the next one.'
+  llm_description: 'Where to continue the list: pass the `nextCursor` returned with the previous page to get the next one. Omit it for the first page.'
+output_schema:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+      description: 'The report''s Version history, newest first: the versions it can be restored to.'
+    nextCursor:
+      type: string
+      description: Pass it as `cursor` to get the next page of versions.
+extra:
+  python:
+    source: tools/list_report_versions.py

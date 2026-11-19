@@ -1,0 +1,74 @@
+identity:
+  name: saveReportSlides
+  author: rollstack
+  label:
+    en_US: Save draft slides
+description:
+  human:
+    en_US: 'Writes slides you wrote as HTML into a slide deck, as the slides agent''s are: a draft sent under the id of a slide of the report replaces that slide where it is, any other is added right after the slide named in afterSlideId, or at the end without one, and every other slide stays.'
+  llm: 'Writes slides you wrote as HTML into a slide deck, as the slides agent''s are: a draft sent under the id of a slide of the report replaces that slide where it is, any other is added right after the slide named in afterSlideId, or at the end without one, and every other slide stays. To move, remove or hide slides, use arrangeReportSlides. Render them with renderReportSlides first: nothing is saved while a draft still has an issue, and the issues come back instead. A chart or table a draft places is filled with its datasheet''s data as part of the save, with no change to the slides. Take the save back by restoring versionBeforeId with restoreReportVersion. Only the report''s editors may. At most 10 drafts a call, and 20 renders and saves a minute per user.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, by its id from listReports or createReport.
+  llm_description: 'The report to act on, by its `id` from `listReports` or `createReport`. Only reports whose `type` is `SlideDeck` work here: another type, such as a Google Slides presentation, returns `400`. You can also copy it from the report''s link in Rollstack: it''s the part right after `/slides/`.'
+- name: slides
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Slides
+  human_description:
+    en_US: The draft slides to save, 1 to 10 a call, each under an id of its own.
+  llm_description: |-
+    The draft slides to save, 1 to 10 a call, each under an id of its own.
+    Pass it as JSON text, as this JSON Schema describes:
+    {"minItems":1,"maxItems":10,"type":"array","items":{"type":"object","properties":{"id":{"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$","description":"The id you give the slide: letters, digits, `_` and `-`, at most 64 characters. Pass an existing slide's id to redraw that slide."},"html":{"type":"string","minLength":1,"maxLength":200000,"description":"The slide as one `<section>` of HTML, as large as the report's canvas. No scripts, embedded pages, event attributes or anything loaded from outside it."}},"required":["id","html"],"additionalProperties":false}}
+- name: afterSlideId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: After slide ID
+  human_description:
+    en_US: The slide of the report the new slides go right after, by its id from getReportContent.
+  llm_description: The slide of the report the new slides go right after, by its `id` from `getReportContent`. Without it they are added at the end. A draft sent under the id of a slide of the report replaces that slide where it is.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    saved:
+      type: boolean
+      description: Whether the drafts were written into the report.
+    versionBeforeId:
+      type: string
+      description: The version of the report saved before this change.
+    conversionError:
+      type: string
+      description: Why the drafts could not be turned into slides, when one could not.
+    slides:
+      type: array
+      items:
+        type: object
+      description: The drafts, in the order they were sent.
+    datasheets:
+      type: array
+      items:
+        type: object
+      description: The datasheets whose charts and tables the save placed.
+extra:
+  python:
+    source: tools/save_report_slides.py

@@ -1,0 +1,41 @@
+identity:
+  name: unshareReport
+  author: rollstack
+  label:
+    en_US: Unshare report
+description:
+  human:
+    en_US: Removes a user's share of a report of any type, and their access to its file when it updates one, as the app does.
+  llm: Removes a user's share of a report of any type, and their access to its file when it updates one, as the app does.
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Report ID
+  human_description:
+    en_US: The report to act on, of any type, by its id from listReports or createReport.
+  llm_description: 'The report to act on, of any `type`, by its `id` from `listReports` or `createReport`. You can also copy it from the report''s link in Rollstack (`appUrl`): it''s the part right after `/slides/` or `/destinations/`.'
+- name: userId
+  type: number
+  required: true
+  form: llm
+  label:
+    en_US: User ID
+  human_description:
+    en_US: The member to share the report with, or to unshare it from.
+  llm_description: The member to share the report with, or to unshare it from. Use their `id` from `listMembers`, which only owners and admins can call, or their `userId` in `sharedWith` from `getReport` if the report is already shared with them. You can share a report only with active members of the organization, and not with yourself. Anyone the report is shared with can unshare it from themselves, even with `view` permission.
+  max: 9007199254740991
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+extra:
+  python:
+    source: tools/unshare_report.py

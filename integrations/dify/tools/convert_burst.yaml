@@ -1,0 +1,82 @@
+identity:
+  name: convertBurst
+  author: rollstack
+  label:
+    en_US: Convert burst to slide deck burst
+description:
+  human:
+    en_US: Turns a burst of an older report, a Google Slides or PowerPoint file, into a new burst of Rollstack reports of type SlideDeck, as Convert to Rollstack slides does for one report.
+  llm: 'Turns a burst of an older report, a Google Slides or PowerPoint file, into a new burst of Rollstack reports of type SlideDeck, as Convert to Rollstack slides does for one report. The burst''s template is converted as convertReport does, each filter the variants differ by becomes a report parameter on it, and each variant becomes a report of its own with its values of those parameters. The older burst''s settings, sharing, schedules, failure notices and emails are copied onto the new burst and its reports. The older burst and its files stay as they are. Answers the new burst, and what became of each filter, variant and sync, with the reason for each that was not converted, and what the older burst had that has no equivalent. It starts an update of the template and of every converted variant to fill their charts, as startBurstRun does: follow them with getBurstRun, and start the ones that failed to start again. Only the older burst''s editors may. It answers once the conversion ends, which can take several minutes for a burst with many variants: send an Idempotency-Key (MCP: idempotencyKey) so a retry doesn''t convert it twice. Counts against the 10 imports a minute per user.'
+parameters:
+- name: id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Burst ID
+  human_description:
+    en_US: The burst to act on, by its id from listBursts.
+  llm_description: 'The burst to act on, by its `id` from `listBursts`. You can also copy it from the burst''s link in Rollstack: it''s the part right after `/collections/`.'
+- name: name
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Name
+  human_description:
+    en_US: Name for the new report, as members will see it in Rollstack.
+  llm_description: Name for the new report, as members will see it in Rollstack. Leading and trailing spaces are removed, and it can't be blank. If omitted, it takes the older report's name.
+- name: folderId
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Folder ID
+  human_description:
+    en_US: The folder to put the new report in, by its id from listFolders; it must be one you can add reports to.
+  llm_description: The folder to put the new report in, by its `id` from `listFolders`; it must be one you can add reports to. If omitted, it goes at the top level, as in the app.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
+output_schema:
+  type: object
+  properties:
+    report:
+      type: object
+      description: 'The new template report, of type `SlideDeck`: the older burst''s template, converted.'
+    conversion:
+      type: object
+      description: What became of the older report's syncs, or null when converting them failed.
+    conversionError:
+      type: string
+      description: Why the syncs could not be converted, when they couldn't.
+    burst:
+      type: object
+      description: The new burst, of kind `parameters`, whose template is the new report.
+    parameters:
+      type: array
+      items:
+        type: object
+      description: The older burst's filters, and what became of each.
+    variants:
+      type: array
+      items:
+        type: object
+      description: The older burst's variants, and what became of each.
+    runs:
+      type: object
+      description: The updates the conversion started to fill every new report's charts with data, as `startBurstRun` would.
+    notMigrated:
+      type: array
+      items:
+        type: string
+      description: What the older burst had that a burst of a slide deck doesn't, such as automatic variant creation.
+extra:
+  python:
+    source: tools/convert_burst.py

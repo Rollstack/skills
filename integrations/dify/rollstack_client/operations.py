@@ -3,25 +3,40 @@
 A Rollstack tool takes its inputs in up to three parts: ``params`` (the ids of what it acts on), ``query`` (options
 such as filters or how long to wait) and ``body`` (what it creates, changes or sends). A Dify tool takes a flat list
 of parameters, so each parameter keeps the name of the Rollstack field it fills, and this module puts it in its part.
-Dify has no list parameters either: ids come as text separated by commas, and lists of objects as JSON text.
+Dify has no list or object parameters for a plugin's tools: a list of strings comes as text separated by commas, and
+any other structured input as JSON text.
 
-The tools, their names and their inputs are Rollstack's own: https://docs.rollstack.com/api/mcp-server
+The map is rollstack_client/tools.json, which tests/generate_tools.py writes from Rollstack's own tool definitions:
+https://docs.rollstack.com/api/mcp-server
 """
 
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 PARTS = ("params", "query", "body")
+# The part of an input that sits beside the parts, such as idempotencyKey
+TOP_LEVEL = ""
 
 TEXT = "text"
+SELECT = "select"
 INTEGER = "integer"
-IDS = "ids"  # a list of ids, given as text separated by commas, or as a JSON array
-OBJECTS = "objects"  # a list of objects, given as a JSON array
+NUMBER = "number"
+BOOLEAN = "boolean"
+LIST = "list"  # a list of strings, given as text separated by commas, or as a JSON array
+JSON = "json"  # any other structured input, given as JSON text
+
+TRUE = {"true", "yes", "1"}
+FALSE = {"false", "no", "0"}
+
+# What _convert answers for the text null, given to an input that takes null as a value of its own
+NULL = object()
 
 
 class InputError(ValueError):
@@ -34,111 +49,55 @@ class Param:
     part: str
     kind: str = TEXT
     required: bool = False
+    # Whether the text null sends null, such as a folder's parent to move it to the top level
+    nullable: bool = False
 
 
 @dataclass(frozen=True)
 class Operation:
     params: tuple[Param, ...] = ()
+    # The parts Rollstack requires, sent even when empty: createReport, for one, requires its body
+    parts: tuple[str, ...] = ()
     # Whether the tool takes an idempotencyKey, which makes sending the call again safe
     takes_idempotency_key: bool = False
-    # The fields of the answer returned as workflow variables, each with its type ("string" unless given), and
-    # the variable that holds an answer that is a list
-    variables: tuple[str | tuple[str, str], ...] = ()
+    # The type of each workflow variable the tool returns, by name, in the order its tool file declares them
+    variable_types: Mapping[str, str] = field(default_factory=dict)
+    # The variable that holds an answer that is a list, when the tool answers one
     list_variable: str | None = None
 
-    @property
-    def variable_types(self) -> dict[str, str]:
-        """The type of each workflow variable the tool returns, by name, in the order its tool file declares them."""
-        types = dict((variable, "string") if isinstance(variable, str) else variable for variable in self.variables)
-        if self.list_variable:
-            types[self.list_variable] = "array"
-        return types
+
+def _load(path: Path) -> dict[str, Operation]:
+    spec = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        name: Operation(
+            params=tuple(Param(**param) for param in entry["params"]),
+            parts=tuple(entry["parts"]),
+            takes_idempotency_key=entry["idempotencyKey"],
+            variable_types=entry["variables"],
+            list_variable=entry["listVariable"],
+        )
+        for name, entry in spec.items()
+    }
 
 
-_REPORT = Param("id", "params", required=True)
-
-OPERATIONS: dict[str, Operation] = {
-    "listReports": Operation(
-        params=(
-            Param("name", "query"),
-            Param("type", "query"),
-            Param("folderId", "query"),
-            Param("limit", "query", INTEGER),
-            Param("cursor", "query"),
-        ),
-        variables=(("data", "array"), "nextCursor"),
-    ),
-    "getReport": Operation(
-        params=(_REPORT,),
-        variables=("id", "name", "type", "folderId", "appUrl", ("running", "boolean"), "lastRunStatus"),
-    ),
-    "listTemplates": Operation(variables=(("data", "array"),)),
-    "createReport": Operation(
-        params=(
-            Param("name", "body"),
-            Param("templateId", "body"),
-            Param("templateDeckId", "body"),
-            Param("folderId", "body"),
-            Param("link", "body"),
-        ),
-        takes_idempotency_key=True,
-        variables=("id", "name", "type", "folderId", "appUrl"),
-    ),
-    "sendReportMessage": Operation(
-        params=(
-            _REPORT,
-            Param("content", "body"),
-            Param("chatId", "body"),
-            Param("slideIds", "body", IDS),
-            Param("answers", "body", OBJECTS),
-        ),
-        takes_idempotency_key=True,
-        variables=("chatId", "messageId", "status", "appUrl"),
-    ),
-    "getReportMessage": Operation(
-        params=(_REPORT, Param("messageId", "params", required=True), Param("waitSeconds", "query", INTEGER)),
-        variables=("chatId", "messageId", "status", "stage", "appUrl", ("replies", "array")),
-    ),
-    "getReportContent": Operation(
-        params=(_REPORT, Param("slideIds", "query", IDS)),
-        variables=(("slides", "array"),),
-    ),
-    "startReportRun": Operation(
-        params=(_REPORT, Param("datasheetIds", "body", IDS), Param("syncIds", "body", IDS)),
-        takes_idempotency_key=True,
-        # code and message are set when the run waits for the user to confirm it in Rollstack
-        variables=("runId", ("started", "boolean"), "code", "message"),
-    ),
-    "getReportRun": Operation(
-        params=(_REPORT, Param("runId", "params", required=True), Param("waitSeconds", "query", INTEGER)),
-        variables=("runId", "status", "startedAt", "finishedAt", ("errors", "array")),
-    ),
-    "getReportSchedules": Operation(params=(_REPORT,), list_variable="schedules"),
-    "updateReportSchedules": Operation(
-        params=(_REPORT, Param("schedules", "body", OBJECTS, required=True)),
-        takes_idempotency_key=True,
-        list_variable="schedules",
-    ),
-    "exportReport": Operation(
-        params=(_REPORT, Param("format", "body", required=True), Param("slideIds", "body", IDS)),
-        takes_idempotency_key=True,
-        variables=("url", "expiresAt"),
-    ),
-}
+OPERATIONS: dict[str, Operation] = _load(Path(__file__).with_name("tools.json"))
 
 
 def build_arguments(operation: str, tool_parameters: Mapping[str, Any]) -> dict[str, Any]:
     """The arguments of a Rollstack tool, from the parameters Dify passed to the tool of the same name."""
     spec = OPERATIONS[operation]
-    # Every part the tool has is sent, even empty: createReport, for one, requires its body
-    arguments: dict[str, Any] = {part: {} for part in PARTS if any(param.part == part for param in spec.params)}
+    arguments: dict[str, Any] = {part: {} for part in spec.parts}
     for param in spec.params:
         value = _convert(param, tool_parameters.get(param.name))
         if value is None:
             if param.required:
                 raise InputError(f"{param.name} is required.")
             continue
-        arguments[param.part][param.name] = value
+        value = None if value is NULL else value
+        if param.part == TOP_LEVEL:
+            arguments[param.name] = value
+        else:
+            arguments.setdefault(param.part, {})[param.name] = value
     return arguments
 
 
@@ -146,12 +105,18 @@ def _convert(param: Param, value: Any) -> Any:
     """The value to send for ``param``, or None when Dify passed nothing for it."""
     if value is None or (isinstance(value, str) and not value.strip()):
         return None
+    if param.nullable and isinstance(value, str) and value.strip().lower() == "null":
+        return NULL
     if param.kind == INTEGER:
         return _integer(param.name, value)
-    if param.kind == IDS:
-        return _ids(param.name, value)
-    if param.kind == OBJECTS:
-        return _objects(param.name, value)
+    if param.kind == NUMBER:
+        return _number(param.name, value)
+    if param.kind == BOOLEAN:
+        return _boolean(param.name, value)
+    if param.kind == LIST:
+        return _list(param.name, value)
+    if param.kind == JSON:
+        return _json(param.name, value)
     return value.strip() if isinstance(value, str) else str(value)
 
 
@@ -167,33 +132,55 @@ def _integer(name: str, value: Any) -> int:
     raise InputError(f"{name} must be a whole number.")
 
 
-def _ids(name: str, value: Any) -> list[str] | None:
+def _number(name: str, value: Any) -> int | float:
+    if isinstance(value, bool):
+        raise InputError(f"{name} must be a number.")
+    if isinstance(value, (int, float)) and math.isfinite(value):
+        return value
+    if isinstance(value, str):
+        text = value.strip()
+        if re.fullmatch(r"[+-]?\d+", text):
+            return int(text)
+        try:
+            number = float(text)
+        except ValueError:
+            pass
+        else:
+            if math.isfinite(number):
+                return number
+    raise InputError(f"{name} must be a number.")
+
+
+def _boolean(name: str, value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    if text in TRUE:
+        return True
+    if text in FALSE:
+        return False
+    raise InputError(f"{name} must be true or false.")
+
+
+def _list(name: str, value: Any) -> list[str] | None:
     if isinstance(value, str) and value.strip().startswith("["):
-        value = _json_array(name, value)
-    items = re.split(r"[,\s]+", value) if isinstance(value, str) else value
+        value = _json(name, value)
+    items = re.split(r"[,\n]+", value) if isinstance(value, str) else value
     if (
         not isinstance(items, (list, tuple))
         or not all(isinstance(item, str) for item in items)
-        or any(item.startswith("{") for item in items)
+        or any(item.strip().startswith("{") for item in items)
     ):
-        raise InputError(f"{name} must be ids separated by commas.")
-    ids = [item.strip() for item in items if item.strip()]
-    return ids or None
+        raise InputError(f"{name} must be values separated by commas, or a JSON array of strings.")
+    values = [item.strip() for item in items if item.strip()]
+    return values or None
 
 
-def _objects(name: str, value: Any) -> list[dict[str, Any]]:
-    # An empty list is a value of its own here: it is how updateReportSchedules removes every schedule
-    items = _json_array(name, value) if isinstance(value, str) else value
-    if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
-        raise InputError(f"{name} must be a JSON array of objects.")
-    return items
-
-
-def _json_array(name: str, text: str) -> list[Any]:
+def _json(name: str, value: Any) -> Any:
+    # An empty list is a value of its own: it is how updateReportSchedules removes every schedule
+    if not isinstance(value, str):
+        return value
     try:
-        value = json.loads(text)
+        return json.loads(value)
     except ValueError as error:
-        raise InputError(f"{name} must be a JSON array, and it isn't valid JSON: {error}.") from error
-    if not isinstance(value, list):
-        raise InputError(f"{name} must be a JSON array.")
-    return value
+        raise InputError(f"{name} must be JSON text, and it isn't valid JSON: {error}.") from error

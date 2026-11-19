@@ -5,7 +5,7 @@ name: rollstack
 label:
   en_US: Rollstack
 description:
-  en_US: Build polished presentations using AI, with advanced charts.
+  en_US: Build polished presentations using AI, with advanced charts and data connections built in.
 icon: icon.png
 tags:
   - productivity
