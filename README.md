@@ -73,8 +73,6 @@ Or copy a skill's folder into your agent's skills directory, such as `~/.claude/
 
 The repo is also an [Agent Plugin](https://agent-plugins.org): `plugin.json` and `mcp.json` at the root describe the same plugin for other clients. `.cursor-plugin/plugin.json` and `.grok-plugin/plugin.json` describe it for Cursor and Grok Build.
 
-**Dify**: [`integrations/dify`](integrations/dify) is a tool plugin for [Dify](https://dify.ai) agents and workflows, with the 121 tools of Rollstack's MCP server that a model calls, and an API key for authentication. Its [README](integrations/dify/README.md) says how to set it up.
-
 ## Connect Rollstack
 
 The skills call Rollstack's MCP server, `https://api.rollstack.com/public/v1/mcp`. Add it to your agent as a remote MCP server and sign in with your Rollstack account. For scripts, use an API key from Settings → Connected apps.
