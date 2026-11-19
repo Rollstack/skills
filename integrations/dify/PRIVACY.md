@@ -7,20 +7,20 @@ This plugin connects Dify to your Rollstack account. It sends the calls your Dif
 | Data | Where it comes from | Where it goes |
 | --- | --- | --- |
 | Your Rollstack API key | You enter it in Dify, which stores it encrypted with the plugin's credentials | Sent to Rollstack as a bearer token with every call. The plugin never returns it, and never writes it to a log or an error message |
-| What you pass to a tool: deck names and ids, your messages to the slides agent, the data you upload (CSV files and documents), queries over a deck's data, links to decks to import, schedules, email recipients and settings, and the members you share with | Your Dify app, or the model that runs it | Sent to Rollstack to carry out the call |
-| What Rollstack answers: decks and their settings, what slides show and images of them, the slides agent's replies, data from the sources added to a deck and the results of queries over it, runs, schedules, emails sent, templates, folders, the data sources connected in Rollstack, the organization's members, and export links | Rollstack | Returned to your Dify app, which may pass it on to the model and the users of that app |
+| What you pass to a tool: deck names and ids, your messages to the slides agent, comments on slides, what the slides agent should remember of how you like your decks (its memories), the data you upload (CSV files and documents), queries over a deck's data, links to decks to import, schedules, email recipients and settings, and the members you share with | Your Dify app, or the model that runs it | Sent to Rollstack to carry out the call |
+| What Rollstack answers: decks and their settings, what slides show and images of them, the slides agent's replies, comments and who wrote them, the slides agent's memories, who opened a deck and how they read it (their visits, time spent and how far they read), data from the sources added to a deck and the results of queries over it, runs, schedules, emails sent, templates, folders, the data sources connected in Rollstack, the organization's members, and export links | Rollstack | Returned to your Dify app, which may pass it on to the model and the users of that app |
 
-Rollstack's answers can hold personal data of members of your Rollstack organization: names and email addresses of a deck's owner, of the members it is shared with, of the people its emails go to and of the people told when a run fails, and, for an owner's or admin's key, the organization's member list. They also hold whatever your decks and their data show. A message you write to the slides agent, a file you upload or an email you set up can hold any personal data you put in it.
+Rollstack's answers can hold personal data of members of your Rollstack organization: names and email addresses of a deck's owner, of the members it is shared with, of the people its emails go to, of the people told when a run fails and of the authors of comments, how each reader of a deck read it, and, for an owner's or admin's key, the organization's member list. They also hold whatever your decks and their data show. A message you write to the slides agent, a file you upload or an email you set up can hold any personal data you put in it.
 
 The plugin itself collects no direct identifiers, no device or location data, and nothing about how you use it.
 
 ## Where data goes
 
 - **Rollstack** (`api.rollstack.com`) is the only service the plugin calls, over HTTPS. Rollstack handles what it receives under its privacy policy: https://www.rollstack.com/legal/privacy-policy. Your key acts as the Rollstack user who created it, with the scopes you gave it, so a call can read or change only what that user can in Rollstack.
-- **Rollstack's own reach.** Some calls make Rollstack itself reach further, under its privacy policy: it reads the data sources and files a deck uses with the access the user has to them, downloads a picture you link to in a message to the slides agent, imports a deck from a link you give, and sends the emails you set up or ask for, from its own servers or the email server you choose.
+- **Rollstack's own reach.** Some calls make Rollstack itself reach further, under its privacy policy: it reads the data sources and files a deck uses with the access the user has to them, downloads a picture you link to in a message to the slides agent, imports a deck from a link you give, and sends the emails you set up or ask for, from its own servers or through an email server your organization connected to Rollstack, which then handles them under its own terms.
 - **Dify** runs the plugin and stores the API key, your app's inputs and the tool results, under Dify's own terms and privacy policy, or under yours when you host Dify yourself.
 
-No other third party receives data from the plugin.
+The plugin itself sends data to no one but Rollstack. The services above that Rollstack reaches on its own receive what those calls need, under Rollstack's privacy policy.
 
 ## Retention and removal
 

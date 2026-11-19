@@ -17,6 +17,15 @@ parameters:
   human_description:
     en_US: 'An uploaded file to replace the content of: its id from createDataset, or a datasheet''s datasetId in listReportDatasheets.'
   llm_description: 'An uploaded file to replace the content of: its `id` from `createDataset`, or a datasheet''s `datasetId` in `listReportDatasheets`. The file sent must be of its kind, a CSV for a CSV and a workbook for a workbook, and it keeps its id and name. Only the user who uploaded it may. Omit it to upload a new file.'
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

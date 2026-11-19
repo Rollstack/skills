@@ -34,7 +34,7 @@ parameters:
     en_US: Folder ID
   human_description:
     en_US: The folder to move the report to, by its id from listFolders; it must be one you can see.
-  llm_description: The folder to move the report to, by its `id` from `listFolders`; it must be one you can see. Pass `null` to move it to the top level, outside any folder. Members then get access to the report through the new folder, and the folders it's in, instead of the old one.
+  llm_description: The folder to move the report to, by its `id` from `listFolders`; it must be one you can see. Pass `null` to move it to the top level, outside any folder. Members then get access to the report through the new folder, and the folders it's in, instead of the old one. To send null, pass the text null.
 - name: timezone
   type: string
   required: false
@@ -62,6 +62,15 @@ parameters:
   human_description:
     en_US: Email addresses to copy when Rollstack emails the owner about a failed scheduled run, while notifyOnFailure is true.
   llm_description: Email addresses to copy when Rollstack emails the owner about a failed scheduled run, while `notifyOnFailure` is `true`. The list you send replaces the current one; send `[]` to clear it. Each address must belong to an active member of the organization, ignoring case. Up to 100 addresses, with no duplicates. Pass them as text, separated by commas, or as a JSON array.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

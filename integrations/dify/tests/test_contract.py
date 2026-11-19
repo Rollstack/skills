@@ -17,7 +17,7 @@ import yaml
 
 import generate_tools
 from conftest import PLUGIN_ROOT
-from generate_tools import CONFIRMATION_VIEW, EMAILS_OR_DELETES, EXCLUDED, JSON_NOTE, LIST_NOTE, RESERVED_OUTPUTS
+from generate_tools import CONFIRMATION_VIEW, EMAILS_OR_DELETES, EXCLUDED, JSON_NOTE, LIST_NOTE, NULL_NOTE, RESERVED_OUTPUTS
 from rollstack_client.operations import BOOLEAN, INTEGER, JSON, LIST, NUMBER, OPERATIONS, SELECT, TEXT
 
 REFERENCE = json.loads((PLUGIN_ROOT / "tests/fixtures/mcp_tools.json").read_text())["tools"]
@@ -34,12 +34,17 @@ TOOLS = {tool["identity"]["name"]: tool for tool in (load_yaml(path) for path in
 
 
 def inputs(name: str) -> list[tuple[str, str, dict[str, Any]]]:
-    """Every input of a Rollstack tool: its part, its name and its schema, with shared definitions resolved."""
+    """Every input of a Rollstack tool: its part, its name and its schema, with shared definitions resolved.
+
+    The inputs of params, query and body, then idempotencyKey, which sits beside them, in the part "".
+    """
     schema = BY_NAME[name]["inputSchema"]
     found = []
     for part in ("params", "query", "body"):
         for field, field_schema in (schema.get("properties", {}).get(part, {}).get("properties") or {}).items():
             found.append((part, field, generate_tools.resolve(field_schema, schema.get("$defs") or {})))
+    if "idempotencyKey" in schema.get("properties", {}):
+        found.append(("", "idempotencyKey", schema["properties"]["idempotencyKey"]))
     return found
 
 
@@ -92,7 +97,11 @@ def test_parameters_are_the_inputs_of_the_reference(name):
         parameter = declared[field]
         kind, source = generate_tools.classify(field_schema)
         assert param.kind == kind, field
-        required = part in schema.get("required", []) and field in schema["properties"][part].get("required", [])
+        required = (
+            field in schema.get("required", [])
+            if part == ""
+            else part in schema.get("required", []) and field in schema["properties"][part].get("required", [])
+        )
         assert param.part == part
         assert parameter["required"] is param.required is required, field
         assert parameter["form"] == "llm"
@@ -117,6 +126,10 @@ def test_parameters_are_the_inputs_of_the_reference(name):
                 assert reference_name in described["$defs"]
         if param.kind not in (LIST, JSON):
             assert LIST_NOTE not in parameter["llm_description"] and JSON_NOTE not in parameter["llm_description"]
+        # The text null sends null, for an input that takes it, and the description says so
+        takes_null = generate_tools.nullable(field_schema)
+        assert param.nullable is takes_null, field
+        assert (NULL_NOTE in parameter["llm_description"]) is takes_null, field
 
 
 @pytest.mark.parametrize("name", list(OPERATIONS))
@@ -126,6 +139,8 @@ def test_parts_and_idempotency_follow_the_reference(name):
 
     assert list(spec.parts) == [part for part in ("params", "query", "body") if part in schema.get("required", [])]
     assert spec.takes_idempotency_key is ("idempotencyKey" in schema.get("properties", {}))
+    # The agent can pass its own key, as Rollstack's descriptions tell it to, so that a call sent again runs once
+    assert spec.takes_idempotency_key is any(param.name == "idempotencyKey" and param.part == "" for param in spec.params)
     assert set(schema.get("properties", {})) - {"idempotencyKey"} <= {"params", "query", "body"}
 
 

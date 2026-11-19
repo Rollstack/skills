@@ -18,8 +18,9 @@ from rollstack_client.operations import OPERATIONS, Operation, build_arguments
 # The name of the provider's credential, as provider/rollstack.yaml declares it
 CREDENTIAL_NAME = "rollstack_api_key"
 
-# What an image's base64 data is replaced with in the JSON the tool answers, once the image is sent as a file
+# What an image's base64 data is replaced with in the JSON the tool answers: sent as a file, or not readable
 IMAGE_SENT = "(sent as an image file)"
+IMAGE_UNREADABLE = "(an image that could not be read, so it was not sent)"
 
 
 def invoke_operation(
@@ -29,8 +30,9 @@ def invoke_operation(
     spec = OPERATIONS[operation]
     arguments = build_arguments(operation, tool_parameters)
     if spec.takes_idempotency_key:
-        # One key per invocation: if the call is sent again after a gateway error, Rollstack runs it once
-        arguments["idempotencyKey"] = str(uuid.uuid4())
+        # The key the agent gave, so that sending the call again runs it once, or else a new one: the client sends
+        # it again after a gateway error, and Rollstack runs the call once
+        arguments.setdefault("idempotencyKey", str(uuid.uuid4()))
     with RollstackClient(tool.runtime.credentials.get(CREDENTIAL_NAME)) as client:
         answer = client.call_tool(operation, arguments)
     yield from _messages(tool, spec, answer)
@@ -42,7 +44,13 @@ def _messages(tool: Tool, spec: Operation, answer: ToolResult) -> Generator[Tool
     It follows what Dify does with the answer of an MCP tool: a JSON object becomes a JSON message, a list of
     objects one JSON message each, an image an image file, and anything else text.
     """
-    images = list(answer.images)
+    images: list[tuple[bytes, str]] = []
+    for data, mime_type in answer.images:
+        blob = _decode(data)
+        if blob is None:
+            yield tool.create_text_message(f"Rollstack sent an image ({mime_type}) that could not be read.")
+        else:
+            images.append((blob, mime_type))
     payload: Any = None
     if answer.structured is not None:
         payload, found = _lift_images(answer.structured)
@@ -66,11 +74,7 @@ def _messages(tool: Tool, spec: Operation, answer: ToolResult) -> Generator[Tool
             # Not JSON, or a list a JSON message can't hold, such as an empty one
             yield tool.create_text_message(text if not isinstance(value, list) else json.dumps(value))
 
-    for data, mime_type in images:
-        try:
-            blob = base64.b64decode(data, validate=True)
-        except (binascii.Error, ValueError):
-            continue
+    for blob, mime_type in images:
         yield tool.create_blob_message(blob, meta={"mime_type": mime_type})
 
     if isinstance(payload, list):
@@ -87,11 +91,12 @@ def _messages(tool: Tool, spec: Operation, answer: ToolResult) -> Generator[Tool
         yield tool.create_variable_message(name, _empty(kind) if value is None else value)
 
 
-def _lift_images(value: Any) -> tuple[Any, list[tuple[str, str]]]:
-    """``value`` with the base64 data of each image in it taken out, and those images.
+def _lift_images(value: Any) -> tuple[Any, list[tuple[bytes, str]]]:
+    """``value`` with the base64 data of each image in it taken out, and those images, decoded.
 
     An image is an object with a ``mimeType`` that starts with ``image/`` and its base64 ``data``, as in what
-    getReportSlideImages answers. The data goes to the user as a file instead of to the model as text.
+    getReportSlideImages answers. The data goes to the user as a file instead of to the model as text. Data that
+    isn't base64 says so in its place, since no file goes out for it.
     """
     if isinstance(value, list):
         lifted = [_lift_images(item) for item in value]
@@ -100,13 +105,24 @@ def _lift_images(value: Any) -> tuple[Any, list[tuple[str, str]]]:
         return value, []
     mime_type, data = value.get("mimeType"), value.get("data")
     if isinstance(mime_type, str) and mime_type.startswith("image/") and isinstance(data, str) and data:
-        return {**value, "data": IMAGE_SENT}, [(data, mime_type)]
-    images: list[tuple[str, str]] = []
+        blob = _decode(data)
+        if blob is None:
+            return {**value, "data": IMAGE_UNREADABLE}, []
+        return {**value, "data": IMAGE_SENT}, [(blob, mime_type)]
+    images: list[tuple[bytes, str]] = []
     copy = {}
     for key, item in value.items():
         copy[key], found = _lift_images(item)
         images += found
     return copy, images
+
+
+def _decode(data: str) -> bytes | None:
+    """An image's bytes from its base64 data, or None when the data isn't base64."""
+    try:
+        return base64.b64decode(data, validate=True)
+    except (binascii.Error, ValueError):
+        return None
 
 
 def _empty(kind: str) -> Any:

@@ -27,6 +27,15 @@ parameters:
     en_US: 'The member to share the folder with, or to unshare it from: their id from listMembers, which only owners and admins can call, or their userId in access from getFolder.'
   llm_description: 'The member to share the folder with, or to unshare it from: their `id` from `listMembers`, which only owners and admins can call, or their `userId` in `access` from `getFolder`. Only active members of the organization. Anyone the folder is shared with can unshare it from themselves.'
   max: 9007199254740991
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 extra:
   python:
     source: tools/unshare_folder.py

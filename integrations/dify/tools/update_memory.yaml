@@ -34,7 +34,16 @@ parameters:
     en_US: Report ID
   human_description:
     en_US: The report the memory holds for, by its id from listReports, which you must be able to edit.
-  llm_description: The report the memory holds for, by its `id` from `listReports`, which you must be able to edit. `null` for all your reports. If omitted, it stays.
+  llm_description: The report the memory holds for, by its `id` from `listReports`, which you must be able to edit. `null` for all your reports. If omitted, it stays. To send null, pass the text null.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

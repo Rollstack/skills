@@ -70,7 +70,7 @@ parameters:
     en_US: SMTP server ID
   human_description:
     en_US: The SMTP connection to send the report's email through, from listSmtpConnections; recipients see its from address as the sender.
-  llm_description: The SMTP connection to send the report's email through, from `listSmtpConnections`; recipients see its `from` address as the sender. If `null` or omitted, the email is sent from Rollstack's own address. A connection `listSmtpConnections` doesn't list, or a Google or Microsoft account Rollstack can no longer send from, returns 403 unless it is already the report's sender.
+  llm_description: The SMTP connection to send the report's email through, from `listSmtpConnections`; recipients see its `from` address as the sender. If `null` or omitted, the email is sent from Rollstack's own address. A connection `listSmtpConnections` doesn't list, or a Google or Microsoft account Rollstack can no longer send from, returns 403 unless it is already the report's sender. To send null, pass the text null.
 - name: sharingFormat
   type: select
   required: false
@@ -172,6 +172,15 @@ parameters:
   human_description:
     en_US: Whether to track when recipients open the report's email; opened emails show as Opened in the report's Email sends panel in the app.
   llm_description: Whether to track when recipients open the report's email; opened emails show as Opened in the report's Email sends panel in the app. Setting it to `true` returns 403 unless email analytics is on for the organization (`emailAnalyticsEnabled` from `getOrganization`). Defaults to `false`.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

@@ -135,7 +135,7 @@ Tests, on Python 3.12 with the pinned dependencies:
 
 ```text
 $ python -m pytest tests
-725 passed, 4 skipped, 2 warnings in 2.04s
+731 passed, 4 skipped, 2 warnings in 2.13s
 
 $ ROLLSTACK_LIVE=1 python -m pytest tests/test_live.py
 2 passed, 2 skipped in 0.77s

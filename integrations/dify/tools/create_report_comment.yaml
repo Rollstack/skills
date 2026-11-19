@@ -44,6 +44,15 @@ parameters:
   human_description:
     en_US: The thread to reply to, by its first comment's id from listReportComments.
   llm_description: The thread to reply to, by its first comment's `id` from `listReportComments`. The reply goes on the thread's slide, and the thread's other participants are notified.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

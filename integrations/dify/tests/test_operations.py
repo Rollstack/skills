@@ -143,3 +143,21 @@ def test_a_connection_search_goes_to_its_connection():
     arguments = build_arguments("searchDashboards", {"type": "Tableau", "id": "conn-1", "query": "Sales"})
 
     assert arguments == {"params": {"type": "Tableau", "id": "conn-1"}, "query": {"query": "Sales"}}
+
+
+def test_null_is_sent_for_an_input_that_takes_it():
+    arguments = build_arguments("updateMemory", {"memoryId": "mem-1", "reportId": "NULL"})
+
+    assert arguments["body"] == {"reportId": None}
+
+
+def test_null_is_text_for_an_input_that_does_not_take_it():
+    arguments = build_arguments("createReport", {"name": "null"})
+
+    assert arguments == {"body": {"name": "null"}}
+
+
+def test_an_idempotency_key_goes_beside_the_parts():
+    arguments = build_arguments("createReport", {"name": "Sales", "idempotencyKey": "key-1"})
+
+    assert arguments == {"body": {"name": "Sales"}, "idempotencyKey": "key-1"}

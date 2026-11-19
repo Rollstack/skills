@@ -53,6 +53,15 @@ parameters:
   human_description:
     en_US: 'A link to an existing deck to import, as its Share or Copy link button gives it: a PowerPoint (.pptx) file in OneDrive or SharePoint, or a Google Slides presentation.'
   llm_description: 'A link to an existing deck to import, as its Share or Copy link button gives it: a PowerPoint (.pptx) file in OneDrive or SharePoint, or a Google Slides presentation. The report starts with its slides and look: a PowerPoint file''s charts come in as charts with their data, and a Google Slides presentation''s as pictures. The file stays as it is. It is read with the user''s own Microsoft or Google account, connected in the app, so they must be able to open it, and Rollstack can open only the Google Slides presentations the user picked in Rollstack before. The report keeps the deck''s look, so leave out `templateId` and `templateDeckId`.'
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

@@ -34,7 +34,7 @@ parameters:
     en_US: SMTP server ID
   human_description:
     en_US: The SMTP connection to send the emails through, from listSmtpConnections; null sends from Rollstack's own address.
-  llm_description: The SMTP connection to send the emails through, from `listSmtpConnections`; `null` sends from Rollstack's own address. If omitted, each report keeps its own sender.
+  llm_description: The SMTP connection to send the emails through, from `listSmtpConnections`; `null` sends from Rollstack's own address. If omitted, each report keeps its own sender. To send null, pass the text null.
 - name: sharingFormat
   type: select
   required: false
@@ -145,6 +145,15 @@ parameters:
   human_description:
     en_US: Whether to track when recipients open the emails.
   llm_description: Whether to track when recipients open the emails. `true` returns 403 unless email analytics is on for the organization. If omitted, stays as it is.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

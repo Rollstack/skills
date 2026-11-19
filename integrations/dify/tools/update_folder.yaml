@@ -34,7 +34,16 @@ parameters:
     en_US: Parent folder ID
   human_description:
     en_US: The folder to move it into, by its id from listFolders, one you own or have manage on, and not the folder itself or one nested in it.
-  llm_description: The folder to move it into, by its `id` from `listFolders`, one you own or have `manage` on, and not the folder itself or one nested in it. Pass `null` to move it to the top level. Its reports, bursts and subfolders move with it.
+  llm_description: The folder to move it into, by its `id` from `listFolders`, one you own or have `manage` on, and not the folder itself or one nested in it. Pass `null` to move it to the top level. Its reports, bursts and subfolders move with it. To send null, pass the text null.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

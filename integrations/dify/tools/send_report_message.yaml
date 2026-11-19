@@ -74,6 +74,15 @@ parameters:
     Your answers to the questions of a `clarification` reply, as when you pick options in the chat in the app: one entry per question you answer. Send them as the next message on the same chat, by passing its `chatId`. When a picked option offers a dashboard, table or spreadsheet, Rollstack adds it to the report as a datasheet before the agent goes on. To add a note, send it in `content` with the answers.
     Pass it as JSON text, as this JSON Schema describes:
     {"minItems":1,"type":"array","items":{"type":"object","properties":{"header":{"type":"string","description":"The `header` of the question you're answering, copied unchanged from the `clarification` reply's `questions`.","examples":["Chart type"]},"question":{"type":"string","description":"The question you're answering, copied unchanged from the `clarification` reply's `questions`. With `header`, it tells Rollstack which question your picks are for.","examples":["Which chart should show revenue by region?"]},"answers":{"minItems":1,"type":"array","items":{"type":"string","examples":["Bar chart"]},"description":"The `label` of each option picked: one for a question whose `multiSelect` is `false`, one or more when it's `true`."}},"required":["header","question","answers"]}}
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

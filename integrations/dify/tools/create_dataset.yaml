@@ -26,6 +26,15 @@ parameters:
   human_description:
     en_US: 'The file''s data, as CSV text: a header row naming the columns, then at least one row of data.'
   llm_description: 'The file''s data, as CSV text: a header row naming the columns, then at least one row of data. With `replaceDataset`, it replaces the file''s whole content, header included, and the uploaded file must be a CSV file. The header''s names become the column names of the datasheets made from the file: a blank one becomes `Column N`, after the column''s position, and a repeated one gets a `_2`, `_3` suffix. Values can be separated by commas, semicolons or tabs, detected from the header row. At most 10 MB.'
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import Any
 
 PARTS = ("params", "query", "body")
+# The part of an input that sits beside the parts, such as idempotencyKey
+TOP_LEVEL = ""
 
 TEXT = "text"
 SELECT = "select"
@@ -33,6 +35,9 @@ JSON = "json"  # any other structured input, given as JSON text
 TRUE = {"true", "yes", "1"}
 FALSE = {"false", "no", "0"}
 
+# What _convert answers for the text null, given to an input that takes null as a value of its own
+NULL = object()
+
 
 class InputError(ValueError):
     """A tool parameter this plugin cannot turn into the value Rollstack expects."""
@@ -44,6 +49,8 @@ class Param:
     part: str
     kind: str = TEXT
     required: bool = False
+    # Whether the text null sends null, such as a folder's parent to move it to the top level
+    nullable: bool = False
 
 
 @dataclass(frozen=True)
@@ -86,7 +93,11 @@ def build_arguments(operation: str, tool_parameters: Mapping[str, Any]) -> dict[
             if param.required:
                 raise InputError(f"{param.name} is required.")
             continue
-        arguments.setdefault(param.part, {})[param.name] = value
+        value = None if value is NULL else value
+        if param.part == TOP_LEVEL:
+            arguments[param.name] = value
+        else:
+            arguments.setdefault(param.part, {})[param.name] = value
     return arguments
 
 
@@ -94,6 +105,8 @@ def _convert(param: Param, value: Any) -> Any:
     """The value to send for ``param``, or None when Dify passed nothing for it."""
     if value is None or (isinstance(value, str) and not value.strip()):
         return None
+    if param.nullable and isinstance(value, str) and value.strip().lower() == "null":
+        return NULL
     if param.kind == INTEGER:
         return _integer(param.name, value)
     if param.kind == NUMBER:

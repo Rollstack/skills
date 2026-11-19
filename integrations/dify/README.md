@@ -279,7 +279,7 @@ The slides agent, exports, datasheets and slide content work on reports whose ty
 
 ### What is different in Dify
 
-- **Inputs.** A list, such as `slideIds` or the `to` addresses of an email, is text separated by commas, or a JSON array. A structured input, such as the `sources` of `addReportDatasheets` or the `schedules` of `updateReportSchedules`, is JSON text: its description gives the JSON Schema it follows.
+- **Inputs.** A list, such as `slideIds` or the `to` addresses of an email, is text separated by commas, or a JSON array. A structured input, such as the `sources` of `addReportDatasheets` or the `schedules` of `updateReportSchedules`, is JSON text: its description gives the JSON Schema it follows. An input that takes null, such as the `parentFolderId` that moves a folder to the top level, takes the text `null`. A tool that changes something takes an optional `idempotencyKey`: sent again with the same key, the call runs once.
 - **Viewers.** In clients that can show them, `showReport` opens a viewer of the deck and `showTemplates` a template picker. Dify can't show them: `showReport` answers the slides' ids and titles, and `showTemplates` the templates. To look at slides, use `getReportSlideImages`, which returns each slide as an image file.
 - **Uploads.** `createDatasetUpload` answers a link to send a file to from a shell, which a Dify agent doesn't have. An agent writes a CSV into `createDataset` instead. A workflow can send a file to the link with an HTTP Request node.
 - **Left out.** Rollstack's server has four more tools, which only its own viewers call, never a model: `getTemplatePickerCovers`, `getReportMessageProgress`, `getReportViewerSlideImages`, and `confirmAction`, which runs a call you confirmed in its confirmation card.

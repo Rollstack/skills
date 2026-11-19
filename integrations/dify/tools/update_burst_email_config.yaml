@@ -34,7 +34,7 @@ parameters:
     en_US: Name
   human_description:
     en_US: The configuration's name, as shown in the burst's Emailing tab in the app.
-  llm_description: The configuration's name, as shown in the burst's Emailing tab in the app.
+  llm_description: The configuration's name, as shown in the burst's Emailing tab in the app. To send null, pass the text null.
 - name: variantIds
   type: string
   required: false
@@ -101,7 +101,7 @@ parameters:
     en_US: SMTP server ID
   human_description:
     en_US: The SMTP connection the email is sent through, from listSmtpConnections; null sends from Rollstack's own address.
-  llm_description: The SMTP connection the email is sent through, from `listSmtpConnections`; `null` sends from Rollstack's own address.
+  llm_description: The SMTP connection the email is sent through, from `listSmtpConnections`; `null` sends from Rollstack's own address. To send null, pass the text null.
 - name: to
   type: string
   required: false
@@ -138,6 +138,15 @@ parameters:
   human_description:
     en_US: Where replies to the email go.
   llm_description: Where replies to the email go. Pass them as text, separated by commas, or as a JSON array.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

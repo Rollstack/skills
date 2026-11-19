@@ -97,6 +97,10 @@ TEXT, SELECT, INTEGER, NUMBER, BOOLEAN, LIST, JSON = "text", "select", "integer"
 
 LIST_NOTE = "Pass them as text, separated by commas, or as a JSON array."
 JSON_NOTE = "Pass it as JSON text, as this JSON Schema describes:"
+NULL_NOTE = "To send null, pass the text null."
+# The input that makes retrying a call safe sits beside the parts, not in one of them
+TOP_LEVEL = ""
+IDEMPOTENCY_KEY = "idempotencyKey"
 ACRONYMS = {
     "id": "ID", "ids": "IDs", "url": "URL", "urls": "URLs", "csv": "CSV", "sql": "SQL", "smtp": "SMTP",
     "html": "HTML", "cc": "CC", "bcc": "BCC", "api": "API", "llm": "LLM", "pdf": "PDF",
@@ -207,44 +211,69 @@ def json_schema(field: dict[str, Any], definitions: dict[str, Any]) -> str:
     return json.dumps(schema, ensure_ascii=False, separators=(",", ":"))
 
 
-def parameters(tool: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """The tool's Dify parameters, and how each one maps onto the Rollstack tool's arguments."""
+def inputs(tool: dict[str, Any]) -> list[tuple[str, str, dict[str, Any], bool]]:
+    """Every input of a Rollstack tool, in order: its part, its name, its schema and whether it is required.
+
+    The inputs of ``params``, ``query`` and ``body`` come first, then ``idempotencyKey``, which a tool that writes
+    takes beside them, so that a call sent again with the same key runs once.
+    """
     schema = tool["inputSchema"]
-    definitions = schema.get("$defs") or {}
-    declared, mapped = [], []
+    found = []
     for part in PARTS:
         part_schema = schema.get("properties", {}).get(part)
         if not part_schema:
             continue
         part_required = part in schema.get("required", [])
         for name, field in (part_schema.get("properties") or {}).items():
-            field = resolve(field, definitions)
-            kind, source = classify(field)
-            required = part_required and name in part_schema.get("required", [])
-            shown = label(name, resource(tool) if part == "params" and name == "id" else "")
-            described = field.get("description") or source.get("description") or shown
-            llm = described
-            if kind == LIST:
-                llm += " " + LIST_NOTE
-                if "enum" in source:
-                    llm += " Each one of: " + ", ".join(source["enum"]) + "."
-            if kind == JSON:
-                llm += "\n" + JSON_NOTE + "\n" + json_schema(field, definitions)
-            parameter: dict[str, Any] = {
-                "name": name,
-                "type": {SELECT: "select", INTEGER: "number", NUMBER: "number", BOOLEAN: "boolean"}.get(kind, "string"),
-                "required": required,
-                "form": "llm",
-                "label": {"en_US": shown},
-                "human_description": {"en_US": plain(first_sentence(described))},
-                "llm_description": llm,
-            }
-            if kind in (INTEGER, NUMBER):
-                parameter.update({bound: source[key] for bound, key in (("min", "minimum"), ("max", "maximum")) if key in source})
-            if kind == SELECT:
-                parameter["options"] = [{"value": value, "label": {"en_US": value}} for value in source["enum"]]
-            declared.append(parameter)
-            mapped.append({"name": name, "part": part, "kind": kind, "required": required})
+            found.append((part, name, field, part_required and name in part_schema.get("required", [])))
+    if IDEMPOTENCY_KEY in schema.get("properties", {}):
+        found.append((TOP_LEVEL, IDEMPOTENCY_KEY, schema["properties"][IDEMPOTENCY_KEY], IDEMPOTENCY_KEY in schema.get("required", [])))
+    return found
+
+
+def nullable(field: dict[str, Any]) -> bool:
+    """Whether an input takes null as a value of its own, such as a folder's parent to move it to the top level."""
+    kinds = field.get("type")
+    options = field.get("anyOf") or field.get("oneOf") or []
+    return (isinstance(kinds, list) and "null" in kinds) or any(option.get("type") == "null" for option in options)
+
+
+def parameters(tool: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """The tool's Dify parameters, and how each one maps onto the Rollstack tool's arguments."""
+    definitions = tool["inputSchema"].get("$defs") or {}
+    declared, mapped = [], []
+    for part, name, field, required in inputs(tool):
+        field = resolve(field, definitions)
+        kind, source = classify(field)
+        shown = label(name, resource(tool) if part == "params" and name == "id" else "")
+        described = field.get("description") or source.get("description") or shown
+        llm = described
+        if kind == LIST:
+            llm += " " + LIST_NOTE
+            if "enum" in source:
+                llm += " Each one of: " + ", ".join(source["enum"]) + "."
+        if nullable(field):
+            llm += " " + NULL_NOTE
+        if kind == JSON:
+            llm += "\n" + JSON_NOTE + "\n" + json_schema(field, definitions)
+        parameter: dict[str, Any] = {
+            "name": name,
+            "type": {SELECT: "select", INTEGER: "number", NUMBER: "number", BOOLEAN: "boolean"}.get(kind, "string"),
+            "required": required,
+            "form": "llm",
+            "label": {"en_US": shown},
+            "human_description": {"en_US": plain(first_sentence(described))},
+            "llm_description": llm,
+        }
+        if kind in (INTEGER, NUMBER):
+            parameter.update({bound: source[key] for bound, key in (("min", "minimum"), ("max", "maximum")) if key in source})
+        if kind == SELECT:
+            parameter["options"] = [{"value": value, "label": {"en_US": value}} for value in source["enum"]]
+        declared.append(parameter)
+        entry = {"name": name, "part": part, "kind": kind, "required": required}
+        if nullable(field):
+            entry["nullable"] = True
+        mapped.append(entry)
     return declared, mapped
 
 

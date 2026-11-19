@@ -42,6 +42,15 @@ parameters:
   human_description:
     en_US: The slides to export, from getReportContent or a reply's changedSlideIds.
   llm_description: The slides to export, from `getReportContent` or a reply's `changedSlideIds`. The file keeps the report's slide order whatever order you list them in. Ids that are not slides of the report are ignored, and so are hidden slides in a PDF. If omitted, the whole report is exported. Pass them as text, separated by commas, or as a JSON array.
+- name: idempotencyKey
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Idempotency key
+  human_description:
+    en_US: A unique value, such as a UUID, that makes retrying this call safe.
+  llm_description: A unique value, such as a UUID, that makes retrying this call safe. A retry with the same key within 24 hours answers the first call's result instead of running it again. Use a new key for each new call. From 1 to 255 printable ASCII characters.
 output_schema:
   type: object
   properties:

@@ -95,6 +95,12 @@
     "part": "body",
     "kind": "text",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -138,6 +144,12 @@
    {
     "name": "link",
     "part": "body",
+    "kind": "text",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
     "kind": "text",
     "required": false
    }
@@ -200,6 +212,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -248,7 +266,8 @@
     "name": "folderId",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "timezone",
@@ -266,6 +285,12 @@
     "name": "notificationMailingList",
     "part": "body",
     "kind": "list",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -357,6 +382,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -393,6 +424,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -418,6 +455,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -440,6 +483,12 @@
     "part": "body",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -500,6 +549,12 @@
     "part": "body",
     "kind": "text",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -529,6 +584,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -621,6 +682,12 @@
     "part": "body",
     "kind": "json",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -655,6 +722,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -688,6 +761,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -716,6 +795,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -755,6 +840,13 @@
     "name": "reportId",
     "part": "body",
     "kind": "text",
+    "required": false,
+    "nullable": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -788,6 +880,13 @@
     "name": "reportId",
     "part": "body",
     "kind": "text",
+    "required": false,
+    "nullable": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -811,6 +910,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -963,6 +1068,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -990,6 +1101,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1016,6 +1133,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1103,6 +1226,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1144,6 +1273,12 @@
     "name": "slideIds",
     "part": "body",
     "kind": "list",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -1313,6 +1448,12 @@
     "part": "body",
     "kind": "list",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1349,6 +1490,12 @@
    {
     "name": "bodyFont",
     "part": "body",
+    "kind": "text",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
     "kind": "text",
     "required": false
    }
@@ -1421,6 +1568,12 @@
     "part": "body",
     "kind": "text",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1481,6 +1634,12 @@
     "part": "body",
     "kind": "text",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1507,6 +1666,12 @@
     "part": "body",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1533,6 +1698,12 @@
     "part": "body",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1560,6 +1731,12 @@
     "part": "body",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1582,6 +1759,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1700,6 +1883,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1725,6 +1914,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1755,6 +1950,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1847,6 +2048,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -1914,6 +2121,13 @@
     "name": "value",
     "part": "body",
     "kind": "json",
+    "required": false,
+    "nullable": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -1967,6 +2181,13 @@
     "name": "value",
     "part": "body",
     "kind": "json",
+    "required": false,
+    "nullable": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -1997,6 +2218,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2048,6 +2275,12 @@
     "part": "body",
     "kind": "select",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2074,6 +2307,12 @@
     "part": "params",
     "kind": "integer",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2102,6 +2341,12 @@
     "part": "body",
     "kind": "select",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2156,6 +2401,12 @@
     "part": "body",
     "kind": "text",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2193,6 +2444,12 @@
     "name": "resolved",
     "part": "body",
     "kind": "boolean",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -2244,6 +2501,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2269,6 +2532,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2424,7 +2693,8 @@
     "name": "smtpServerId",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "sharingFormat",
@@ -2454,6 +2724,12 @@
     "name": "emailAnalyticsEnabled",
     "part": "body",
     "kind": "boolean",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -2486,6 +2762,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2505,6 +2787,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2714,6 +3002,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2744,6 +3038,12 @@
    {
     "name": "folderId",
     "part": "body",
+    "kind": "text",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
     "kind": "text",
     "required": false
    }
@@ -2801,6 +3101,12 @@
     "part": "body",
     "kind": "select",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2837,7 +3143,8 @@
     "name": "name",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "variantIds",
@@ -2873,7 +3180,8 @@
     "name": "smtpServerId",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "to",
@@ -2897,6 +3205,12 @@
     "name": "replyTo",
     "part": "body",
     "kind": "list",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -2936,6 +3250,12 @@
     "part": "body",
     "kind": "list",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2963,6 +3283,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -2989,6 +3315,12 @@
     "name": "variantIds",
     "part": "body",
     "kind": "list",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -3028,6 +3360,12 @@
     "name": "renameFiles",
     "part": "body",
     "kind": "boolean",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -3072,7 +3410,8 @@
     "name": "smtpServerId",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "sharingFormat",
@@ -3109,6 +3448,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3139,7 +3484,8 @@
     "name": "name",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "variantIds",
@@ -3175,7 +3521,8 @@
     "name": "smtpServerId",
     "part": "body",
     "kind": "text",
-    "required": false
+    "required": false,
+    "nullable": true
    },
    {
     "name": "to",
@@ -3199,6 +3546,12 @@
     "name": "replyTo",
     "part": "body",
     "kind": "list",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -3268,6 +3621,12 @@
     "part": "body",
     "kind": "boolean",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3299,6 +3658,12 @@
     "part": "body",
     "kind": "json",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3337,6 +3702,12 @@
     "part": "body",
     "kind": "json",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3369,6 +3740,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3396,6 +3773,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3421,6 +3804,12 @@
     "part": "body",
     "kind": "list",
     "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3445,6 +3834,12 @@
     "part": "body",
     "kind": "list",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3472,6 +3867,12 @@
     "part": "params",
     "kind": "text",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3714,6 +4115,13 @@
     "name": "parentFolderId",
     "part": "body",
     "kind": "text",
+    "required": false,
+    "nullable": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
     "required": false
    }
   ],
@@ -3747,6 +4155,13 @@
    {
     "name": "parentFolderId",
     "part": "body",
+    "kind": "text",
+    "required": false,
+    "nullable": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
     "kind": "text",
     "required": false
    }
@@ -3782,6 +4197,12 @@
     "part": "body",
     "kind": "select",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3808,6 +4229,12 @@
     "part": "params",
     "kind": "integer",
     "required": true
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
+    "kind": "text",
+    "required": false
    }
   ],
   "parts": [
@@ -3828,6 +4255,12 @@
    {
     "name": "operationId",
     "part": "body",
+    "kind": "text",
+    "required": false
+   },
+   {
+    "name": "idempotencyKey",
+    "part": "",
     "kind": "text",
     "required": false
    }

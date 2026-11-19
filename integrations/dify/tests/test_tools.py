@@ -19,7 +19,7 @@ from conftest import FakeResponse, FakeSession, rpc, tool_answer
 from rollstack_client import mcp
 from rollstack_client.mcp import RollstackError
 from rollstack_client.operations import BOOLEAN, INTEGER, JSON, LIST, NUMBER, OPERATIONS, InputError
-from rollstack_client.tooling import IMAGE_SENT
+from rollstack_client.tooling import IMAGE_SENT, IMAGE_UNREADABLE
 
 MessageType = ToolInvokeMessage.MessageType
 
@@ -297,12 +297,39 @@ def test_slide_images_in_the_answer_are_sent_as_image_files(rollstack):
 
     messages = run("getReportSlideImages", {"id": "rep-1", "slideIds": "s-1, s-2"})
 
-    # The model gets the slides without their base64 data, and the user each one as a file
+    # The model gets the slides without their base64 data, and the user each one as a file. A slide whose data
+    # isn't base64 goes out as no file, and says so
     (shown,) = [m.json_object for m in of_type(messages, MessageType.JSON)]
-    assert [item["data"] for item in shown["slides"]] == [IMAGE_SENT, IMAGE_SENT]
+    assert [item["data"] for item in shown["slides"]] == [IMAGE_SENT, IMAGE_UNREADABLE]
     blobs = [m for m in messages if m.type == MessageType.BLOB]
     assert [(m.message.blob, m.meta) for m in blobs] == [(jpeg, {"mime_type": "image/jpeg"})]
     assert variables(messages)["slides"][0]["data"] == IMAGE_SENT
+
+
+def test_an_image_block_that_is_not_base64_is_reported(rollstack):
+    rollstack(rpc({"content": [{"type": "image", "data": "not base64!", "mimeType": "image/png"}]}))
+
+    messages = run("getReportSlideImages", {"id": "rep-1", "slideIds": "s-1"})
+
+    assert [m.text for m in of_type(messages, MessageType.TEXT)] == ["Rollstack sent an image (image/png) that could not be read."]
+    assert [m for m in messages if m.type == MessageType.BLOB] == []
+
+
+def test_an_idempotency_key_the_agent_gives_is_sent_as_it_is(rollstack):
+    # Rollstack's descriptions tell the agent to send one, so that a call it sends again runs once
+    session = rollstack(tool_answer({"id": "rep-2"}))
+
+    run("convertReport", {"id": "rep-1", "idempotencyKey": "convert-rep-1"})
+
+    assert sent(session)["arguments"]["idempotencyKey"] == "convert-rep-1"
+
+
+def test_null_moves_a_folder_to_the_top_level(rollstack):
+    session = rollstack(tool_answer({"id": "fold-1", "parentFolderId": None}))
+
+    run("updateFolder", {"id": "fold-1", "parentFolderId": " null "})
+
+    assert sent(session)["arguments"]["body"] == {"parentFolderId": None}
 
 
 def test_an_image_block_is_sent_as_an_image_file(rollstack):
