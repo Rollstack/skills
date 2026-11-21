@@ -1,6 +1,6 @@
 ---
 name: rollstack-build-deck
-description: Build or change a whole slide deck in Rollstack from company data, such as a BI dashboard, a spreadsheet or a CSV, with Rollstack's slides agent, which does it in one call on the company template, then review and export it. Use when the user asks Rollstack for a deck, QBR, business review, board pack or slides from their data. To write or shape the slides yourself with the user, use rollstack-slides instead.
+description: Build or change a whole slide deck in Rollstack from company data, such as a BI dashboard, a spreadsheet or a CSV, with Rollstack's slides agent, which does it in one call on the company template, writes the takeaways and checks every slide, then review and export it. Use when the user asks Rollstack for a deck, QBR, business review, board pack or slides from their data. If the user hasn't said whether Rollstack's slides agent or you should build the slides, ask them first, in the words the Rollstack MCP server's instructions give. To write or shape the slides yourself with the user, use rollstack-slides instead.
 license: MIT
 ---
 
