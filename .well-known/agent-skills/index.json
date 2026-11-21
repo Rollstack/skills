@@ -11,9 +11,9 @@
     {
       "name": "rollstack-build-deck",
       "type": "skill-md",
-      "description": "Build or change a whole slide deck in Rollstack from company data, such as a BI dashboard, a spreadsheet or a CSV, with Rollstack's slides agent, which does it in one call on the company template, then review and export it. Use when the user asks Rollstack for a deck, QBR, business review, board pack or slides from their data. To write or shape the slides yourself with the user, use rollstack-slides instead.",
+      "description": "Build or change a whole slide deck in Rollstack from company data, such as a BI dashboard, a spreadsheet or a CSV, with Rollstack's slides agent, which does it in one call on the company template, writes the takeaways and checks every slide, then review and export it. Use when the user asks Rollstack for a deck, QBR, business review, board pack or slides from their data. If the user hasn't said whether Rollstack's slides agent or you should build the slides, ask them first, in the words the Rollstack MCP server's instructions give. To write or shape the slides yourself with the user, use rollstack-slides instead.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-build-deck/SKILL.md",
-      "digest": "sha256:0fc15aea577a497ec98e1bb27f97ce39d41ae1398e533e312a6cfedfca3464f1"
+      "digest": "sha256:8375f728860fa7e7316c6ec895312b5bcd74d3377a2baa16adb80fb4d6bd66b4"
     },
     {
       "name": "rollstack-burst-reports",
@@ -39,9 +39,9 @@
     {
       "name": "rollstack-edit-deck",
       "type": "skill-md",
-      "description": "Change the slides of an existing Rollstack slide deck yourself, with the Rollstack MCP tools getReportSlideHtml, renderReportSlides, saveReportSlides and arrangeReportSlides, keeping what people changed in Rollstack's editor. Use when the user asks to reword, fix, add, move, remove, hide or show slides of a deck, or to undo a change to one.",
+      "description": "Change the slides of an existing Rollstack slide deck yourself, with the Rollstack MCP tools getReportSlideHtml, renderReportSlides, saveReportSlides and arrangeReportSlides, keeping what people changed in Rollstack's editor. Use when the user asks to reword, fix, add, move, remove, hide or show slides of a deck, or to undo a change to one. Before writing slides, if the user hasn't said whether Rollstack's slides agent or you should write them, ask them first, in the words the Rollstack MCP server's instructions give. To have Rollstack's slides agent make the change, use rollstack-build-deck instead.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-edit-deck/SKILL.md",
-      "digest": "sha256:96e64feb9ac03babb7f4dfa42fa7bfcc900efb0f46740974234c0e8cf0c74c8f"
+      "digest": "sha256:04543bd49b808ca6fa2e21d6c1b518ed0bf762250e488731e39856d8f52fc9e5"
     },
     {
       "name": "rollstack-getting-started",
@@ -67,16 +67,16 @@
     {
       "name": "rollstack-slides",
       "type": "skill-md",
-      "description": "Write the slides of a Rollstack slide deck yourself, as HTML, check each one with the Rollstack MCP tool renderReportSlides and save them with saveReportSlides. Use when the user wants to shape the slides with you, or gives you material Rollstack can't read, such as files or notes in this chat. To have Rollstack's slides agent build a whole deck in one call on the company template, use rollstack-build-deck instead.",
+      "description": "Write the slides of a Rollstack slide deck yourself, as HTML, check each one with the Rollstack MCP tool renderReportSlides and save them with saveReportSlides. Use when the user wants to shape the slides with you, or gives you material Rollstack can't read, such as files or notes in this chat. If the user hasn't said whether Rollstack's slides agent or you should build the slides, ask them first, in the words the Rollstack MCP server's instructions give. To have Rollstack's slides agent build a whole deck in one call on the company template, use rollstack-build-deck instead.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-slides/SKILL.md",
-      "digest": "sha256:3a6eda6555917164656f58ffb2b59cd9cba3206945c353a30067254aa871d8d4"
+      "digest": "sha256:4640047492e030fda38d2e4a4173ba0070ebe8dc67f2ae7b2b23dcab0fda128d"
     },
     {
       "name": "rollstack-update-deck",
       "type": "skill-md",
-      "description": "Refresh a Rollstack slide deck with new data, such as this month's numbers or a newer version of a file, and fix the slides the new data made wrong yourself, with the Rollstack MCP tools replaceDataset, startReportRun, getReportSlideImages and saveReportSlides. Use when the user gives you a newer file for a deck, or wants you to roll a deck forward and fix its slides. To refresh a deck from its sources and let Rollstack repair its slides, or to schedule its updates, use rollstack-refresh-and-schedule instead.",
+      "description": "Refresh a Rollstack slide deck with new data, such as this month's numbers or a newer version of a file, and fix the slides the new data made wrong yourself, with the Rollstack MCP tools replaceDataset, startReportRun, getReportSlideImages and saveReportSlides. Use when the user gives you a newer file for a deck, or wants you to roll a deck forward and fix its slides. If the user hasn't said whether Rollstack or you should fix the slides, ask them first, in the words the Rollstack MCP server's instructions give. To refresh a deck from its sources and let Rollstack repair its slides, or to schedule its updates, use rollstack-refresh-and-schedule instead.",
       "url": "https://raw.githubusercontent.com/Rollstack/skills/main/skills/rollstack-update-deck/SKILL.md",
-      "digest": "sha256:b3d4ace71c5d429144a5d120a0795755bd2feef0a25fd0aa48e2e0f36d1157a2"
+      "digest": "sha256:a57ce376b3279c88e00d30d73006233948bd6812a9eab9c0e73f3878073fbb4c"
     }
   ]
 }

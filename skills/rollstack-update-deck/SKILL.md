@@ -1,6 +1,6 @@
 ---
 name: rollstack-update-deck
-description: Refresh a Rollstack slide deck with new data, such as this month's numbers or a newer version of a file, and fix the slides the new data made wrong yourself, with the Rollstack MCP tools replaceDataset, startReportRun, getReportSlideImages and saveReportSlides. Use when the user gives you a newer file for a deck, or wants you to roll a deck forward and fix its slides. To refresh a deck from its sources and let Rollstack repair its slides, or to schedule its updates, use rollstack-refresh-and-schedule instead.
+description: Refresh a Rollstack slide deck with new data, such as this month's numbers or a newer version of a file, and fix the slides the new data made wrong yourself, with the Rollstack MCP tools replaceDataset, startReportRun, getReportSlideImages and saveReportSlides. Use when the user gives you a newer file for a deck, or wants you to roll a deck forward and fix its slides. If the user hasn't said whether Rollstack or you should fix the slides, ask them first, in the words the Rollstack MCP server's instructions give. To refresh a deck from its sources and let Rollstack repair its slides, or to schedule its updates, use rollstack-refresh-and-schedule instead.
 license: MIT
 ---
 

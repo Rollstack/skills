@@ -1,6 +1,6 @@
 ---
 name: rollstack-edit-deck
-description: Change the slides of an existing Rollstack slide deck yourself, with the Rollstack MCP tools getReportSlideHtml, renderReportSlides, saveReportSlides and arrangeReportSlides, keeping what people changed in Rollstack's editor. Use when the user asks to reword, fix, add, move, remove, hide or show slides of a deck, or to undo a change to one.
+description: Change the slides of an existing Rollstack slide deck yourself, with the Rollstack MCP tools getReportSlideHtml, renderReportSlides, saveReportSlides and arrangeReportSlides, keeping what people changed in Rollstack's editor. Use when the user asks to reword, fix, add, move, remove, hide or show slides of a deck, or to undo a change to one. Before writing slides, if the user hasn't said whether Rollstack's slides agent or you should write them, ask them first, in the words the Rollstack MCP server's instructions give. To have Rollstack's slides agent make the change, use rollstack-build-deck instead.
 license: MIT
 ---
 
